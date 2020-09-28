@@ -49,11 +49,9 @@ public:
   bool    aligned ( Facet ID ) const { return m_aligned[ID]; }
   CubeID  groupID (   void   ) const { return m_groupID;     }
 
-  const std::string& toString() const
-  {
-    return m_readable;
-  }
-
+  const std::string& toString () const { return m_readable;         }
+  operator        const char* () const { return m_readable.c_str(); }
+  
   static char token ( Facet F ) { return Token[ F ]; }
 };
 
