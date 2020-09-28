@@ -13,4 +13,4 @@ add_subdirectory(test)
 
 add_executable(rubikg main.cpp)
 
-target_link_libraries(rubikg core cli)
+target_link_libraries(rubikg core cli test)
