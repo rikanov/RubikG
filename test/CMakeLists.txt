@@ -7,7 +7,6 @@ include_directories(../engine/include)
 
 link_directories(../build/core)
 
-add_library(test source/test.cpp)
+add_library(test source/test.cpp source/u_simplex.cpp)
 
-#target_link_libraries(test core)
 
