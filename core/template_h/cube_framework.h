@@ -158,7 +158,7 @@ Facet CFramework<N>::getFacet ( const Facet right, const Facet up, int x, int y 
   
   const CubeID trans  = Simplex::GetGroupID   ( right, up ); 
   const CubeID inv    = Simplex::Inverse      ( trans ); 
-  const Facet  facet  = Simplex::FrontSide    ( right, up ); // = Simplex::GetCube( trans ).whatIs( _F );
+  const Facet  facet  = OCube::FrontSide    ( right, up ); // = Simplex::GetCube( trans ).whatIs( _F );
   const int    index  = CPositions<N>::GetIndex ( x, y, N - 1, inv );
   
   return getCube ( index ).whatIs( facet );

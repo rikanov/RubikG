@@ -2,45 +2,7 @@
 
 Simplex * Simplex::Singleton = nullptr;
 
- /**************************************************************************************************************************
-  * 
-  * All the 24 simplex cube orientations are represented as the indices of two given direction (Up and Right in our case).  
-  *                                                                                                                      
-  * The simplexFrontSide[][] array contains the Front side indices belonging to the given up and Right indices,     
-  * so we can determine all the other indices for any direction. (by using SideOpposite() function)
-  * Example: if the Left facet lies on upside and the Down facet on the right, the front facet is:
-  * 
-  * Facet front = simplexFrontSide[ Down = 3 ][ Left = 4 ] = Back (aka 5)
-  * 
-  *************************************************************************************************************************/
-
-Simplex::Simplex() :
-    simplexFrontSide
-{
-
-    // Front   Right     Up   Down    Left   Back
-    // --------------------------------------------
-    {  _NF,     _U,     _L,    _R,     _D,    _NF },  // Front
-    {   _D,    _NF,     _F,    _B,    _NF,     _U },  // Right
-    {   _R,     _B,    _NF,   _NF,     _F,     _L },  // Up
-    {   _L,     _F,    _NF,   _NF,     _B,     _R },  // Down
-    {   _U,    _NF,     _B,    _F,    _NF,     _D },  // Left
-    {  _NF,     _D,     _R,    _L,     _U,    _NF }   // Back
-    // --------------------------------------------
-
-     /*******************************************************
-      *                                                                                                                  
-      *       Notice the function symmetries:                                                 
-      *                                                                                                                  
-      *   - Swapping directions gives opposite side index                          
-      *   - Using opposite side for one of the directions                        
-      *     gives the opposite side index                                                                   
-      *   - Using opposite sides for both direction gives                            
-      *     the same side index                                                                         
-      *                                                                                                                  
-      ********************************************************/
-
-}
+Simplex::Simplex()
 {
   // Constructor body
   Singleton = this;
@@ -61,10 +23,10 @@ void Simplex::init()
         simplexGroupID [ right ][ up ] = _NF;
         continue;
       }
-      CubeID front = FrontSide( right, up );
+      CubeID front = OCube::FrontSide( right, up );
       const int index = 4 * front + lastRadix [ front ]++;
       simplexGroupID [ right ][ up ] = index;
-      simplexGroup [ index ].init ( right, up );
+      simplexGroup [ index ].init ( right, up, index );
        // created all the 24 orientation of a simplex and store them in an array
       //  indexed by their group ID
     }
@@ -88,7 +50,7 @@ void Simplex::initGroup()
 
       const CubeID c = GetGroupID ( cr, cu );
 
-      composition	[a][b] = c;
-      transform	[a][c] = b;
+      composition [a][b] = c;
+      transform   [a][c] = b;
     }
 }

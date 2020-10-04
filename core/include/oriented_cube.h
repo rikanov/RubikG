@@ -31,7 +31,8 @@
 
 class OCube
 {
-  static const char Token [7];
+  static const char  Token [7];
+  static const Facet FrontSides [ 6 /*Right*/ ][ 6 /*Up*/ ];
 
   Facet  m_whereIs [6];
   Facet  m_whatIs  [6];
@@ -42,7 +43,7 @@ class OCube
 
 public:
   OCube( ) = default;
-  void init ( Facet R, Facet U );
+  void init ( Facet R, Facet U, CubeID groupID );
 
   Facet   whereIs ( Facet ID ) const { return m_whereIs[ID]; }
   Facet	  whatIs  ( Facet ID ) const { return m_whatIs[ID];  }
@@ -53,6 +54,7 @@ public:
   operator        const char* () const { return m_readable.c_str(); }
   
   static char token ( Facet F ) { return Token[ F ]; }
+  static Facet FrontSide ( Facet r, Facet u ) { return FrontSides[r][u]; }
 };
 
 #endif // !ORIENTED_CUBE_HEADER

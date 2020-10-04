@@ -34,20 +34,19 @@ private: // functions
   void initGroup();
 
 private: // array datamembers
-  const Facet            simplexFrontSide [ 6 /*Right*/ ][ 6 /*Up*/ ];
   OCube                  simplexGroup     [ 24 /* ID */ ];
   CubeID                 simplexGroupID   [ 6 /*Right*/ ][ 6 /*Up*/ ];
   CubeID /* X: [0 23] */ composition      [ 24 /* A */  ][ 24 /*B*/ ]; // X = AB
   CubeID /* X: [0 23] */ transform        [ 24 /* A */  ][ 24 /*B*/ ]; // AX = B => X = inv(A) B
   
 public:
+
   // create a singleton object
   static void          instance    ( )                          { if ( Singleton == nullptr ) new Simplex;   }
   static void          onExit      ( )                          { delete Singleton; Singleton = nullptr;     }
   static const OCube & GetCube     ( CubeID ID )                { return Singleton->simplexGroup [ID];       }
   static const OCube & GetCube     ( Facet r, Facet u )         { return GetCube( GetGroupID( r, u ) );      }
   static CubeID        GetGroupID  ( Facet r, Facet u )         { return Singleton->simplexGroupID [r][u];   }
-  static Facet         FrontSide   ( Facet r, Facet u )         { return Singleton->simplexFrontSide [r][u]; }
   static CubeID        Composition ( CubeID a, CubeID b )       { return Singleton->composition [a][b];      }
   static CubeID        Transform   ( CubeID a, CubeID b )       { return Singleton->transform [a][b];        }
   static CubeID        Inverse     ( CubeID a )                 { return Singleton->transform [a][0];        } 
