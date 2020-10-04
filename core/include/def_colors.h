@@ -13,7 +13,9 @@ namespace Color
 {
   enum Code {
 #ifdef _WIN32
-    DEFAULT       = 0, 
+    DEFAULT       = 7, 
+	BOLD          = FOREGROUND_INTENSITY,
+	ULINE         = FOREGROUND_INTENSITY,
     BLACK         = 0,
     BLUE          = 1,
     GREEN         = 2,

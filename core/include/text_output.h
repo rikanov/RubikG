@@ -2,11 +2,17 @@
 #define TEXT_OUTPUT__H
 
 
-#include <stdio.h>
+#include <cstdlib>
 #include <iostream>
 #include <string>
 
 #include "def_colors.h"
+
+// clear screen ToDo
+inline void CLS()
+{
+  if ( system( "CLS" ) ) system( "clear" );
+}
 
 // new line
 inline void NL()
