@@ -7,8 +7,10 @@ class UnitTests
 {
 private:
   
-  static void head( const std::string& unit );
-  static void tail( const std::string& unit, bool success );
+  static void head   ( const std::string& unit );
+  static void tail   ( const std::string& unit, bool success );
+  static void finish ( const std::string& unit, bool success );
+  static void stamp  ( bool success, bool& result );
   
    // Unit tests of base classes (core folder)
   // -----------------------------------------
@@ -18,7 +20,7 @@ private:
   bool unit_CFramework() const; // cube_framework.h
   
 public:
-  bool run() const;
+  bool testCore() const;
   
 };
 

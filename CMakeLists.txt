@@ -5,7 +5,7 @@ project(rubikg)
 include_directories( core/include )
 include_directories( core/template_h )
 include_directories( CLi/include )
-include_directories( test/include )
+include_directories( test )
 
 add_subdirectory(core)
 add_subdirectory(CLi)

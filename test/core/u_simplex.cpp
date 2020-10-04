@@ -3,14 +3,14 @@
 
 bool UnitTests::unit_Simplex() const
 {
-  bool result = true;
+  bool resultGroup = true;
   
   head( "Simplex" );
-  clog( Color::gray, "Start Simplex instance..." );
+  clog_( Color::gray, "Start Simplex instance..." );
   Simplex::instance();
-  clog("Done." );
+  clog( Color::gray, "Done." );
   NL();
-  
+  clog( Color::white, "Testing group operations" );
   // test cases
   Facet testCases[10][3][2]  = 
                               {/*       A           B      expected AxB  */
@@ -31,26 +31,31 @@ bool UnitTests::unit_Simplex() const
     const Facet rA = c[0][0], uA = c[0][1];
     const Facet rB = c[1][0], uB = c[1][1];
     const Facet rC = c[2][0], uC = c[2][1];
-    CubeID A = Simplex::GetGroupID( rA , uA );
-    CubeID B = Simplex::GetGroupID( rB , uB );
-    CubeID C = Simplex::GetGroupID( rC , uC );
-    CubeID T = Simplex::Composition( A , B );
+    CubeID A = Simplex::GetGroupID ( rA , uA );
+    CubeID B = Simplex::GetGroupID ( rB , uB );
+    CubeID C = Simplex::GetGroupID ( rC , uC );
+	CubeID T = Simplex::Transform  ( A  , C  );
+    CubeID X = Simplex::Composition( A  , B  );
     clog_( Color::blue, Simplex::GetCube( A ), 'X', Simplex::GetCube( B ), '=', Simplex::GetCube( C ), '\t' );
-    if ( C == T )
-    {
-      clog( Color::green, "OK" );
-    }
-    else
-    {
-      clog( Color::red, "NO OK!" );
-      result = false;
-    }
+	stamp( C == X && B == T, resultGroup );
   }
   
-  NL();
-  clog( Color::gray, Color::uline, "Simplex exit." );
+  tail( "Group operation test", resultGroup );
+  
+  clog( Color::white, "Testing inverses..." );
+  bool resultInverse = true;
+  all_id( cube )
+  {
+	  CubeID inv = Simplex::Inverse( cube );
+	  clog_( Color::blue, "The inverse of", Simplex::GetCube( cube ), "is", Simplex::GetCube( inv ) );
+	  stamp( Simplex::Composition( cube, inv ) == 0 /* identity */, resultInverse );
+  }
+  tail( "Test inverse function" , resultInverse );
+  clog_( Color::gray, "Simplex exit..." );
   Simplex::onExit();
-  clog("Done." );
-  tail( "Simplex", result );
+  clog( Color::gray, "Done." );
+
+  const bool result = resultGroup && resultInverse;
+  finish( "Simplex", result );
   return result;
 }
