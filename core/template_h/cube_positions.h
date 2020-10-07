@@ -32,14 +32,12 @@ static const bool SHOW_LOG = false;
 
 struct Coord 
 {
-  unsigned int x = 0; 
-  unsigned int y = 0; 
-  unsigned int z = 0;    
+  unsigned int x = 0;
+  unsigned int y = 0;
+  unsigned int z = 0; 
   std::string toString() const 
   { 
-    char buff[13]; 
-    sprintf(buff, "<%2d %2d %2d >", x, y, z); 
-    return std::string(buff);
+    return "< " + std::to_string( x ) + ' ' + std::to_string( y ) + ' ' + std::to_string( z ) + " >";
   }
 };
 
