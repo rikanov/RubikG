@@ -50,11 +50,10 @@ class CPositions
   static constexpr unsigned int FrameworkSize [] = { 0, 1, 8 - 0, 27 - 1, 64 - 8, 125 - 27, 216 - 64, 341 - 125, 512 - 216, 721 - 341, 1000 - 512 }; //  N > 1 :  N ^ 3 - ( N - 2 ) ^ 3
   static CPositions * Singleton; 
   
-  const int frameworkSize;
-  int **    routerPositions;
-  int       frameworkSlice [ 3 ] [ N ] [ N * N ]; // [axis] [slice index] [cubes] 
-  int       coordToIndex   [ N ] [ N ] [ N ];
-  Coord     indexToCoord   [ FrameworkSize [ N ] ];
+  int   routerPositions [ FrameworkSize [ N ] ][ 24 ];
+  int   frameworkSlice  [ 3 ] [ N ] [ N * N ]; // [axis] [slice index] [cubes] 
+  int   coordToIndex    [ N ] [ N ] [ N ];
+  Coord indexToCoord    [ FrameworkSize [ N ] ];
 
   CPositions();
   ~CPositions();
@@ -71,7 +70,7 @@ class CPositions
 public:
   static void  Instance ( )                     { if ( Singleton == nullptr ) new CPositions<N>;  }
   static void  OnExit   ( )                     { delete Singleton; Singleton = nullptr;          }
-  static int   GetSize  ( )                     { return Singleton->frameworkSize;                }
+  static int   GetSize  ( )                     { return Singleton->FrameworkSize [ N ];          }
   static bool  ValID    ( int id )              { return 0 <= id && id < GetSize();               }
   static Coord GetCoord ( int id )              { return Singleton->indexToCoord [ id ];          }
   static int   GetPlace ( int id, int rot)      { return Singleton->routerPositions[ id ][ rot ]; }
@@ -88,14 +87,8 @@ CPositions<N> * CPositions<N>::Singleton = nullptr;
 
 template<unsigned int N>
 CPositions<N>:: CPositions( )
-  :frameworkSize   ( FrameworkSize[N] )
 {
   Singleton = this;
-  routerPositions = new int* [ frameworkSize ];
-  for ( int id = 0; id < frameworkSize; ++id )
-  {
-	routerPositions[id] = new int [24];
-  }
   initPositions();
 }
 
@@ -134,10 +127,10 @@ void CPositions<N>::initIndices()
       indexToCoord [index] = { x, y, z };
       coordToIndex [ x ][ y ][ z ] = index++;
     }
-	else
-	{
+    else
+    {
       coordToIndex[ x ][ y ][ z ] = -1;
-	}
+    }
   } // getIndex() is fully working now
 }
 
@@ -163,12 +156,6 @@ void CPositions<N>::initPositions()
 template<unsigned int N>
 CPositions<N>:: ~CPositions( )
 {
-  for ( int id = 0; id < frameworkSize; ++id )
-  {
-    delete[] routerPositions[id] ;
-  }
-  delete[] routerPositions;
-  routerPositions = nullptr;
 }
 
 #endif // TOPOLOGY_H
