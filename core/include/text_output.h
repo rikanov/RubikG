@@ -8,6 +8,8 @@
 
 #include "def_colors.h"
 
+static Color::Modifier Default = Color::off;
+
 // clear screen ToDo
 inline void CLS()
 {
@@ -20,14 +22,14 @@ inline void NL()
   std::cout << std::endl;
 }
 
-// color off & new line --> writing color will turn gray
-inline void coff()
+// set text color & new line
+inline void NL( Color::Modifier c )
 {
-	std::cout << Color::gray << std::endl;
+  std::cout << c << std::endl;
 }
 
-  // basic characters print out
- // ---------------------------
+  // basic text messages
+ // --------------------
 template <typename T>
 void clog_ (T t) 
 {
@@ -51,7 +53,7 @@ void clog_ (T t, Args... args)
 template <typename T>
 void clog (T t) 
 {
-  std::cout << t << Color::off << std::endl ;
+  std::cout << t << std::endl ;
 }
 
 template<typename T, typename... Args>
@@ -61,25 +63,38 @@ void clog (T t, Args... args) // recursive variadic function
   clog  ( args... ) ;
 }
 
- // wide characters print out
-// --------------------------
-template <typename T>
-void wlog_ (T t) 
+ // basic text messages with given separator
+// -----------------------------------------
+template < typename T>
+void slog_ ( const char * sep, T t) 
 {
-  std::wcout << t << ' ';
+  if ( typeid( t ) != typeid( Color::Modifier ) )
+  {
+    std::cout << t << sep;
+  }
+  else
+  {
+    std::cout << t;
+  }
+}
+template < typename T, typename... Args>
+void slog_ ( const char * sep, T t, Args... args ) 
+{
+  slog_ ( sep, t );
+  slog_ ( sep, args... );
 }
 
-template <typename T>
-void wlog (T t) 
+template < typename T >
+void slog ( const char * sep, T t) 
 {
-  std::wcout << t << std::endl ;
+  std::cout << t << std::endl ;
 }
 
-template<typename T, typename... Args>
-void wlog (T t, Args... args) // recursive variadic function
+template< typename T, typename... Args >
+void slog ( const char * sep, T t, Args... args) // recursive variadic function
 {
-  wlog_ ( t );
-  wlog  ( args...) ;
+  slog_ ( sep, t );
+  slog  ( sep, args... ) ;
 }
 
 // logger
@@ -87,6 +102,5 @@ inline void clogPos(const char * text)
 {
   clog( text, std::string("\t@  ") + std::string(__FILE__) + std::to_string(__LINE__) );
 }
-
 
 #endif // ! TEXT_OUTPUT__H
