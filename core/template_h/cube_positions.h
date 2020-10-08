@@ -17,12 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TOPOLOGY_H
-#define TOPOLOGY_H
+#ifndef CUBE_POSITIONS_H
+#define CUBE_POSITIONS_H
 
 #include  "simplex.h"
 
-static const bool SHOW_LOG = false;
+static const bool SHOW_LOG = false; // setting true is only for debuging purposes
 
 #define for_vector( x,y,z, N )           \
   for ( unsigned int x = 0; x < N; ++x )  \
@@ -54,8 +54,7 @@ class CPositions
   Coord indexToCoord    [ FrameworkSize [ N ] ];
 
   CPositions();
-  ~CPositions();
-
+  
   Coord rotate ( int x, int y, int z, CubeID rot ); // an auxiliary function for inner calculations
   Coord rotate ( const Coord C, CubeID rot )        { return rotate( C.x, C.y, C.z, rot ); }
   
@@ -66,14 +65,16 @@ class CPositions
   static int* GetNode  ( int x, int y, int z )   { return GetNode( GetIndex ( x, y, z) );   }
 
 public:
+  static constexpr int GetSize ( ) { return Singleton->FrameworkSize [ N ]; }
+  
   static void  Instance ( )                     { if ( Singleton == nullptr ) new CPositions<N>;  }
   static void  OnExit   ( )                     { delete Singleton; Singleton = nullptr;          }
-  static int   GetSize  ( )                     { return Singleton->FrameworkSize [ N ];          }
   static bool  ValID    ( int id )              { return 0 <= id && id < GetSize();               }
   static Coord GetCoord ( int id )              { return Singleton->indexToCoord [ id ];          }
   static int   GetPlace ( int id, int rot)      { return Singleton->routerPositions[ id ][ rot ]; }
   static int   GetIndex ( int x, int y, int z ) { return Singleton->coordToIndex[ x ][ y ][ z ];  }
   static int   GetIndex ( const Coord & C )     { return GetIndex( C.x, C.y, C.z);                }
+  
   static int   GetIndex ( int x, int y, int z, CubeID rot ) { return GetNode( x, y, z ) [ rot ];                  }
   static int   GetSlice ( Axis a, int sl, int id )          { return Singleton->frameworkSlice [ a ][ sl ][ id ]; }
 
@@ -150,10 +151,4 @@ void CPositions<N>::initPositions()
     }
   }
 }
-
-template<unsigned int N>
-CPositions<N>:: ~CPositions( )
-{
-}
-
-#endif // TOPOLOGY_H
+#endif // CUBE_POSITIONS_H
