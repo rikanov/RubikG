@@ -29,21 +29,17 @@ class CFramework
 {
   static  CFramework<N> * BasicMoves;
 
-  CubeID * frameworkSpace;
+  CubeID frameworkSpace [ CPositions<N>::GetSize() ];
 
 public:
 
   // Constructors
-  CFramework( void );
+  CFramework( void ) = default;
   CFramework( const CFramework<N>&, const CFramework<N>& );
-  CFramework( CFramework<N>&& f );
   
   // Operations
   CFramework<N> inverse (void);
   void rot( Axis, int );
-  
-  // Destructor
-  ~CFramework( );
   
   // Query functions
   CubeID     getCubeID ( int id  ) const { return frameworkSpace[id];                   }
@@ -70,32 +66,18 @@ public:
 
 /// ----------------------------------- Template definitions starts here ------------------------------------- ///
 
- // Constructors
-//  ------------
 template<unsigned int N>
 CFramework<N> * CFramework<N>::BasicMoves = nullptr;
 
-template<unsigned int N>
-CFramework<N>::CFramework( )
-{
-  frameworkSpace = new CubeID [ CPositions<N>::GetSize() ] ();
-}
-
+ // Conmposition of two cubes --> construct a new one
+//  -------------------------------------------------
 template<unsigned int N>
 CFramework<N>::CFramework( const CFramework<N> & cf1, const CFramework<N> & cf2 )
 {
-  frameworkSpace = new CubeID [ CPositions<N>::GetSize() ];
   for ( int id = 0; id < CPositions<N>::GetSize(); ++id )
   {
-    frameworkSpace[id] = Simplex::Composition( cf2.getCubeID( id ), cf1.getCubeID( id ) );
+    frameworkSpace[id] = Simplex::Composition( cf2.getCubeID( id ), cf1.getCubeID( id ) ); // group opreation for each cubes
   }    
-}
-
-template<unsigned int N>
-CFramework<N>::CFramework( CFramework<N> && f )
-{ 
-  frameworkSpace = f.frameworkSpace;
-  f.frameworkSpace = nullptr;
 }
 
  // Operations
@@ -156,8 +138,8 @@ Facet CFramework<N>::getFacet ( const Facet right, const Facet up, int x, int y 
     return _NF;
   }
   
-  const CubeID trans  = Simplex::GetGroupID   ( right, up ); 
-  const CubeID inv    = Simplex::Inverse      ( trans ); 
+  const CubeID trans  = Simplex::GetGroupID ( right, up ); 
+  const CubeID inv    = Simplex::Inverse    ( trans ); 
   const Facet  facet  = OCube::FrontSide    ( right, up ); // = Simplex::GetCube( trans ).whatIs( _F );
   const int    index  = CPositions<N>::GetIndex ( x, y, N - 1, inv );
   
@@ -239,15 +221,4 @@ void CFramework<N>::print( bool separator ) const
   }
   coff();
 }
-
-
- // Destructor
-//  ----------
-template<unsigned int N>
-CFramework<N>::~CFramework()
-{
-  delete[] frameworkSpace;
-  frameworkSpace = nullptr;
-}
-
 #endif
