@@ -70,15 +70,14 @@ public:
 
 /// ----------------------------------- Template definitions starts here ------------------------------------- ///
 
+ // Constructors
+//  ------------
 template<unsigned int N>
 CFramework<N> * CFramework<N>::BasicMoves = nullptr;
 
- // Constructors
-// -------------
 template<unsigned int N>
 CFramework<N>::CFramework( )
 {
-  // set all element to zero --> i.e. the identity element of the Simplex group
   frameworkSpace = new CubeID [ CPositions<N>::GetSize() ] ();
 }
 
@@ -86,14 +85,14 @@ CFramework<N>::CFramework( )
 template<unsigned int N>
 CFramework<N>::CFramework( const CFramework<N> & cf1, const CFramework<N> & cf2 )
 {
-  frameworkSpace = new CubeID [ CPositions<N>::GetSize() ];
+  frameworkSpace = new CubeID [ CPositions<N>::GetSize() ] ();
   for ( int id = 0; id < CPositions<N>::GetSize(); ++id )
   {
-    frameworkSpace[id] = Simplex::Composition( cf2.getCubeID( id ), cf1.getCubeID( id ) );
-  }    
+    const int position = CPositions<N>::GetIndex( id, Simplex::Inverse( cf2.getCubeID( id ) ) );
+    frameworkSpace[ id ] = Simplex::Composition( cf1.getCubeID( position ), cf2.getCubeID( id ) );
+  }
 }
 
-// move constructor
 template<unsigned int N>
 CFramework<N>::CFramework( CFramework<N> && f )
 { 
@@ -106,12 +105,14 @@ CFramework<N>::CFramework( CFramework<N> && f )
 template<unsigned int N> 
 CFramework<N> CFramework<N>::inverse()
 {
- CFramework<N> inv;
- for ( int id = 0; id < CPositions<N>::GetSize(); ++id )
- {
-   inv.frameworkSpace[ id ] = Simplex::Inverse( frameworkSpace[ id ] );
- }
- return inv;
+  CFramework<N> inv;
+  for ( int id = 0; id < CPositions<N>::GetSize(); ++id )
+  {
+    const CubeID rotinv = Simplex::Inverse( frameworkSpace[ id ] );
+    const int position = CPositions<5>::GetIndex( id, rotinv );
+    inv.frameworkSpace[ position ] = rotinv;
+  }
+  return inv;
 }
 
 template<unsigned int N> 
@@ -128,7 +129,7 @@ void CFramework<N>::rot( Axis axis, int slice )
   }
   for ( int index = 0; index < cubes; ++index ) // apply stored assignments
   {
-    frameworkSpace[ CPositions<N>::GetPlace( socket[index], Simplex::Tilt( axis ) ) ] = state[ index ];
+    frameworkSpace[ CPositions<N>::GetIndex( socket[index], Simplex::Tilt( axis ) ) ] = state[ index ];
   }
 }
 
@@ -242,6 +243,7 @@ void CFramework<N>::print( bool separator ) const
   }
   NL( Color::gray );
 }
+
 
  // Destructor
 //  ----------
