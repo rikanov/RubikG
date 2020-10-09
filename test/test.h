@@ -11,6 +11,7 @@ private:
   static void tail   ( const std::string& unit, bool success );
   static void finish ( const std::string& unit, bool success );
   static void stamp  ( bool success, bool& result );
+  static void done   ();
   
    // Unit tests of base classes (core folder)
   // -----------------------------------------

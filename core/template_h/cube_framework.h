@@ -65,7 +65,7 @@ public:
 #ifdef _WIN32
   static const char FChar[] = { (char) 254u, '\0' };
 #else
-  static const char FChar = (char) 254u;
+  static const char FChar[] = "■";
 #endif
 
 /// ----------------------------------- Template definitions starts here ------------------------------------- ///

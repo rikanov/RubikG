@@ -53,6 +53,12 @@ void UnitTests::finish(const std::string& unit, bool success)
   clog( std::string( 23 + unit.length(), '-' ) );
   NL();
   NL();  
-  clog( "Press", Color::white, "ENTER", Color::off,"to end." ); 
+  clog( Color::off, "Press", Color::white, "ENTER", Color::off,"to end." ); 
   std::cin.get();
 }
+
+void UnitTests::done()
+{ 
+  clog( Color::white, Color::uline, "Done.", Color::off ); 
+} 
+
