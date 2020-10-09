@@ -71,7 +71,7 @@ public:
   static void  OnExit   ( )                     { delete Singleton; Singleton = nullptr;          }
   static bool  ValID    ( int id )              { return 0 <= id && id < GetSize();               }
   static Coord GetCoord ( int id )              { return Singleton->indexToCoord [ id ];          }
-  static int   GetPlace ( int id, int rot)      { return Singleton->routerPositions[ id ][ rot ]; }
+  static int   GetIndex ( int id, CubeID rot)   { return Singleton->routerPositions[ id ][ rot ]; }
   static int   GetIndex ( int x, int y, int z ) { return Singleton->coordToIndex[ x ][ y ][ z ];  }
   static int   GetIndex ( const Coord & C )     { return GetIndex( C.x, C.y, C.z);                }
   
