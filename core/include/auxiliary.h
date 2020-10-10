@@ -1,7 +1,7 @@
 #ifndef AUXILIARY__H
 #define AUXILIARY__H
 
-#include "global.h"
+#include <def_colors.h>
 
  // Auxiliary types
 // ----------------

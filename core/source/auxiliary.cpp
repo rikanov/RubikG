@@ -1,4 +1,4 @@
-#include "auxiliary.h"
+#include <auxiliary.h>
 
 
  // Auxiliary functions

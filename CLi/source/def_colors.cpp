@@ -1,4 +1,4 @@
-#include "def_colors.h"
+#include <def_colors.h>
 
 
 namespace Color 
@@ -6,6 +6,7 @@ namespace Color
   Modifier off    ( DEFAULT    );
   Modifier bold   ( BOLD       );
   Modifier uline  ( ULINE      );
+  Modifier flash  ( FLASH      );
   Modifier black  ( BLACK      );
   Modifier red    ( LIGHT_RED  );
   Modifier blue   ( LIGHT_BLUE );

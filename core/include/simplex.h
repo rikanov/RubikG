@@ -20,7 +20,7 @@
 #ifndef SIMPLEX_HEADER
 #define SIMPLEX_HEADER
 
-#include "oriented_cube.h"
+#include <oriented_cube.h>
 
 class Simplex
 {

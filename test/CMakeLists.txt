@@ -6,7 +6,8 @@ include_directories(../core/template_h)
 include_directories(../CLi/include)
 include_directories(../engine/include)
 
-link_directories(../build/core)
+find_library( CLi  REQUIRED )
+find_library( core REQUIRED )
 
 add_library(test  test.h
                   common/test_common.cpp
@@ -16,3 +17,4 @@ add_library(test  test.h
                  )
 
 
+target_link_libraries( test cli core )

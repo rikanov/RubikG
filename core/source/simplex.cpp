@@ -1,4 +1,4 @@
-#include "simplex.h"
+#include <simplex.h>
 
 Simplex * Simplex::Singleton = nullptr;
 

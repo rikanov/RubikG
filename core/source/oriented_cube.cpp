@@ -1,4 +1,4 @@
-#include "oriented_cube.h"
+#include <oriented_cube.h>
 
 const char OCube::Token [7] = "FRUDLB";
 

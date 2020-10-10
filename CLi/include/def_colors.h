@@ -1,7 +1,7 @@
 #ifndef COLORS_DEFINED__
 #define COLORS_DEFINED__
 
-#include<iostream>
+#include <iostream>
 
 
 #ifdef _WIN32
@@ -36,6 +36,7 @@ namespace Color
     DEFAULT       = 0,
     BOLD          = 1,
     ULINE         = 4,
+    FLASH         = 5,
     BLACK         = 30, 
     RED           = 31, 
     GREEN         = 32, 
@@ -92,7 +93,7 @@ namespace Color
   extern Modifier off;
   extern Modifier bold;
   extern Modifier uline;
-
+  extern Modifier flash;
   extern Modifier black;
   extern Modifier red;
   extern Modifier blue;

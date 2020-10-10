@@ -1,10 +1,10 @@
 #CLi
 include_directories(include)
-include_directories(../core/include)
-include_directories(../core/template_h)
 
-link_directories(../build/core)
 
-add_library(cli source/cli.cpp )
-
-target_link_libraries(cli core)
+add_library(cli source/_intro_screen.cpp
+                source/def_colors.cpp 
+                source/cli.cpp
+                source/repl.cpp
+                source/repl_autocomp.cpp
+            )

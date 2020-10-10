@@ -1,7 +1,7 @@
 #ifndef BASIC_ROTATIONS__H
 #define BASIC_ROTATIONS__H
 
-#include "auxiliary.h"
+#include <auxiliary.h>
 
 // brief: simple auxiliary template functions to handle basic rotation IDs for the sake of lower memory usage
 //

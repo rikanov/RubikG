@@ -20,8 +20,8 @@
 #ifndef CUBE_FRAMEWORK_HEADER
 #define CUBE_FRAMEWORK_HEADER
 
-#include "simplex.h"
-#include "cube_positions.h"
+#include <simplex.h>
+#include <cube_positions.h>
 
 /// ----------------------------------- Template declarations starts here ------------------------------------- ///
 template<unsigned int N>

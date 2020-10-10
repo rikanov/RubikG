@@ -20,7 +20,8 @@
 #ifndef CUBE_POSITIONS_H
 #define CUBE_POSITIONS_H
 
-#include  "simplex.h"
+#include <text_output.h>
+#include <simplex.h>
 
 static const bool SHOW_LOG = false; // setting true is only for debuging purposes
 
