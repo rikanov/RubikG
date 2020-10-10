@@ -1,5 +1,5 @@
-#include "test.h"
-#include "simplex.h"
+#include <test.h>
+#include <simplex.h>
 
 bool UnitTests::unit_Simplex() const
 {
@@ -8,9 +8,9 @@ bool UnitTests::unit_Simplex() const
   head( "Simplex" );
   clog_( Color::gray, "Start Simplex instance..." );
   Simplex::instance();
-  clog( Color::gray, "Done." );
+  done();
   NL();
-  clog( Color::white, "Testing group operations" );
+  tcase( "Testing group operations" );
   // test cases
   Facet testCases[10][3][2]  = 
                               {/*       A           B      expected AxB  */
@@ -42,7 +42,7 @@ bool UnitTests::unit_Simplex() const
   
   tail( "Group operation test", resultGroup );
   
-  clog( Color::white, "Testing inverses..." );
+  tcase( "Testing inverses" );
   bool resultInverse = true;
   all_id( cube )
   {
@@ -53,7 +53,7 @@ bool UnitTests::unit_Simplex() const
   tail( "Test inverse function" , resultInverse );
   clog_( Color::gray, "Simplex exit..." );
   Simplex::onExit();
-  clog( Color::gray, "Done." );
+  done();
 
   const bool result = resultGroup && resultInverse;
   finish( "Simplex", result );

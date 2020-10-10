@@ -2,12 +2,14 @@
 #define UNIT_TEST__H
 
 #include <string>
+#include <text_output.h>
 
 class UnitTests
 {
 private:
   
   static void head   ( const std::string& unit );
+  static void tcase  ( const std::string& unit, const std::string& msg1 = "", const std::string& msg2 = "" );
   static void tail   ( const std::string& unit, bool success );
   static void finish ( const std::string& unit, bool success );
   static void stamp  ( bool success, bool& result );
