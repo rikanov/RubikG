@@ -1,5 +1,5 @@
 #include <test.h>
-#include <cube_framework.h>
+#include <u_cframework.h>
 
 bool UnitTests::unit_CFramework() const
 {
@@ -28,13 +28,13 @@ bool UnitTests::unit_CFramework() const
   clog(               "-------------------" );
   NL();
   tcase( "Test case 1", " X1, Y1" );
-  test1.rot( _X, 1 );
-  test1.rot( _Y, 1 );
+  test1.rotate( _X, 1 );
+  test1.rotate( _Y, 1 );
   test1.print();
   
   tcase( "Test case 2 :", " Y1, Z4" );
-  test2.rot( _Y, 1);
-  test2.rot( _Z, 4);
+  test2.rotate( _Y, 1);
+  test2.rotate( _Z, 4);
   test2.print();
   
   tcase( "Test case 3", " combine of T1 + T2", "X1, Y1, Y1, Z4" );
@@ -47,14 +47,14 @@ bool UnitTests::unit_CFramework() const
   
   tcase( "Test case 5", " revert of T4", "Z4, Z4, Z4, Y1, Y1, X1, X1, X1" );
   CFramework<5> test5;
-  test5.rot( _Z, 4 );
-  test5.rot( _Z, 4 );
-  test5.rot( _Z, 4 );
-  test5.rot( _Y, 1 );
-  test5.rot( _Y, 1 );
-  test5.rot( _X, 1 );
-  test5.rot( _X, 1 );
-  test5.rot( _X, 1 );
+  test5.rotate( _Z, 4 );
+  test5.rotate( _Z, 4 );
+  test5.rotate( _Z, 4 );
+  test5.rotate( _Y, 1 );
+  test5.rotate( _Y, 1 );
+  test5.rotate( _X, 1 );
+  test5.rotate( _X, 1 );
+  test5.rotate( _X, 1 );
   test5.print();
 
   tcase( "Test case 6", " combine of T3 + T4", "solved cube" );
@@ -65,6 +65,12 @@ bool UnitTests::unit_CFramework() const
   CFramework<5> test7(test3,test5);
   test7.print();
   
+  CFramework_test<4> test8;
+  for ( int i = 0; i < 4; ++i )
+  {
+    test8.shuffle();
+    test8.print();
+  }
   clog_( "Cube positions:", Color::bold, "onExit()", Color::off, ':' );
   CPositions<2>::OnExit();
   CPositions<3>::OnExit();

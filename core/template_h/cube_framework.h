@@ -20,15 +20,20 @@
 #ifndef CUBE_FRAMEWORK_HEADER
 #define CUBE_FRAMEWORK_HEADER
 
-#include <simplex.h>
+#include <cube_basic_rotations.h>
 #include <cube_positions.h>
 
 /// ----------------------------------- Template declarations starts here ------------------------------------- ///
 template<unsigned int N>
 class CFramework
 {
-  static  CFramework<N> * BasicMoves;
+  static CFramework<N> * BaseRotations;
+  static void            initBase();
 
+  static inline CFramework<N> BaseRotation   ( int rotID );
+  static inline CFramework<N> BaseRotation   ( Axis A, byte slice, byte turn );
+  static inline CFramework<N> RandomRotation ();
+  
   CubeID * frameworkSpace;
 
 public:
@@ -39,8 +44,11 @@ public:
   CFramework( CFramework<N>&& f );
   
   // Operations
-  CFramework<N> inverse (void);
-  void rot( Axis, int );
+  CFramework<N> inverse    ( void );
+  CFramework<N> transposed ( bool norm = true );
+  void          rotate     ( Axis, int  );
+  void          rotate     ( byte rotID );
+  static CFramework<N> transform  ( const CFramework<N>& A, const CFramework<N>& C ); 
   
   // Destructor
   ~CFramework( );
@@ -70,10 +78,45 @@ public:
 
 /// ----------------------------------- Template definitions starts here ------------------------------------- ///
 
+ // Static functions
+// -----------------
+template<unsigned int N> 
+CFramework<N> CFramework<N>::BaseRotation( int rotID )
+{
+  return BaseRotations[rotID];
+}
+
+template<unsigned int N> 
+CFramework<N> CFramework<N>::BaseRotation( Axis A, byte slice, byte turn )
+{
+  return BaseRotations[ getRotID<N>( A, slice, turn ) ];
+}
+
+template<unsigned int N> CFramework<N> CFramework<N>::RandomRotation()
+{
+  return BaseRotations[ randomRotID<N>() ];
+}
+
+template<unsigned int N> 
+void CFramework<N>::initBase()
+{
+  if ( BaseRotations )
+  {
+    return;
+  }
+  const int numberOfRotations = 3 * N * 3;
+  BaseRotations = new CFramework<N> [ numberOfRotations ];
+  for ( byte rotID = 0; rotID < numberOfRotations; ++rotID )
+  {
+    BaseRotations[rotID].rotate( rotID );
+  }
+}
+
+  
  // Constructors
 //  ------------
 template<unsigned int N>
-CFramework<N> * CFramework<N>::BasicMoves = nullptr;
+CFramework<N> * CFramework<N>::BaseRotations = nullptr;
 
 template<unsigned int N>
 CFramework<N>::CFramework( )
@@ -109,14 +152,41 @@ CFramework<N> CFramework<N>::inverse()
   for ( int id = 0; id < CPositions<N>::GetSize(); ++id )
   {
     const CubeID rotinv = Simplex::Inverse( frameworkSpace[ id ] );
-    const int position = CPositions<5>::GetIndex( id, rotinv );
+    const int position = CPositions<N>::GetIndex( id, rotinv );
     inv.frameworkSpace[ position ] = rotinv;
   }
   return inv;
 }
 
 template<unsigned int N> 
-void CFramework<N>::rot( Axis axis, int slice )
+CFramework<N> CFramework<N>::transposed( bool norm )
+{
+  CFramework<N> trans;
+  for ( int id = 0; id < CPositions<N>::GetSize(); ++id )
+  {
+    const CubeID rot = norm ? Simplex::Inverse( frameworkSpace[ id ] ) : frameworkSpace[ id ];
+    const int position = CPositions<N>::GetIndex( id, rot );
+    trans.frameworkSpace[ position ] = frameworkSpace[ id ];
+  }
+  return trans;
+}
+
+// transform( A, C ) returns with B where A + B = C
+template<unsigned int N> 
+CFramework<N> CFramework<N>::transform( const CFramework<N>& A, const CFramework<N>& C )
+{
+  CFramework<N> B, trans = C.transposed();
+  for ( int id = 0; id < CPositions<N>::GetSize(); ++id )
+  {
+    CubeID aim = trans.getCubeID( A.whatIs( id ) );
+    B.frameworkSpace[ id ] = Simplex::Transform( A.getCubeID( id ), aim );
+  }
+  return B;
+}
+
+// clockwise rotation one slice (side) with 90 degree
+template<unsigned int N> 
+void CFramework<N>::rotate( Axis axis, int slice )
 {
   const int cubes = ( slice == 0 || slice == N - 1 ) ? N * N : 4 * ( N - 1 );
   int socket [ N * N ];
@@ -133,12 +203,25 @@ void CFramework<N>::rot( Axis axis, int slice )
   }
 }
 
+// rotation by rotat IDs
+template<unsigned int N> void CFramework<N>::rotate( byte rotID )
+{
+  Axis axis  = getAxis  <N> ( rotID );;
+  byte slice = getSlice <N> ( rotID );
+  byte turn  = getTurn  <N> ( rotID );
+  
+  while ( 0 < turn-- )
+  {
+    rotate( axis, slice ); 
+  }
+}
+
  // Query functions
 //  ---------------
 template<unsigned int N>
 int CFramework<N>::whatIs( int id ) const
 { 
-  return CPositions<N>::GetPlace( id, Simplex::Inverse( frameworkSpace [ id ] ) ); 
+  return CPositions<N>::GetIndex( id, Simplex::Inverse( frameworkSpace [ id ] ) ); 
 }
 
 template<unsigned int N>

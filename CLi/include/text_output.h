@@ -6,7 +6,7 @@
 #include <iostream>
 #include <string>
 
-#include "def_colors.h"
+#include <def_colors.h>
 
 static Color::Modifier Default = Color::off;
 
