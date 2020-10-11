@@ -4,20 +4,54 @@
 #include <cube_framework.h>
 #include <cube_basic_rotations.h>
 
-
+class IFramework_test
+{
+public:
+  virtual bool shuffle() =0;
+  virtual bool integrity() const =0;
+};
 template<unsigned int N>
-class CFramework_test: public CFramework<N>
+class CFramework_test: public IFramework_test, public CFramework<N>
 {
   
 public:
-  bool shuffle();
-  bool integrity() const;
+  
+  CFramework_test( void )
+  : CFramework<N>::CFramework()
+  {
+    
+  }
+  CFramework_test( const CFramework<N>& a, const CFramework<N>& b )
+  : CFramework<N>::CFramework( a, b )
+  {
+    
+  }
+  
+  bool shuffle() override;
+  bool integrity() const override;
 };
 
 template<unsigned int N> 
 bool CFramework_test<N>::integrity() const
 {
   bool integrity = true;
+  // check permutations
+  for ( int startIndex = 0; startIndex < CPositions<N>::GetSize(); ++startIndex )
+  {
+    CubeID testID = 0; // identity
+    int nextIndex = startIndex;
+    do
+    {
+      testID = Simplex::Composition( testID, CFramework<N>::getCubeID( nextIndex ) );
+      nextIndex = CFramework<N>::whatIs( nextIndex );
+    } while ( nextIndex != startIndex );
+    if ( testID != 0 ) // not identity
+    {
+      clog( startIndex, (int) testID );
+      integrity = false;
+      break;
+    }
+  }
   return integrity;
 }
 
