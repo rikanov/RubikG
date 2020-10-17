@@ -1,5 +1,5 @@
 #include <test.h>
-#include <u_cframework.h>
+#include <cube_framework.h>
 
 bool UnitTests::unit_CFramework() const
 {
@@ -65,12 +65,27 @@ bool UnitTests::unit_CFramework() const
   CFramework<5> test7(test3,test5);
   test7.print();
   
-  CFramework_test<4> test8;
-  for ( int i = 0; i < 4; ++i )
+  tcase( "Test case 8", "integrity test of 4 x 4 cubes");
+  CFramework<4> test8A, test8C;
+  const int num = 1000;
+  int counter = 0;
+  for( int s = 0; s < num; ++s)
   {
-    test8.shuffle();
-    test8.print();
+    bool integrity = true;
+    test8A.shuffle();
+    test8C.shuffle();
+    CFramework<4> test8B ( CFramework<4>::Transform( test8A, test8C ) );
+    
+    integrity &= test8A.integrity();
+    integrity &= test8B.integrity();
+    integrity &= test8C.integrity();
+    integrity &= ( test8B == test8C - test8A ) && ( test8C == test8A + test8B );
+    
+    counter += integrity;
   }
+  const bool s = ( counter == num );
+  tail( std::to_string( counter ) + " out of " + std::to_string( num ) + " executed", s );
+  success &= s;
   clog_( "Cube positions:", Color::bold, "onExit()", Color::off, ':' );
   CPositions<2>::OnExit();
   CPositions<3>::OnExit();

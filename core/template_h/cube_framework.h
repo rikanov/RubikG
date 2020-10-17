@@ -22,18 +22,20 @@
 
 #include <cube_basic_rotations.h>
 #include <cube_positions.h>
+#include <cstring> // memcmp, memcpy
 
 /// ----------------------------------- Template declarations starts here ------------------------------------- ///
 template<unsigned int N>
 class CFramework
 {
   static CFramework<N> * BaseRotations;
-  static void            initBase();
+  static void            InitializeBase();
 
   static inline CFramework<N> BaseRotation   ( int rotID );
   static inline CFramework<N> BaseRotation   ( Axis A, byte slice, byte turn );
   static inline CFramework<N> RandomRotation ();
   
+  static constexpr size_t _mem_size = CPositions<N>::GetSize() * sizeof( CubeID );
   CubeID * frameworkSpace;
 
 public:
@@ -44,12 +46,18 @@ public:
   CFramework( CFramework<N>&& f );
   
   // Operations
-  CFramework<N> inverse    ( void );
-  CFramework<N> transposed ( bool norm = true );
+  CFramework<N> inverse    ( void ) const;
   void          rotate     ( Axis, int  );
   void          rotate     ( byte rotID );
-  static CFramework<N> transform  ( const CFramework<N>& A, const CFramework<N>& C ); 
+  void          shuffle    ( void );
   
+  static CFramework<N> Transform  ( const CFramework<N>& A, const CFramework<N>& C ) { return CFramework<N>( A.inverse(), C ); } // transform( A, C ) returns with B where A + B = C
+  
+  // Operators
+  constexpr CFramework<N>& operator=  ( const CFramework<N>& C ) { std::memcpy( frameworkSpace, C.frameworkSpace, _mem_size ); return *this; }
+  bool                     operator== ( const CFramework<N>& X ) { return std::memcmp( frameworkSpace, X.frameworkSpace, _mem_size ) == 0;   }
+  const     CFramework<N>  operator+  ( const CFramework<N>& B ) { return CFramework<N> ( *this, B ); }
+  const     CFramework<N>  operator-  ( const CFramework<N>& B ) { return Transform( B, *this );      }
   // Destructor
   ~CFramework( );
   
@@ -60,6 +68,7 @@ public:
   inline int whereIs   ( int id  ) const ;
   Coord      whatIs    ( Coord C ) const { return CPositions<N>::getCoord( whatIs ( CPositions<N>::getIndex( C ) ) ); }
   Coord      whereIs   ( Coord C ) const { return CPositions<N>::getCoord( whereIs( CPositions<N>::getIndex( C ) ) ); }
+  bool       integrity ( void    ) const ;
   Facet      getFacet  ( const Facet front, const Facet up, int x, int y) const; // left-bottom corner: x = 0, y = 0
   
   // Printer
@@ -78,8 +87,8 @@ public:
 
 /// ----------------------------------- Template definitions starts here ------------------------------------- ///
 
- // Static functions
-// -----------------
+ // Non-operational static functions
+// ---------------------------------
 template<unsigned int N> 
 CFramework<N> CFramework<N>::BaseRotation( int rotID )
 {
@@ -98,7 +107,7 @@ template<unsigned int N> CFramework<N> CFramework<N>::RandomRotation()
 }
 
 template<unsigned int N> 
-void CFramework<N>::initBase()
+void CFramework<N>::InitializeBase()
 {
   if ( BaseRotations )
   {
@@ -128,10 +137,10 @@ CFramework<N>::CFramework( )
 template<unsigned int N>
 CFramework<N>::CFramework( const CFramework<N> & cf1, const CFramework<N> & cf2 )
 {
-  frameworkSpace = new CubeID [ CPositions<N>::GetSize() ] ();
+  frameworkSpace = new CubeID [ CPositions<N>::GetSize() ];
   for ( int id = 0; id < CPositions<N>::GetSize(); ++id )
   {
-    const int position = CPositions<N>::GetIndex( id, Simplex::Inverse( cf2.getCubeID( id ) ) );
+    const int position = cf2.whatIs( id );
     frameworkSpace[ id ] = Simplex::Composition( cf1.getCubeID( position ), cf2.getCubeID( id ) );
   }
 }
@@ -140,13 +149,15 @@ template<unsigned int N>
 CFramework<N>::CFramework( CFramework<N> && f )
 { 
   frameworkSpace = f.frameworkSpace;
-  f.frameworkSpace = nullptr;
+  f.frameworkSpace = nullptr; clog_ ( "called" );
 }
 
  // Operations
 //  ----------
+
+// inverse
 template<unsigned int N> 
-CFramework<N> CFramework<N>::inverse()
+CFramework<N> CFramework<N>::inverse() const
 {
   CFramework<N> inv;
   for ( int id = 0; id < CPositions<N>::GetSize(); ++id )
@@ -158,32 +169,6 @@ CFramework<N> CFramework<N>::inverse()
   return inv;
 }
 
-template<unsigned int N> 
-CFramework<N> CFramework<N>::transposed( bool norm )
-{
-  CFramework<N> trans;
-  for ( int id = 0; id < CPositions<N>::GetSize(); ++id )
-  {
-    const CubeID rot = norm ? Simplex::Inverse( frameworkSpace[ id ] ) : frameworkSpace[ id ];
-    const int position = CPositions<N>::GetIndex( id, rot );
-    trans.frameworkSpace[ position ] = frameworkSpace[ id ];
-  }
-  return trans;
-}
-
-// transform( A, C ) returns with B where A + B = C
-template<unsigned int N> 
-CFramework<N> CFramework<N>::transform( const CFramework<N>& A, const CFramework<N>& C )
-{
-  CFramework<N> B, trans = C.transposed();
-  for ( int id = 0; id < CPositions<N>::GetSize(); ++id )
-  {
-    CubeID aim = trans.getCubeID( A.whatIs( id ) );
-    B.frameworkSpace[ id ] = Simplex::Transform( A.getCubeID( id ), aim );
-  }
-  return B;
-}
-
 // clockwise rotation one slice (side) with 90 degree
 template<unsigned int N> 
 void CFramework<N>::rotate( Axis axis, int slice )
@@ -191,7 +176,7 @@ void CFramework<N>::rotate( Axis axis, int slice )
   const int cubes = ( slice == 0 || slice == N - 1 ) ? N * N : 4 * ( N - 1 );
   int socket [ N * N ];
   int state  [ N * N ]; // to store indices and values temporarily. Rotations must be atomic operations
-  for ( int index = 0; index < cubes; ++index)
+  for ( int index = 0; index < cubes; ++index )
   {
     socket[index]    = CPositions<N>::GetSlice( axis, slice, index );
     const CubeID & f = frameworkSpace [ socket[index] ];
@@ -213,6 +198,18 @@ template<unsigned int N> void CFramework<N>::rotate( byte rotID )
   while ( 0 < turn-- )
   {
     rotate( axis, slice ); 
+  }
+}
+
+template<unsigned int N> 
+void CFramework<N>::shuffle()
+{
+  static std::default_random_engine engine( time(0) );
+  static std::uniform_int_distribution<int> dist( 2 * N * N, 3 * N * N);
+  int counter = dist( engine ); 
+  while ( 0 < counter-- )
+  {
+    CFramework<N>::rotate( randomRotID<N>() );
   }
 }
 
@@ -249,6 +246,30 @@ Facet CFramework<N>::getFacet ( const Facet right, const Facet up, int x, int y 
   const int    index  = CPositions<N>::GetIndex ( x, y, N - 1, inv );
   
   return getCube ( index ).whatIs( facet );
+}
+
+template<unsigned int N> 
+bool CFramework<N>::integrity() const
+{
+  static const Facet orientations [6][2] = { { _F, _U }, { _R, _U }, { _B, _U }, { _L, _U }, { _R, _B }, { _R, _F } };
+  
+  int counter[6] = {};
+  for ( auto side : orientations )
+  {
+    for ( int x = 0; x < N; ++x )
+    {
+      for ( int y = 0; y < N; ++y )
+      {
+        ++counter[ CFramework<N>::getFacet( side[0], side[1], x, y ) ];
+      }
+    }
+  }
+  int idx = 0;
+  while ( idx < 6 && counter[idx] == N * N )
+  {
+    ++idx;
+  }
+  return idx == 6;
 }
 
  // Printer
