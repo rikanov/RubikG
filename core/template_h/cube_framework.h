@@ -29,7 +29,6 @@ template<unsigned int N>
 class CFramework
 {
   static CFramework<N> * BaseRotations;
-  static void            InitializeBase();
 
   static inline CFramework<N> BaseRotation   ( int rotID );
   static inline CFramework<N> BaseRotation   ( Axis A, byte slice, byte turn );
@@ -39,6 +38,9 @@ class CFramework
   CubeID * frameworkSpace;
 
 public:
+  
+  static void InitializeBase();
+  static void DeleteBase();
 
   // Constructors
   CFramework( void );
@@ -121,6 +123,13 @@ void CFramework<N>::InitializeBase()
   }
 }
 
+template<unsigned int N> void CFramework<N>::DeleteBase()
+{
+  delete[] BaseRotations;
+  BaseRotations = nullptr;
+}
+
+
   
  // Constructors
 //  ------------
@@ -149,7 +158,7 @@ template<unsigned int N>
 CFramework<N>::CFramework( CFramework<N> && f )
 { 
   frameworkSpace = f.frameworkSpace;
-  f.frameworkSpace = nullptr; clog_ ( "called" );
+  f.frameworkSpace = nullptr;
 }
 
  // Operations
