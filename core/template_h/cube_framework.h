@@ -34,7 +34,7 @@ class CFramework
   static inline CFramework<N> BaseRotation   ( Axis A, byte slice, byte turn );
   static inline CFramework<N> RandomRotation ();
   
-  static constexpr size_t _mem_size = CPositions<N>::GetSize() * sizeof( CubeID );
+  static constexpr size_t Fsize = CPositions<N>::GetSize();
   CubeID * frameworkSpace;
 
 public:
@@ -45,6 +45,7 @@ public:
   // Constructors
   CFramework( void );
   CFramework( const CFramework<N>&, const CFramework<N>& );
+  CFramework( const CFramework<N>& );
   CFramework( CFramework<N>&& f );
   
   // Operations
@@ -56,8 +57,8 @@ public:
   static CFramework<N> Transform  ( const CFramework<N>& A, const CFramework<N>& C ) { return CFramework<N>( A.inverse(), C ); } // transform( A, C ) returns with B where A + B = C
   
   // Operators
-  constexpr CFramework<N>& operator=  ( const CFramework<N>& C ) { std::memcpy( frameworkSpace, C.frameworkSpace, _mem_size ); return *this; }
-  bool                     operator== ( const CFramework<N>& X ) { return std::memcmp( frameworkSpace, X.frameworkSpace, _mem_size ) == 0;   }
+  constexpr CFramework<N>& operator=  ( const CFramework<N>& C ) { std::memcpy( frameworkSpace, C.frameworkSpace, Fsize ); return *this; }
+  bool                     operator== ( const CFramework<N>& X ) { return std::memcmp( frameworkSpace, X.frameworkSpace, Fsize ) == 0;   }
   const     CFramework<N>  operator+  ( const CFramework<N>& B ) { return CFramework<N> ( *this, B ); }
   const     CFramework<N>  operator-  ( const CFramework<N>& B ) { return Transform( B, *this );      }
   // Destructor
@@ -138,21 +139,30 @@ CFramework<N> * CFramework<N>::BaseRotations = nullptr;
 
 template<unsigned int N>
 CFramework<N>::CFramework( )
+ : frameworkSpace( new CubeID [ Fsize ] () )
 {
-  frameworkSpace = new CubeID [ CPositions<N>::GetSize() ] ();
+  
 }
 
 // Conmposition of two cubes --> construct a new one
 template<unsigned int N>
 CFramework<N>::CFramework( const CFramework<N> & cf1, const CFramework<N> & cf2 )
+ : frameworkSpace( new CubeID [ Fsize ] )
 {
-  frameworkSpace = new CubeID [ CPositions<N>::GetSize() ];
-  for ( int id = 0; id < CPositions<N>::GetSize(); ++id )
+  for ( int id = 0; id < Fsize; ++id )
   {
     const int position = cf2.whatIs( id );
     frameworkSpace[ id ] = Simplex::Composition( cf1.getCubeID( position ), cf2.getCubeID( id ) );
   }
 }
+
+template<unsigned int N> 
+CFramework<N>::CFramework(const CFramework<N>& C)
+ : frameworkSpace( new CubeID [ Fsize ] )
+{
+  std::memcpy( frameworkSpace, C.frameworkSpace, Fsize );
+}
+
 
 template<unsigned int N>
 CFramework<N>::CFramework( CFramework<N> && f )
@@ -169,7 +179,7 @@ template<unsigned int N>
 CFramework<N> CFramework<N>::inverse() const
 {
   CFramework<N> inv;
-  for ( int id = 0; id < CPositions<N>::GetSize(); ++id )
+  for ( int id = 0; id < Fsize; ++id )
   {
     const CubeID rotinv = Simplex::Inverse( frameworkSpace[ id ] );
     const int position = CPositions<N>::GetIndex( id, rotinv );
