@@ -50,7 +50,7 @@ public:
   
   // Operations
   CFramework<N> inverse    ( void ) const;
-  void          rotate     ( Axis, int  );
+  void          rotate     ( Axis, int, int turn = 1 );
   void          rotate     ( byte rotID );
   void          shuffle    ( void );
   
@@ -190,20 +190,22 @@ CFramework<N> CFramework<N>::inverse() const
 
 // clockwise rotation one slice (side) with 90 degree
 template<unsigned int N> 
-void CFramework<N>::rotate( Axis axis, int slice )
+void CFramework<N>::rotate( Axis axis, int slice, int turn )
 {
   const int cubes = ( slice == 0 || slice == N - 1 ) ? N * N : 4 * ( N - 1 );
   int socket [ N * N ];
   int state  [ N * N ]; // to store indices and values temporarily. Rotations must be atomic operations
+  
+  const CubeID twist = Simplex::Tilt( axis, turn );
   for ( int index = 0; index < cubes; ++index )
   {
     socket[index]    = CPositions<N>::GetSlice( axis, slice, index );
     const CubeID & f = frameworkSpace [ socket[index] ];
-    state[index]     = Simplex::Composition( f, Simplex::Tilt( axis ) );
+    state[index]     = Simplex::Composition( f, twist );
   }
   for ( int index = 0; index < cubes; ++index ) // apply stored assignments
   {
-    frameworkSpace[ CPositions<N>::GetIndex( socket[index], Simplex::Tilt( axis ) ) ] = state[ index ];
+    frameworkSpace[ CPositions<N>::GetIndex( socket[index], twist ) ] = state[ index ];
   }
 }
 
@@ -214,10 +216,8 @@ template<unsigned int N> void CFramework<N>::rotate( byte rotID )
   byte slice = getSlice <N> ( rotID );
   byte turn  = getTurn  <N> ( rotID );
   
-  while ( 0 < turn-- )
-  {
-    rotate( axis, slice ); 
-  }
+  rotate( axis, slice, turn ); 
+
 }
 
 template<unsigned int N> 

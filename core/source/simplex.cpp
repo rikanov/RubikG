@@ -31,9 +31,16 @@ void Simplex::init()
       //  indexed by their group ID
     }
   }
-  tilt [ _X ] = Simplex::GetGroupID( _R, _F );
-  tilt [ _Y ] = Simplex::GetGroupID( _B, _U );
-  tilt [ _Z ] = Simplex::GetGroupID( _U, _L );
+  tilt [ _X ] [1] = Simplex::GetGroupID( _R, _F );
+  tilt [ _Y ] [1] = Simplex::GetGroupID( _B, _U );
+  tilt [ _Z ] [1] = Simplex::GetGroupID( _U, _L );
+  for ( Axis a: { _X, _Y, _Z } )
+  {
+    for ( int t: { 2, 3 } )
+    {
+      tilt [a][t] = Simplex::Composition( tilt [a][t-1], tilt [a][1] ); 
+    }
+  }
 }
 
 void Simplex::initGroup()

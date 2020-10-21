@@ -1,5 +1,6 @@
 #include <test.h>
 #include <cube_framework.h>
+#include <cube_stack.h>
 
 bool UnitTests::unit_CFramework() const
 {
@@ -51,14 +52,9 @@ bool UnitTests::unit_CFramework() const
   
   tcase( "Test case 5", " revert of T4", "Z4, Z4, Z4, Y1, Y1, X1, X1, X1" );
   CFramework<5> test5;
-  test5.rotate( _Z, 4 );
-  test5.rotate( _Z, 4 );
-  test5.rotate( _Z, 4 );
-  test5.rotate( _Y, 1 );
-  test5.rotate( _Y, 1 );
-  test5.rotate( _X, 1 );
-  test5.rotate( _X, 1 );
-  test5.rotate( _X, 1 );
+  test5.rotate( _Z, 4, 3 );
+  test5.rotate( _Y, 1, 2 );
+  test5.rotate( _X, 1, 3 );
   test5.print();
   success &= test5.integrity();
   

@@ -26,7 +26,7 @@ class Simplex
 {
     static Simplex * Singleton;
   
-  CubeID tilt [ 3 ] ;
+  CubeID tilt [ 3 ] [ 4 ] = {};
 
 private: // functions
   Simplex();
@@ -50,7 +50,7 @@ public:
   static CubeID        Composition ( CubeID a, CubeID b )       { return Singleton->composition [a][b];      }
   static CubeID        Transform   ( CubeID a, CubeID b )       { return Singleton->transform [a][b];        }
   static CubeID        Inverse     ( CubeID a )                 { return Singleton->transform [a][0];        } 
-  static CubeID        Tilt        ( Axis a )                   { return Singleton->tilt[ a ];               }
+  static CubeID        Tilt        ( Axis a, int t = 1 )        { return Singleton->tilt [a][t];             }
   
   static bool          Coaxial     ( Facet a, Facet b )         { return  a == b || a == SideOpposite( b ) || a == _NF || b == _NF; }
 
