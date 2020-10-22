@@ -45,6 +45,7 @@ public:
   // Constructors
   CFramework( void );
   CFramework( const CFramework<N>&, const CFramework<N>& );
+  CFramework( const CFramework<N>&, byte );
   CFramework( const CFramework<N>& );
   CFramework( CFramework<N>&& f );
   
@@ -129,8 +130,6 @@ template<unsigned int N> void CFramework<N>::DeleteBase()
   delete[] BaseRotations;
   BaseRotations = nullptr;
 }
-
-
   
  // Constructors
 //  ------------
@@ -157,12 +156,19 @@ CFramework<N>::CFramework( const CFramework<N> & cf1, const CFramework<N> & cf2 
 }
 
 template<unsigned int N> 
-CFramework<N>::CFramework(const CFramework<N>& C)
+CFramework<N>::CFramework( const CFramework<N>& C )
  : frameworkSpace( new CubeID [ Fsize ] )
 {
   std::memcpy( frameworkSpace, C.frameworkSpace, Fsize );
 }
 
+template<unsigned int N> 
+CFramework<N>::CFramework( const CFramework<N>& C, byte rotID )
+ : frameworkSpace( new CubeID [ Fsize ] )
+{
+  std::memcpy( frameworkSpace, C.frameworkSpace, Fsize );
+  rotate( rotID );
+}
 
 template<unsigned int N>
 CFramework<N>::CFramework( CFramework<N> && f )
@@ -366,7 +372,6 @@ void CFramework<N>::print( bool separator ) const
   }
   NL( Color::gray );
 }
-
 
  // Destructor
 //  ----------
