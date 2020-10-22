@@ -1,3 +1,22 @@
+/*
+ * In brief: simple auxiliary template functions to handle basic rotation IDs for the sake of lower memory usage
+ *
+ * Copyright (C) 2020  Robert Ikanov <robert.ikanov@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef BASIC_ROTATIONS__H
 #define BASIC_ROTATIONS__H
 
@@ -5,8 +24,6 @@
 #include <ctime>
 #include <random>
 
-// brief: simple auxiliary template functions to handle basic rotation IDs for the sake of lower memory usage
-//
 // Mapping between all the basic rotations and the set of one-byte size IDs:
 // Axis  --> X,Y or Z represented by integers [ 0..2 ]
 // Slice --> index of the turning slice [ 0..N ) where N isthe size of the cube
