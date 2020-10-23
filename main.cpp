@@ -3,12 +3,13 @@
 
 int main()
 {
-  CNode<3>::Initialize( 5 );
   init();
+  CNode<3>::Initialize( 5 );
   std::atexit( exit );
   
   UnitTests tests;
   tests.testCore();
   
+  CNode<3>::OnExit();
   return 0;
 }

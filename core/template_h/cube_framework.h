@@ -131,11 +131,13 @@ template<unsigned int N> void CFramework<N>::DeleteBase()
   BaseRotations = nullptr;
 }
   
- // Constructors
-//  ------------
 template<unsigned int N>
 CFramework<N> * CFramework<N>::BaseRotations = nullptr;
 
+ // Constructors
+//  ------------
+
+// default
 template<unsigned int N>
 CFramework<N>::CFramework( )
  : frameworkSpace( new CubeID [ Fsize ] () )
@@ -155,6 +157,7 @@ CFramework<N>::CFramework( const CFramework<N> & cf1, const CFramework<N> & cf2 
   }
 }
 
+// copy
 template<unsigned int N> 
 CFramework<N>::CFramework( const CFramework<N>& C )
  : frameworkSpace( new CubeID [ Fsize ] )
