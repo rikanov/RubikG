@@ -78,4 +78,36 @@ inline byte getTurn( byte id )
   return id % 3 + 1;
 }
 
+template<unsigned int N>
+std::string toString( Axis A )
+{
+  switch ( A )
+  {
+    case _X:
+      return "X";
+    case _Y:
+      return "Y";
+    case _Z:
+      return "Z";
+    default:
+      return "#ERR";
+  }
+}
+
+template<unsigned int N>
+std::string toString( byte B )  
+{
+  return std::string( "{ _" + toString<N> ( getAxis<N> (B) ) + ", " + std::to_string( getSlice<N> (B) ) + ", " + std::to_string( getTurn<N> (B) ) + " }" );
+}
+
+template<unsigned int N>
+std::string toString( const byte* B )  
+{
+  std::string ret;
+  while ( *B != 0 )
+  {
+    ret += toString<N> ( *( B++ ) );
+  }
+  return ret;
+}
 #endif

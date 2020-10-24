@@ -1,6 +1,5 @@
 #include <test.h>
 #include <cube_framework.h>
-#include <cube_stack.h>
 
 bool UnitTests::unit_CFramework() const
 {

@@ -4,7 +4,7 @@ include_directories($(CMAKE_PROJECT_INCLUDE))
 include_directories(../core/include)
 include_directories(../core/template_h)
 include_directories(../CLi/include)
-include_directories(../engine/include)
+include_directories(../engine )
 
 find_library( CLi  REQUIRED )
 find_library( core REQUIRED )
