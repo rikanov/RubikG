@@ -99,7 +99,7 @@ public:
 template<unsigned int N>
 CNode<N>::CNode()
   : m_parent( nullptr )
-  , m_rotID ( 9 * N /* not exist */ )
+  , m_rotID ( 9 * N + 1 /* not exist */ )
   , m_data  ( CFramework<N>() )
 {
 }
