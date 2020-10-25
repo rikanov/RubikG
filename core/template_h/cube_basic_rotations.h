@@ -39,20 +39,20 @@ template<unsigned int N>
 byte randomRotID()
 {
   static std::default_random_engine engine( time( 0 ) );
-  static std::uniform_int_distribution<byte> dist( 0, 3 * N * 3 - 1 ); 
+  static std::uniform_int_distribution<byte> dist( 1, 3 * N * 3 ); 
   return dist( engine );
 }
 
 template<unsigned int N>
 inline byte getRotID( Axis A, byte S, byte R )
 {
-  return ( 3 * N * A ) + ( 3 * S ) + R - 1;
+  return ( 3 * N * A ) + ( 3 * S ) + R;
 }
 
 template<unsigned int N>
 inline Axis getAxis( byte id )
 {
-  switch ( id / ( 3 * N ) )
+  switch ( --id / ( 3 * N ) )
   {
     case 0:
       return _X;
@@ -66,16 +66,16 @@ inline Axis getAxis( byte id )
 }
 
 template<unsigned int N>
-inline byte getSlice( byte id )
+inline byte getLayer( byte id )
 {
-  return ( id % ( 3 * N ) ) / 3;
+  return ( --id % ( 3 * N ) ) / 3;
 }
 
 
 template<unsigned int N>
 inline byte getTurn( byte id )
 {
-  return id % 3 + 1;
+  return --id % 3 + 1;
 }
 
 template<unsigned int N>
@@ -97,7 +97,7 @@ std::string toString( Axis A )
 template<unsigned int N>
 std::string toString( byte B )  
 {
-  return std::string( "{ _" + toString<N> ( getAxis<N> (B) ) + ", " + std::to_string( getSlice<N> (B) ) + ", " + std::to_string( getTurn<N> (B) ) + " }" );
+  return std::string( "{ _" + toString<N> ( getAxis<N> (B) ) + ", " + std::to_string( getLayer<N> (B) ) + ", " + std::to_string( getTurn<N> (B) ) + " }" );
 }
 
 template<unsigned int N>

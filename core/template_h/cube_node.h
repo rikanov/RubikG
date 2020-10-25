@@ -22,11 +22,15 @@
 
 #include <cube_framework.h>
 
+#define all_turns( axis, layer, turn )      \
+  for ( Axis axis : { _X, _Y, _Z } )          \
+    for ( byte layer = 0; layer < N; ++layer ) \
+      for ( byte turn: { 1, 2, 3 } ) 
+        
 template<unsigned int N>
 class CNode
 {
-  static CNode<N>* Tree;
-  static CNode<N>* NextNode;
+  static CNode<N>* Root;
   static byte      Depth;
   static long*     IndexOFLevel;
   
@@ -42,10 +46,9 @@ class CNode
   
   // calculate the number of nodes ( in a tree of any size )
   static void initIndices();
-  
-  // insert children nodes into the tree
-  void extend() const;
 
+  void storeRotID( byte* id ) const;
+  
 public:
   
   // build a new tree of a given size
@@ -57,18 +60,21 @@ public:
   
   const CNode<N>& operator= ( const CNode<N>& C )
   {
-        m_parent = C.parent();
-        m_rotID  = C.rotID();
-        m_data   = C.data();
+    m_parent = C.parent();
+    m_rotID  = C.rotID();
+    m_data   = C.data();
   }
-
+  
+  // get path recursively
+  const byte* getPath() const;
+  
   // Queries
   byte                 rotID () const { return m_rotID;  }
   const CNode<N>*      parent() const { return m_parent; }
   const CFramework<N>& data  () const { return m_data;   }
   
-  static const CNode<N>* getNode( int id ) { return Tree + id; }
-  static const CNode<N>* getRoot( void )   { return Tree;      }
+  static const CNode<N>* getNode( int id ) { return Root + id; }
+  static const CNode<N>* getRoot( void )   { return Root;      }
 };
 
  // set default values to static members
@@ -76,11 +82,7 @@ public:
 
 // Tree
   template<unsigned int N>
-  CNode<N>* CNode<N>::Tree     = nullptr;
-
-// NextNode
-  template<unsigned int N>
-  CNode<N>* CNode<N>::NextNode = nullptr;
+  CNode<N>* CNode<N>::Root     = nullptr;
 
 // IndexOFLevel
   template<unsigned int N>
@@ -132,17 +134,42 @@ void CNode<N>::Initialize( int depth )
   }
   
   // allocate a new tree
-  Tree = new CNode<N> [ IndexOFLevel[ Depth + 1 ] ];
-  NextNode = Tree;
-  
+    Root  = new CNode<N> [ IndexOFLevel[ Depth + 1 ] ];
+    
   // create root
-  CNode<N> root;
-  *( NextNode++ ) = CNode<N> ();
+    *Root = CNode<N>();
   
-  clog( "tree" );
+  // extend recursively
+  // while having not extended nodes beside leaf nodes 
+  //     get the next node from LIFO
+  //     extend it --> put the children nodes into a LIFO
   
-  // extend root
-  Tree -> extend();
+  auto Out = Root;
+  auto In  = Root + 1;
+  auto End = Root + IndexOFLevel[ Depth ];
+  
+  while ( Out != End )
+  {
+    // extend
+    
+    const Axis skipAxis  = getAxis  <N> ( Out -> m_rotID );
+    const byte skipLayer = getLayer <N> ( Out -> m_rotID ); 
+    
+    // insert children into the tree and skip redundancy with the parent
+    all_turns( axis, layer, turn )
+    {
+      if ( axis == skipAxis && layer <= skipLayer )
+      {
+        continue;
+      }
+      *( In++ ) = CNode<N> ( Out, getRotID<N> ( axis, layer, turn ) );
+    }
+  
+    ++ Out; 
+  }
+  clog( "teszt root: ", toString<N>( Root -> m_rotID ) );
+  clog( "teszt 1.  : ", toString<N>( ( Root + 1 ) -> m_rotID ) );
+  clog( Root  -> m_parent == nullptr );
 }
 
 // calculate the width of levels
@@ -151,9 +178,16 @@ template<unsigned int N> void CNode<N>::initIndices()
   // create a new array
     IndexOFLevel = new long [9];
   
-  // calculate the constant ratio of the iteration
-    const int redundancy = 3 * 3 * ( N + 1 ) * N / 2;
-    const int iter = ( 9 * N ) * ( 9 * N ) - redundancy;
+   // N(i) = N(i-2) * ratio
+  //  ----------------------  
+  int ratio = 0;
+  all_turns( axis, layer, turn )
+  {
+    int countLayers  = 3 * N;       // three axes X N layers
+        countLayers -= layer + 1 ;  // do not turn former layers on the same axis
+    
+    ratio += 3 * countLayers;       // each layers has three possible turns
+  }
   
   // Initialize the recursion
     IndexOFLevel[0] = 0;         // level 0 : empty tree
@@ -162,7 +196,7 @@ template<unsigned int N> void CNode<N>::initIndices()
   
   // calculate the number of nodes in a given level recursively
     for ( int dep = 3; dep < 9; ++dep )
-        IndexOFLevel[dep] = IndexOFLevel[dep-2] * iter;
+        IndexOFLevel[dep] = IndexOFLevel[dep-2] * ratio;
   
   // number of nodes in a tree = sum of levels
     for ( int dep = 1; dep < 9; ++dep )
@@ -173,50 +207,28 @@ template<unsigned int N> void CNode<N>::initIndices()
 template<unsigned int N> 
 const CNode<N> * CNode<N>::StartNode( int level )
 {
-  return Tree + IndexOFLevel[ level ]; 
+  return Root + IndexOFLevel[ level ]; 
 }
 
-// extend node: insert its children to the tree recursively
+// get path ToDO: smart pointer !!!!
 template<unsigned int N> 
-void CNode<N>::extend() const
+const byte * CNode<N>::getPath() const
 {
-  static int buildingDepth = 0;
-  
-  ++buildingDepth;
-  
-  const Axis skipAxis  = getAxis  <N> ( m_rotID );
-  const byte skipSlice = getSlice <N> ( m_rotID ); 
-  
-  // insert children into the tree and skip redundancy with the parent
-  const CNode<N>* insertedNodes = NextNode;
-  for ( Axis axis : { _X, _Y, _Z } )
-  {
-    for ( byte slice = 0; slice < N; ++slice )
-    {
-      if ( axis == skipAxis && slice <= skipSlice )
-      {
-        continue;
-      }
-      for ( byte turn: { 1, 2, 3 } )
-      {
-        *( NextNode++ ) = CNode<N> ( this, getRotID<N> ( axis, slice, turn ) );
-      }
-    }
-  }
-  const CNode<N>* extendedNodes = NextNode;
-  
-  // extend children recursively
-  if ( buildingDepth < Depth )
-  {
-    while ( insertedNodes != extendedNodes )
-    {
-      ( insertedNodes++ ) -> extend();
-    }
-  }
-  
-  clog_ ( '\r', NextNode - Tree );
-  --buildingDepth; // go upward
+  byte *ret = new byte [ Depth ]();
+  storeRotID( ret );
+  return ret;
 }
+
+template<unsigned int N> 
+void CNode<N>::storeRotID(byte* id) const
+{ 
+  if ( m_parent ) 
+  { 
+    m_parent->storeRotID( id +1 );
+    *id = m_rotID; if ( m_rotID == 0 ) clog ( "NULL!" );
+  }
+}
+
 
  // release sources
 //  ---------------
@@ -224,10 +236,10 @@ void CNode<N>::extend() const
 template<unsigned int N> 
 void CNode<N>::OnExit()
 {
-  delete[] Tree;
+  delete[] Root;
   delete[] IndexOFLevel;
   
-  Tree         = nullptr;
+  Root         = nullptr;
   IndexOFLevel = nullptr;
 }
 

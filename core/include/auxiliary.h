@@ -17,6 +17,13 @@ enum Axis
   _X, _Y, _Z, _NA
 };
 
+using Layer = unsigned char;
+
+enum Turn
+{
+   _0, _1, _2, _3
+};
+
  // Auxiliary inline functions
 // ---------------------------
 inline void operator++ ( Facet& id )

@@ -4,7 +4,7 @@
 int main()
 {
   init();
-  CNode<4>::Initialize( 4 );
+  CNode<4>::Initialize( 5 );
   
   byte *path = new byte [5];
   
@@ -13,22 +13,16 @@ int main()
     clog( i, " -- > ", toString<4>( i ) ) ;
   }
   NL();
-  for ( Axis axis : { _X, _Y, _Z } )
-  {
-    for ( byte slice = 0; slice < 4; ++slice )
-    {
-      for ( byte turn: { 1, 2, 3 } )
-      {
-        const byte i = getRotID<4>( axis, slice,turn);
-        clog ( (int) i , toString<4>( i ) );
-      }
-    }
-  }
-  for( int i = 0; i < 300; ++i)
+  
+  for( int i = 0; i < 100; ++i)
   {
     Engine<4>::Path( CNode<4>::getNode( i )  , path );
     std::string out = toString<4>( path );
-    clog( i, '.', out );
+    slog( "\t", i, out, toString<4>( CNode<4>::getNode( i ) -> getPath() ) );
+  }
+  for( int i = 1; i < 5; ++i)
+  {
+    clog( toString<4>( CNode<4>::StartNode( i ) -> getPath() ) );
   }
   clog( Color::off, "Press", Color::white, Color::bold, "ENTER", Color::off,"to end." ); 
   std::cin.get();

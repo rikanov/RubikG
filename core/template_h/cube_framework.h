@@ -221,11 +221,11 @@ void CFramework<N>::rotate( Axis axis, int slice, int turn )
 // rotation by rotat IDs
 template<unsigned int N> void CFramework<N>::rotate( byte rotID )
 {
-  Axis axis  = getAxis  <N> ( rotID );;
-  byte slice = getSlice <N> ( rotID );
+  Axis axis  = getAxis  <N> ( rotID );
+  byte layer = getLayer <N> ( rotID );
   byte turn  = getTurn  <N> ( rotID );
   
-  rotate( axis, slice, turn ); 
+  rotate( axis, layer, turn ); 
 
 }
 
