@@ -38,8 +38,8 @@ using byte = unsigned char;
 template<unsigned int N>
 byte randomRotID()
 {
-  static std::default_random_engine engine( time( 0 ) );
-  static std::uniform_int_distribution<byte> dist( 1, 3 * N * 3 ); 
+  static std::default_random_engine engine( static_cast<unsigned int>( time( 0 ) ) );
+  static std::uniform_int_distribution<int> dist( 1, (int) 3 * N * 3 ); 
   return dist( engine );
 }
 
