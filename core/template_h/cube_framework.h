@@ -232,7 +232,7 @@ template<unsigned int N> void CFramework<N>::rotate( byte rotID )
 template<unsigned int N> 
 void CFramework<N>::shuffle()
 {
-  static std::default_random_engine engine( time(0) );
+  static std::default_random_engine engine( static_cast<unsigned int>( time( 0 ) ) );
   static std::uniform_int_distribution<int> dist( 2 * N * N, 3 * N * N);
   int counter = dist( engine ); 
   while ( 0 < counter-- )
