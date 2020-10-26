@@ -20,7 +20,7 @@
 #ifndef CUBE_FRAMEWORK_HEADER
 #define CUBE_FRAMEWORK_HEADER
 
-#include <cube_basic_rotations.h>
+#include <basic_functions.h>
 #include <cube_positions.h>
 #include <cstring> // memcmp, memcpy
 
@@ -31,7 +31,7 @@ class CFramework
   static CFramework<N> * BaseRotations;
 
   static inline CFramework<N> BaseRotation   ( int rotID );
-  static inline CFramework<N> BaseRotation   ( Axis A, byte slice, byte turn );
+  static inline CFramework<N> BaseRotation   ( Axis A, Layer layer, Turn turn );
   static inline CFramework<N> RandomRotation ();
   
   static constexpr size_t Fsize = CPositions<N>::GetSize();
@@ -45,14 +45,14 @@ public:
   // Constructors
   CFramework( void );
   CFramework( const CFramework<N>&, const CFramework<N>& );
-  CFramework( const CFramework<N>&, byte );
+  CFramework( const CFramework<N>&, RotID );
   CFramework( const CFramework<N>& );
   CFramework( CFramework<N>&& f );
   
   // Operations
   CFramework<N> inverse    ( void ) const;
-  void          rotate     ( Axis, int, int turn = 1 );
-  void          rotate     ( byte rotID );
+  void          rotate     ( Axis, Layer, Turn turn = 1 );
+  void          rotate     ( RotID rotID );
   void          shuffle    ( void );
   
   static CFramework<N> Transform  ( const CFramework<N>& A, const CFramework<N>& C ) { return CFramework<N>( A.inverse(), C ); } // transform( A, C ) returns with B where A + B = C
@@ -100,9 +100,9 @@ CFramework<N> CFramework<N>::BaseRotation( int rotID )
 }
 
 template<unsigned int N> 
-CFramework<N> CFramework<N>::BaseRotation( Axis A, byte slice, byte turn )
+CFramework<N> CFramework<N>::BaseRotation( Axis A, Layer layer, Turn turn )
 {
-  return BaseRotations[ getRotID<N>( A, slice, turn ) ];
+  return BaseRotations[ getRotID<N>( A, layer, turn ) ];
 }
 
 template<unsigned int N> CFramework<N> CFramework<N>::RandomRotation()
@@ -119,7 +119,7 @@ void CFramework<N>::InitializeBase()
   }
   const int numberOfRotations = 3 * N * 3;
   BaseRotations = new CFramework<N> [ numberOfRotations ];
-  for ( byte rotID = 0; rotID < numberOfRotations; ++rotID )
+  for ( RotID rotID = 0; rotID < numberOfRotations; ++rotID )
   {
     BaseRotations[rotID].rotate( rotID );
   }
@@ -166,7 +166,7 @@ CFramework<N>::CFramework( const CFramework<N>& C )
 }
 
 template<unsigned int N> 
-CFramework<N>::CFramework( const CFramework<N>& C, byte rotID )
+CFramework<N>::CFramework( const CFramework<N>& C, RotID rotID )
  : frameworkSpace( new CubeID [ Fsize ] )
 {
   std::memcpy( frameworkSpace, C.frameworkSpace, Fsize );
@@ -199,16 +199,16 @@ CFramework<N> CFramework<N>::inverse() const
 
 // clockwise rotation one slice (side) with 90 degree
 template<unsigned int N> 
-void CFramework<N>::rotate( Axis axis, int slice, int turn )
+void CFramework<N>::rotate( Axis axis, Layer layer, Turn turn )
 {
-  const int cubes = ( slice == 0 || slice == N - 1 ) ? N * N : 4 * ( N - 1 );
+  const int cubes = ( layer == 0 || layer == N - 1 ) ? N * N : 4 * ( N - 1 );
   int socket [ N * N ];
   int state  [ N * N ]; // to store indices and values temporarily. Rotations must be atomic operations
   
   const CubeID twist = Simplex::Tilt( axis, turn );
   for ( int index = 0; index < cubes; ++index )
   {
-    socket[index]    = CPositions<N>::GetSlice( axis, slice, index );
+    socket[index]    = CPositions<N>::GetLayer( axis, layer, index );
     const CubeID & f = frameworkSpace [ socket[index] ];
     state[index]     = Simplex::Composition( f, twist );
   }
@@ -219,11 +219,11 @@ void CFramework<N>::rotate( Axis axis, int slice, int turn )
 }
 
 // rotation by rotat IDs
-template<unsigned int N> void CFramework<N>::rotate( byte rotID )
+template<unsigned int N> void CFramework<N>::rotate( RotID rotID )
 {
-  Axis axis  = getAxis  <N> ( rotID );
-  byte layer = getLayer <N> ( rotID );
-  byte turn  = getTurn  <N> ( rotID );
+  Axis  axis  = getAxis  <N> ( rotID );
+  Layer layer = getLayer <N> ( rotID );
+  Turn  turn  = getTurn  <N> ( rotID );
   
   rotate( axis, layer, turn ); 
 

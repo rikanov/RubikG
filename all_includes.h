@@ -5,22 +5,8 @@
 
 #include <test.h>
 #include <cli.h>
-#include <rubiks_cube.h>
+#include <cube_framework.h>
 
-void init()
-{
-  Simplex::instance();
-  CPositions<2>::Instance();
-  CPositions<3>::Instance();
-  CPositions<4>::Instance();
-  CPositions<5>::Instance();
-  CFramework<2>::InitializeBase();
-  CFramework<3>::InitializeBase();
-  CFramework<4>::InitializeBase();
-  CFramework<5>::InitializeBase();
-  CLi::init();
-  CLi::REPL();
-}
 
 void exit()
 {
@@ -33,5 +19,22 @@ void exit()
   CFramework<3>::DeleteBase();
   CFramework<4>::DeleteBase();
   CFramework<5>::DeleteBase();
-  Simplex::onExit();
+  Simplex::OnExit();
 }
+
+void init()
+{
+  Simplex::Instance();
+  CPositions<2>::Instance();
+  CPositions<3>::Instance();
+  CPositions<4>::Instance();
+  CPositions<5>::Instance();
+  CFramework<2>::InitializeBase();
+  CFramework<3>::InitializeBase();
+  CFramework<4>::InitializeBase();
+  CFramework<5>::InitializeBase();
+  CLi::init();
+  CLi::REPL();
+  std::atexit( exit );
+}
+

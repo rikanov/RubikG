@@ -24,30 +24,30 @@
 
 #define all_turns( axis, layer, turn )      \
   for ( Axis axis : { _X, _Y, _Z } )          \
-    for ( byte layer = 0; layer < N; ++layer ) \
-      for ( byte turn: { 1, 2, 3 } ) 
+    for ( Layer layer = 0; layer < N; ++layer ) \
+      for ( Turn turn: { 1, 2, 3 } ) 
         
 template<unsigned int N>
 class CNode
 {
   static CNode<N>* Root;
-  static byte      Depth;
+  static short     Depth;
   static long*     IndexOFLevel;
   
   const CNode<N>*  m_parent;
   CFramework<N>    m_data;
-  byte             m_rotID;
+  RotID            m_rotID;
   
   // create root
   CNode( void );
     
   // create a new node from a parent node by a rotational operation
-  CNode( const CNode<N>* aParent, byte aRotID ); 
+  CNode( const CNode<N>* aParent, RotID aRotID ); 
   
   // calculate the number of nodes ( in a tree of any size )
   static void initIndices();
 
-  void storeRotID( byte* id ) const;
+  void storeRotID( RotID* id ) const;
   
 public:
   
@@ -66,10 +66,10 @@ public:
   }
   
   // get path recursively
-  const byte* getPath() const;
+  const RotID* getPath() const;
   
   // Queries
-  byte                 rotID () const { return m_rotID;  }
+  RotID                rotID () const { return m_rotID;  }
   const CNode<N>*      parent() const { return m_parent; }
   const CFramework<N>& data  () const { return m_data;   }
   
@@ -90,7 +90,7 @@ public:
 
 // Depth
   template<unsigned int N>
-  byte CNode<N>::Depth         = 0;
+  short CNode<N>::Depth        = 0;
 
  // Constructors
 //  ------------
@@ -106,7 +106,7 @@ CNode<N>::CNode()
 
 // inner node (having a parent node)
 template<unsigned int N>
-CNode<N>::CNode( const CNode<N>* aParent, byte aRotID )
+CNode<N>::CNode( const CNode<N>* aParent, RotID aRotID )
   : m_parent( aParent )
   , m_rotID ( aRotID )
   , m_data  ( m_parent->m_data, aRotID )
@@ -152,8 +152,8 @@ void CNode<N>::Initialize( int depth )
   {
     // extend
     
-    const Axis skipAxis  = getAxis  <N> ( Out -> m_rotID );
-    const byte skipLayer = getLayer <N> ( Out -> m_rotID ); 
+    const Axis  skipAxis  = getAxis  <N> ( Out -> m_rotID );
+    const Layer skipLayer = getLayer <N> ( Out -> m_rotID ); 
     
     // insert children into the tree and skip redundancy with the parent
     all_turns( axis, layer, turn )
@@ -212,15 +212,15 @@ const CNode<N> * CNode<N>::StartNode( int level )
 
 // get path ToDO: smart pointer !!!!
 template<unsigned int N> 
-const byte * CNode<N>::getPath() const
+const RotID * CNode<N>::getPath() const
 {
-  byte *ret = new byte [ Depth ]();
+  RotID *ret = new RotID [ Depth ]();
   storeRotID( ret );
   return ret;
 }
 
 template<unsigned int N> 
-void CNode<N>::storeRotID(byte* id) const
+void CNode<N>::storeRotID( RotID* id ) const
 { 
   if ( m_parent ) 
   { 

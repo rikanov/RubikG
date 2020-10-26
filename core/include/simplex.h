@@ -42,8 +42,8 @@ private: // array datamembers
 public:
 
   // create a singleton object
-  static void          instance    ( )                          { if ( Singleton == nullptr ) new Simplex;   }
-  static void          onExit      ( )                          { delete Singleton; Singleton = nullptr;     }
+  static void          Instance    ( )                          { if ( Singleton == nullptr ) new Simplex;   }
+  static void          OnExit      ( )                          { delete Singleton; Singleton = nullptr;     }
   static const OCube & GetCube     ( CubeID ID )                { return Singleton->simplexGroup [ID];       }
   static const OCube & GetCube     ( Facet r, Facet u )         { return GetCube( GetGroupID( r, u ) );      }
   static CubeID        GetGroupID  ( Facet r, Facet u )         { return Singleton->simplexGroupID [r][u];   }

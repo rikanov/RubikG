@@ -20,7 +20,7 @@
 #ifndef ORIENTED_CUBE_HEADER
 #define ORIENTED_CUBE_HEADER
 
-#include <auxiliary.h>
+#include <basic_functions.h>
 
 // Oriented cube class, an auxiliary class for the sake of readable code. 
 // It won't be used directly by algorithms but its mapping function is very useful for UI too.
@@ -31,7 +31,7 @@
 
 class OCube
 {
-  static const char  Token [7];
+  static const char  Tokens [7];
   static const Facet FrontSides [ 6 /*Right*/ ][ 6 /*Up*/ ];
 
   Facet  m_whereIs [6];
@@ -53,7 +53,7 @@ public:
   const std::string& toString () const { return m_readable;         }
   operator        const char* () const { return m_readable.c_str(); }
   
-  static char token ( Facet F ) { return Token[ F ]; }
+  static char  Token     ( Facet F )          { return Tokens[ F ];      }
   static Facet FrontSide ( Facet r, Facet u ) { return FrontSides[r][u]; }
 };
 

@@ -1,5 +1,5 @@
 /*
- * In brief: simple auxiliary template functions to handle basic rotation IDs for the sake of lower memory usage
+ * In brief: simple auxiliary template functions to handle basic rotation IDs in order to reach lower memory usage
  *
  * Copyright (C) 2020  Robert Ikanov <robert.ikanov@gmail.com>
  *
@@ -20,7 +20,7 @@
 #ifndef BASIC_ROTATIONS__H
 #define BASIC_ROTATIONS__H
 
-#include <auxiliary.h>
+#include <base_types.h>
 #include <ctime>
 #include <random>
 
@@ -33,24 +33,20 @@
 // ID = 3 * N * Axis + 3 * Slice + Turn 
 // ID < 3 * N * 3
 
-using byte = unsigned char;
+ // RotID from components
+//  ---------------------
 
 template<unsigned int N>
-byte randomRotID()
+inline RotID getRotID( Axis A, Layer L, Turn T )
 {
-  static std::default_random_engine engine( static_cast<unsigned int>( time( 0 ) ) );
-  static std::uniform_int_distribution<int> dist( 1, (int) 3 * N * 3 ); 
-  return dist( engine );
+  return ( 3 * N * A ) + ( 3 * L ) + T;
 }
 
-template<unsigned int N>
-inline byte getRotID( Axis A, byte S, byte R )
-{
-  return ( 3 * N * A ) + ( 3 * S ) + R;
-}
+ // Get components from RotID
+//  -------------------------
 
 template<unsigned int N>
-inline Axis getAxis( byte id )
+inline Axis getAxis( RotID id )
 {
   switch ( --id / ( 3 * N ) )
   {
@@ -66,17 +62,30 @@ inline Axis getAxis( byte id )
 }
 
 template<unsigned int N>
-inline byte getLayer( byte id )
+inline Layer getLayer( RotID id )
 {
   return ( --id % ( 3 * N ) ) / 3;
 }
 
-
 template<unsigned int N>
-inline byte getTurn( byte id )
+inline Turn getTurn( RotID id )
 {
   return --id % 3 + 1;
 }
+
+ // Random RotID
+//  ------------
+ 
+template<unsigned int N>
+RotID randomRotID()
+{
+  static std::default_random_engine engine( static_cast<unsigned int>( time( 0 ) ) );
+  static std::uniform_int_distribution<int> dist( 1, (int) 3 * N * 3 ); 
+  return dist( engine );
+}
+ 
+ // Readable output 
+//  ---------------
 
 template<unsigned int N>
 std::string toString( Axis A )
@@ -95,13 +104,13 @@ std::string toString( Axis A )
 }
 
 template<unsigned int N>
-std::string toString( byte B )  
+std::string toString( RotID B )  
 {
   return std::string( "{ _" + toString<N> ( getAxis<N> (B) ) + ", " + std::to_string( getLayer<N> (B) ) + ", " + std::to_string( getTurn<N> (B) ) + " }" );
 }
 
 template<unsigned int N>
-std::string toString( const byte* B )  
+std::string toString( const RotID* B )  
 {
   std::string ret;
   while ( *B != 0 )

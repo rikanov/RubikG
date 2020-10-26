@@ -7,7 +7,7 @@ bool UnitTests::unit_Simplex() const
   
   head( "Simplex" );
   clog_( Color::gray, "Start Simplex instance..." );
-  Simplex::instance();
+  Simplex::Instance();
   done();
   NL();
   tcase( "Testing group operations" );
@@ -52,7 +52,7 @@ bool UnitTests::unit_Simplex() const
   }
   tail( "Test inverse function" , resultInverse );
   clog_( Color::gray, "Simplex exit..." );
-  Simplex::onExit();
+  Simplex::OnExit();
   done();
 
   const bool result = resultGroup && resultInverse;

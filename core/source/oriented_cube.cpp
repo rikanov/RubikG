@@ -1,6 +1,6 @@
 #include <oriented_cube.h>
 
-const char OCube::Token [7] = "FRUDLB";
+const char OCube::Tokens [7] = "FRUDLB";
 
  /**************************************************************************************************************************
   * 
@@ -60,9 +60,9 @@ void OCube::init( Facet r, Facet u, CubeID groupID )
 	m_groupID = groupID;
 
 	// Set a readable name 
-	m_readable.push_back( token ( whatIs( _R ) ) );
-	m_readable.push_back( token ( whatIs( _U ) ) );
-	m_readable.push_back( token ( whatIs( _F ) ) );
+	m_readable.push_back( Token ( whatIs( _R ) ) );
+	m_readable.push_back( Token ( whatIs( _U ) ) );
+	m_readable.push_back( Token ( whatIs( _F ) ) );
 	m_readable.push_back( '(' );
 	if (m_groupID < 10)
 	{

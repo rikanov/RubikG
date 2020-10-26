@@ -7,7 +7,7 @@ bool UnitTests::unit_CFramework() const
   head( "cube framework" );
 
   clog_( "Start Simplex instance..." );
-  Simplex::instance();
+  Simplex::Instance();
   done();
 
   clog_( "Start 'cube positions' instances..." );
@@ -98,7 +98,7 @@ bool UnitTests::unit_CFramework() const
   done();
   
   clog_( "Simplex:", Color::bold, "onExit()", Color::off, ':' );
-  Simplex::onExit();
+  Simplex::OnExit();
   done();
 
   finish( "Cube framework", success );

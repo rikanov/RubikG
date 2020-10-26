@@ -9,12 +9,12 @@ class Engine
 {
   
 public:
-  static void Path( const CNode<N>* C, byte* P );
+  static void Path( const CNode<N>* C, RotID* P );
 };
 
  // Querry 
 template<unsigned int N> 
-void Engine<N>::Path( const CNode<N>* C, byte* P )
+void Engine<N>::Path( const CNode<N>* C, RotID* P )
 {
   while ( C != CNode<N>::getRoot() )
   {

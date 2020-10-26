@@ -70,14 +70,14 @@ public:
   
   static void  Instance ( )                     { if ( Singleton == nullptr ) new CPositions<N>;  }
   static void  OnExit   ( )                     { delete Singleton; Singleton = nullptr;          }
-  static bool  ValID    ( int id )              { return 0 <= id && id < GetSize();               }
-  static Coord GetCoord ( int id )              { return Singleton->indexToCoord [ id ];          }
-  static int   GetIndex ( int id, CubeID rot)   { return Singleton->routerPositions[ id ][ rot ]; }
-  static int   GetIndex ( int x, int y, int z ) { return Singleton->coordToIndex[ x ][ y ][ z ];  }
-  static int   GetIndex ( const Coord & C )     { return GetIndex( C.x, C.y, C.z);                }
+  static bool  ValID    ( PosID id )            { return 0 <= id && id < GetSize();               }
+  static Coord GetCoord ( PosID id )            { return Singleton->indexToCoord [ id ];          }
+  static PosID GetIndex ( PosID id, CubeID rot) { return Singleton->routerPositions[ id ][ rot ]; }
+  static PosID GetIndex ( int x, int y, int z ) { return Singleton->coordToIndex[ x ][ y ][ z ];  }
+  static PosID GetIndex ( const Coord & C )     { return GetIndex( C.x, C.y, C.z);                }
   
-  static int   GetIndex ( int x, int y, int z, CubeID rot ) { return GetNode( x, y, z ) [ rot ];                  }
-  static int   GetSlice ( Axis a, int sl, int id )          { return Singleton->frameworkSlice [ a ][ sl ][ id ]; }
+  static PosID GetIndex ( int x, int y, int z, CubeID rot ) { return GetNode( x, y, z ) [ rot ];                  }
+  static int   GetLayer ( Axis a, Layer sl, Turn id )       { return Singleton->frameworkSlice [ a ][ sl ][ id ]; }
 
 };
 
