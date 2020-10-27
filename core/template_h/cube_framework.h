@@ -30,7 +30,7 @@ class CFramework
 {
   static CFramework<N> * BaseRotations;
 
-  static inline CFramework<N> BaseRotation   ( int rotID );
+  static inline CFramework<N> BaseRotation   ( RotID rotID );
   static inline CFramework<N> BaseRotation   ( Axis A, Layer layer, Turn turn );
   static inline CFramework<N> RandomRotation ();
   
@@ -66,14 +66,14 @@ public:
   ~CFramework( );
   
   // Query functions
-  CubeID     getCubeID ( int id  ) const { return frameworkSpace[id];                   }
-  OCube      getCube   ( int id  ) const { return Simplex::GetCube( getCubeID ( id ) ); }
-  inline int whatIs    ( int id  ) const ;
-  inline int whereIs   ( int id  ) const ;
-  Coord      whatIs    ( Coord C ) const { return CPositions<N>::getCoord( whatIs ( CPositions<N>::getIndex( C ) ) ); }
-  Coord      whereIs   ( Coord C ) const { return CPositions<N>::getCoord( whereIs( CPositions<N>::getIndex( C ) ) ); }
-  bool       integrity ( void    ) const ;
-  Facet      getFacet  ( const Facet front, const Facet up, int x, int y) const; // left-bottom corner: x = 0, y = 0
+  CubeID       getCubeID ( PosID id ) const { return frameworkSpace[id];                   }
+  OCube        getCube   ( PosID id ) const { return Simplex::GetCube( getCubeID ( id ) ); }
+  inline PosID whatIs    ( PosID id ) const ;
+  inline PosID whereIs   ( PosID id ) const ;
+  Coord        whatIs    ( Coord C )  const { return CPositions<N>::getCoord( whatIs ( CPositions<N>::getIndex( C ) ) ); }
+  Coord        whereIs   ( Coord C )  const { return CPositions<N>::getCoord( whereIs( CPositions<N>::getIndex( C ) ) ); }
+  bool         integrity ( void    )  const ;
+  Facet        getFacet  ( const Facet front, const Facet up, int x, int y) const; // left-bottom corner: x = 0, y = 0
   
   // Printer
   void show ( Facet                  ) const;
@@ -94,7 +94,7 @@ public:
  // Non-operational static functions
 // ---------------------------------
 template<unsigned int N> 
-CFramework<N> CFramework<N>::BaseRotation( int rotID )
+CFramework<N> CFramework<N>::BaseRotation( RotID rotID )
 {
   return BaseRotations[rotID];
 }
@@ -117,9 +117,9 @@ void CFramework<N>::InitializeBase()
   {
     return;
   }
-  const int numberOfRotations = 3 * N * 3;
-  BaseRotations = new CFramework<N> [ numberOfRotations ];
-  for ( RotID rotID = 0; rotID < numberOfRotations; ++rotID )
+  const RotID maxRotID = 3 * N * 3;
+  BaseRotations = new CFramework<N> [ maxRotID + 1 ];
+  for ( RotID rotID = 0; rotID <= maxRotID; ++rotID )
   {
     BaseRotations[rotID].rotate( rotID );
   }
@@ -150,9 +150,9 @@ template<unsigned int N>
 CFramework<N>::CFramework( const CFramework<N> & cf1, const CFramework<N> & cf2 )
  : frameworkSpace( new CubeID [ Fsize ] )
 {
-  for ( int id = 0; id < Fsize; ++id )
+  for ( PosID id = 0; id < Fsize; ++id )
   {
-    const int position = cf2.whatIs( id );
+    const PosID position = cf2.whatIs( id );
     frameworkSpace[ id ] = Simplex::Composition( cf1.getCubeID( position ), cf2.getCubeID( id ) );
   }
 }
@@ -188,7 +188,7 @@ template<unsigned int N>
 CFramework<N> CFramework<N>::inverse() const
 {
   CFramework<N> inv;
-  for ( int id = 0; id < Fsize; ++id )
+  for ( PosID id = 0; id < Fsize; ++id )
   {
     const CubeID rotinv = Simplex::Inverse( frameworkSpace[ id ] );
     const int position = CPositions<N>::GetIndex( id, rotinv );
@@ -203,7 +203,7 @@ void CFramework<N>::rotate( Axis axis, Layer layer, Turn turn )
 {
   const int cubes = ( layer == 0 || layer == N - 1 ) ? N * N : 4 * ( N - 1 );
   int socket [ N * N ];
-  int state  [ N * N ]; // to store indices and values temporarily. Rotations must be atomic operations
+  CubeID state  [ N * N ]; // to store indices and values temporarily. Rotations must be atomic operations
   
   const CubeID twist = Simplex::Tilt( axis, turn );
   for ( int index = 0; index < cubes; ++index )
@@ -224,9 +224,7 @@ template<unsigned int N> void CFramework<N>::rotate( RotID rotID )
   Axis  axis  = getAxis  <N> ( rotID );
   Layer layer = getLayer <N> ( rotID );
   Turn  turn  = getTurn  <N> ( rotID );
-  
   rotate( axis, layer, turn ); 
-
 }
 
 template<unsigned int N> 
@@ -244,13 +242,13 @@ void CFramework<N>::shuffle()
  // Query functions
 //  ---------------
 template<unsigned int N>
-int CFramework<N>::whatIs( int id ) const
+PosID CFramework<N>::whatIs( PosID id ) const
 { 
   return CPositions<N>::GetIndex( id, Simplex::Inverse( frameworkSpace [ id ] ) ); 
 }
 
 template<unsigned int N>
-int CFramework<N>::whereIs( int id ) const
+PosID CFramework<N>::whereIs( PosID id ) const
 { 
   int orbit = id;
   while ( whatIs( orbit ) != id )
@@ -284,9 +282,9 @@ bool CFramework<N>::integrity() const
   int counter[6] = {};
   for ( auto side : orientations )
   {
-    for ( int x = 0; x < N; ++x )
+    for ( Layer x = 0; x < N; ++x )
     {
-      for ( int y = 0; y < N; ++y )
+      for ( Layer y = 0; y < N; ++y )
       {
         ++counter[ CFramework<N>::getFacet( side[0], side[1], x, y ) ];
       }
@@ -305,7 +303,10 @@ bool CFramework<N>::integrity() const
 template<unsigned int N>
 void CFramework<N>::show( Facet F ) const
 {
-  std::cout << colorOf( F ) << FChar << ' ';
+  if ( F != _NF )
+    std::cout << colorOf( F ) << FChar << ' ';
+  else
+    std::cout << FChar << ' ';
 }
 
 template<unsigned int N>
@@ -319,9 +320,9 @@ template<unsigned int N>
 void CFramework<N>::print( Facet right, Facet up ) const
 {
   std::cout << std::endl;
-  for ( int y = N - 1; y >= 0; --y )
+  for ( Layer y = N - 1; y >= 0; --y )
   {
-    for ( int x = 0; x < N; ++x )
+    for ( Layer x = 0; x < N; ++x )
     {
       show( right, up, x, y );
     }
@@ -335,13 +336,13 @@ void CFramework<N>::print( bool separator ) const
 {
   const int SideSize = separator ? N + 1 : N; 
   // print UP side
-  for ( int y = SideSize - 1; y >= 0; --y )
+  for ( Layer y = SideSize - 1; y >= 0; --y )
   {
-    for ( int x = 0; x < SideSize; ++x )
+    for ( Layer x = 0; x < SideSize; ++x )
     {
       show( _NF );
     }
-    for ( int x = 0; x < SideSize; ++x )
+    for ( Layer x = 0; x < SideSize; ++x )
     {
       show( _R, _B, x, y );
     }
@@ -349,11 +350,11 @@ void CFramework<N>::print( bool separator ) const
   }
   // print middle sides Left - Front - Right - Back
   Facet orientations [] = { _F, _R, _B, _L };
-  for ( int y = SideSize - 1; y >= 0; --y )
+  for ( Layer y = SideSize - 1; y >= 0; --y )
   {
     for ( Facet right: orientations )
     {
-      for ( int x = 0; x < SideSize; ++x )
+      for ( Layer x = 0; x < SideSize; ++x )
       {
         show( right, _U, x, y );
       }
@@ -361,13 +362,13 @@ void CFramework<N>::print( bool separator ) const
 	NL();
   }
   // print DOWN side
-  for ( int y = SideSize - 1; y >= 0; --y )
+  for ( Layer y = SideSize - 1; y >= 0; --y )
   {
-    for ( int x = 0; x < SideSize; ++x )
+    for ( Layer x = 0; x < SideSize; ++x )
     {
       show( _NF );
     }
-    for ( int x = 0; x < SideSize; ++x )
+    for ( Layer x = 0; x < SideSize; ++x )
     {
       show( _R, _F, x, y );
     }
