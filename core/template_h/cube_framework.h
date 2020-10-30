@@ -51,8 +51,8 @@ public:
   
   // Operations
   CFramework<N> inverse    ( void ) const;
-  void          rotate     ( Axis, Layer, Turn turn = 1 );
-  void          rotate     ( RotID rotID );
+  void          rotate     ( const Axis, const Layer, const Turn turn = 1 );
+  void          rotate     ( const RotID rotID );
   void          shuffle    ( void );
   
   static CFramework<N> Transform  ( const CFramework<N>& A, const CFramework<N>& C ) { return CFramework<N>( A.inverse(), C ); } // transform( A, C ) returns with B where A + B = C
@@ -197,33 +197,31 @@ CFramework<N> CFramework<N>::inverse() const
   return inv;
 }
 
-// clockwise rotation one slice (side) with 90 degree
+// clockwise rotation one layer (side) with 90 degree turns
 template<unsigned int N> 
-void CFramework<N>::rotate( Axis axis, Layer layer, Turn turn )
+void CFramework<N>::rotate( const Axis axis, const Layer layer, const Turn turn )
 {
   const int cubes = ( layer == 0 || layer == N - 1 ) ? N * N : 4 * ( N - 1 );
-  int socket [ N * N ];
-  CubeID state  [ N * N ]; // to store indices and values temporarily. Rotations must be atomic operations
+  CubeID state  [ cubes ]; // to store rotational states temporarily.
   
   const CubeID twist = Simplex::Tilt( axis, turn );
   for ( int index = 0; index < cubes; ++index )
   {
-    socket[index]    = CPositions<N>::GetLayer( axis, layer, index );
-    const CubeID & f = frameworkSpace [ socket[index] ];
+    const CubeID & f = frameworkSpace [ CPositions<N>::GetLayer( axis, layer, index ) ];
     state[index]     = Simplex::Composition( f, twist );
   }
   for ( int index = 0; index < cubes; ++index ) // apply stored assignments
   {
-    frameworkSpace[ CPositions<N>::GetIndex( socket[index], twist ) ] = state[ index ];
+    frameworkSpace[ CPositions<N>::GetIndex( CPositions<N>::GetLayer( axis, layer, index ), twist ) ] = state[ index ];
   }
 }
 
-// rotation by rotat IDs
-template<unsigned int N> void CFramework<N>::rotate( RotID rotID )
+// rotation by using RotID
+template<unsigned int N> void CFramework<N>::rotate( const RotID rotID )
 {
-  Axis  axis  = getAxis  <N> ( rotID );
-  Layer layer = getLayer <N> ( rotID );
-  Turn  turn  = getTurn  <N> ( rotID );
+  const Axis  axis  = getAxis  <N> ( rotID );
+  const Layer layer = getLayer <N> ( rotID );
+  const Turn  turn  = getTurn  <N> ( rotID );
   rotate( axis, layer, turn ); 
 }
 
