@@ -301,10 +301,7 @@ bool CFramework<N>::integrity() const
 template<unsigned int N>
 void CFramework<N>::show( Facet F ) const
 {
-  if ( F != _NF )
-    std::cout << colorOf( F ) << FChar << ' ';
-  else
-    std::cout << FChar << ' ';
+  std::cout << colorOf( F ) << FChar << ' ';
 }
 
 template<unsigned int N>

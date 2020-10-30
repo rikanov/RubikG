@@ -45,8 +45,8 @@ enum Axis
   _X, _Y, _Z, _NA
 };
 
-typedef unsigned char Layer;
-typedef unsigned char Turn;
+typedef char Layer;
+typedef char Turn;
 
 
  // Auxiliary inline functions

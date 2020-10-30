@@ -5,6 +5,8 @@
 int main()
 {
   init();
+  CFramework<4> A;
+  A.print(_L);
   UnitTests tests;
   tests.testCore();
   
