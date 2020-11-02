@@ -71,8 +71,8 @@ void Simplex::initGroup()
 void Simplex::initMetric()
 {
   byte redund[24] = {};
-  byte depth[24]  = {};
-  byte qeueu[24]  = {};
+  byte depth [24] = {};
+  byte qeueu [24] = {};
   
   all_id ( i ) { depth[i] = 0xFF; }
   depth[0] = 0;
@@ -84,7 +84,7 @@ void Simplex::initMetric()
   {
     for ( Axis axis : { _X, _Y, _Z } )
     {  
-      for ( RotID rot : { 1, 3 } )
+      for ( RotID rot : { 1, 2, 3 } )
       {
         const CubeID next = Composition( *qeueuOut, Tilt( axis, rot) );
         if ( depth[ next ] == 0xFF )

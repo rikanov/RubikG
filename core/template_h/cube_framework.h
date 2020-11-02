@@ -248,12 +248,12 @@ PosID CFramework<N>::whatIs( PosID id ) const
 template<unsigned int N>
 PosID CFramework<N>::whereIs( PosID id ) const
 { 
-  int orbit = id;
-  while ( whatIs( orbit ) != id )
-  { 
-    orbit = whatIs( orbit ); // go to the next in the cycle
+  CubeID rot = 0; 
+  while ( frameworkSpace[ CPositions<N>::GetIndex( id, rot ) ] != rot )
+  {
+    ++ rot;
   }
-  return orbit; // found: whereIs( orbit ) = id;
+  return CPositions<N>::GetIndex( id, rot );
 }
 
 template<unsigned int N>

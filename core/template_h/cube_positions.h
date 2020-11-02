@@ -50,10 +50,10 @@ class CPositions
   static CPositions * Singleton; 
   
   PosID routerPositions [ FrameworkSize [ N ] ][ 24 ];
-  PosID frameworkSlice  [ 3 ] [ N ] [ N * N ]; // [axis] [layer index] [cubes] 
+  PosID frameworkLayer  [ 3 ] [ N ] [ N * N ]; // [axis] [layer index] [cubes] 
   PosID coordToIndex    [ N ] [ N ] [ N ];
-  Coord indexToCoord    [ FrameworkSize [ N ] ];
-
+  Layer indexToCoord    [ FrameworkSize [ N ] ][ 3 ]; // [ PosID ] [ Axis ]
+  
   CPositions();
   
   Coord rotate ( Layer x, Layer y, Layer z, CubeID rot ); 
@@ -71,16 +71,17 @@ class CPositions
 public:
   static constexpr int GetSize ( ) { return Singleton->FrameworkSize [ N ]; }
   
-  static   void    Instance  ( void )                            { if ( Singleton == nullptr ) new CPositions<N>;       }
-  static   void    OnExit    ( void )                            { delete Singleton; Singleton = nullptr;               }
-  static   bool    ValID     ( PosID id )                        { return 0 <= id && id < GetSize();                    }
-  static   Coord   GetCoord  ( PosID id )                        { return Singleton->indexToCoord [ id ];               }
-  static   PosID   GetIndex  ( PosID id, CubeID rot)             { return Singleton->routerPositions[ id ][ rot ];      }
-  static   PosID   GetIndex  ( const Coord & C )                 { return GetIndex( C.x, C.y, C.z);                     }
-  static   PosID   GetIndex  ( Layer x, Layer y, Layer z )       { return Singleton->coordToIndex[ x ][ y ][ z ];       }
-  static   PosID   GetIndex  ( int x, int y, int z, CubeID rot ) { return GetNode( x, y, z ) [ rot ];                   }
-  static   Layer   GetLayer  ( Axis a, Layer l, Turn t )         { return Singleton->frameworkSlice [ a ][ l ][ t ];    }
-  static   Layer   LayerSize ( Layer l )                         { return l == 0 || l == N - 1 ? N * N : 4 * ( N - 1 ); }
+  static   void    Instance  ( void )                            { if ( Singleton == nullptr ) new CPositions<N>;            }
+  static   void    OnExit    ( void )                            { delete Singleton; Singleton = nullptr;                    }
+  static   bool    ValID     ( PosID id )                        { return 0 <= id && id < GetSize();                         }
+  static   PosID   GetIndex  ( PosID id, CubeID rot)             { return Singleton->routerPositions[ id ][ rot ];           }
+  static   PosID   GetIndex  ( const Coord & C )                 { return GetIndex( C.x, C.y, C.z);                          }
+  static   PosID   GetIndex  ( Layer x, Layer y, Layer z )       { return Singleton->coordToIndex[ x ][ y ][ z ];            }
+  static   PosID   GetIndex  ( int x, int y, int z, CubeID rot ) { return GetNode( x, y, z ) [ rot ];                        }
+  static   Layer   GetLayer  ( Axis a, Layer l, byte id )        { return Singleton->frameworkLayer [ a ][ l ][ id ];        }
+  static   Layer   GetCoord  ( PosID p, Axis a )                 { return Singleton->indexToCoord [ p ][ a ];                }
+  static   Layer   GetCoord  ( PosID p, RotID r, Axis a )        { return Singleton->indexToCoord [ GetIndex( p, r ) ][ a ]; }
+  static   Layer   LayerSize ( Layer l )                         { return l == 0 || l == N - 1 ? N * N : 4 * ( N - 1 );      }
 };
 
 /// ----------------------------------- Template definitions starts here ------------------------------------- ///
@@ -126,11 +127,14 @@ void CPositions<N>::initIndices()
   {
     if ( x == 0 || x == N - 1 || y == 0 || y == N - 1 || z == 0 || z == N - 1 )
     {
-      frameworkSlice [ _X ][ x ][ idX[x]++ ] = index;
-      frameworkSlice [ _Y ][ y ][ idY[y]++ ] = index;
-      frameworkSlice [ _Z ][ z ][ idZ[z]++ ] = index;
+      frameworkLayer [ _X ][ x ][ idX[x]++ ] = index;
+      frameworkLayer [ _Y ][ y ][ idY[y]++ ] = index;
+      frameworkLayer [ _Z ][ z ][ idZ[z]++ ] = index;
       
-      indexToCoord [index] = { x, y, z };
+      indexToCoord [ index ][ _X ] = x;
+      indexToCoord [ index ][ _Y ] = y;
+      indexToCoord [ index ][ _Z ] = z;
+      
       coordToIndex [ x ][ y ][ z ] = index++;
     }
     else

@@ -3,26 +3,75 @@
 
 #include <cube_node.h>
 
- // Querry 
-template<unsigned int N> 
-class Engine
+struct Slot
 {
-  
-public:
-  static void Path( const CNode<N>* C, RotID* P );
+  PosID pos = 0;
+  RotID rot = 0;
 };
 
  // Querry 
 template<unsigned int N> 
-void Engine<N>::Path( const CNode<N>* C, RotID* P )
+class Engine
 {
-  while ( C != CNode<N>::getRoot() )
+  CFramework<N> & m_CFramework;
+  
+  Slot * m_selectedCubes;
+  byte   m_counter[ 3 ][ N ];
+  
+  void turnLayer( Axis axis, Layer layer );
+public:
+  Engine ( CFramework<N> & C, PosID * P );
+  bool isTwistedOnAxis( Axis A );
+};
+
+template<unsigned int N> Engine<N>::Engine(CFramework<N>& C, PosID * P)
+ : m_CFramework   ( C )
+{
+  Slot * slotPointer = m_selectedCubes;
+  while ( *P != 0xFF )
   {
-    *( P++ ) = C -> rotID();
-    C = C -> parent();
+    slotPointer->pos = m_CFramework.whereIs( *P );
+    slotPointer->rot = m_CFramework.getCubeID( slotPointer->pos );
+    
+    for ( Axis axis : { _X, _Y, _Z } )
+      ++ m_counter[ axis ][ CPositions<N>::GetCoord( slotPointer->pos, axis ) ];
   }
-  *P = 0;
 }
 
-#endif
+template<unsigned int N> 
+bool Engine<N>::isTwistedOnAxis(Axis A)
+{
+  for ( Layer layer = 0; layer < N; ++layer )
+  {
+    for ( PosID index = 1; index <= CPositions<N>::LayerSize( layer ); ++index )
+    {
+      if ( m_CFramework.getCubeID( index ) != m_CFramework.getCubeID( 0 ) )
+      {
+        return false;
+      }
+    }
+  }
+  return true;
+}
 
+template<unsigned int N> void Engine<N>::turnLayer(Axis axis, Layer layer)
+{
+  int parts = m_counter[ axis ][ layer ];
+  for( Slot * slotPointer = m_selectedCubes; parts > 0; ++ slotPointer )
+  {
+    if ( CPositions<N>::GetCoord( slotPointer->pos, slotPointer->rot, axis ) == layer )
+    {
+      for ( Axis toDelete : { _X, _Y, _Z} )
+        -- m_counter[ toDelete ][ CPositions<N>::GetCoord( slotPointer->pos, toDelete ) ];
+        
+      slotPointer->rot = Simplex::Composition( slotPointer->rot, Simplex::Tilt( axis ) );
+      
+      for ( Axis toAdd : { _X, _Y, _Z} )
+        ++ m_counter[ toAdd ][ CPositions<N>::GetCoord( slotPointer->pos, toAdd ) ];
+        
+      -- parts;
+    }
+  }
+}
+
+#endif // !ENGINE_HEADER
