@@ -201,7 +201,7 @@ CFramework<N> CFramework<N>::inverse() const
 template<unsigned int N> 
 void CFramework<N>::rotate( const Axis axis, const Layer layer, const Turn turn )
 {
-  const int cubes = ( layer == 0 || layer == N - 1 ) ? N * N : 4 * ( N - 1 );
+  const int cubes = CPositions<N>::LayerSize( layer );
   CubeID state  [ cubes ]; // to store rotational states temporarily.
   
   const CubeID twist = Simplex::Tilt( axis, turn );

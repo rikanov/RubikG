@@ -22,6 +22,8 @@
 
 #include <def_colors.h>
 
+typedef unsigned char byte;
+
  // ID types
 //  --------
 

@@ -32,12 +32,14 @@ private: // functions
   Simplex();
   void init();
   void initGroup();
+  void initMetric();
 
 private: // array datamembers
   OCube                  simplexGroup     [ 24 /* ID */ ];
   CubeID                 simplexGroupID   [ 6 /*Right*/ ][ 6 /*Up*/ ];
   CubeID /* X: [0 23] */ composition      [ 24 /* A */  ][ 24 /*B*/ ]; // X = AB
   CubeID /* X: [0 23] */ transform        [ 24 /* A */  ][ 24 /*B*/ ]; // AX = B => X = inv(A) B
+  byte                   metric           [ 24 /* A */  ][ 24 /*B*/ ];
   
 public:
 
