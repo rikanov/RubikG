@@ -71,16 +71,16 @@ class CPositions
 public:
   static constexpr int GetSize ( ) { return Singleton->FrameworkSize [ N ]; }
   
-  static   void    Instance ( )                                 { if ( Singleton == nullptr ) new CPositions<N>;    }
-  static   void    OnExit   ( )                                 { delete Singleton; Singleton = nullptr;            }
-  static   bool    ValID    ( PosID id )                        { return 0 <= id && id < GetSize();                 }
-  static   Coord   GetCoord ( PosID id )                        { return Singleton->indexToCoord [ id ];            }
-  static   PosID   GetIndex ( PosID id, CubeID rot)             { return Singleton->routerPositions[ id ][ rot ];   }
-  static   PosID   GetIndex ( const Coord & C )                 { return GetIndex( C.x, C.y, C.z);                  }
-  static   PosID   GetIndex ( Layer x, Layer y, Layer z )       { return Singleton->coordToIndex[ x ][ y ][ z ];    }
-  static   PosID   GetIndex ( int x, int y, int z, CubeID rot ) { return GetNode( x, y, z ) [ rot ];                }
-  static   Layer   GetLayer ( Axis a, Layer l, Turn t )         { return Singleton->frameworkSlice [ a ][ l ][ t ]; }
-
+  static   void    Instance  ( void )                            { if ( Singleton == nullptr ) new CPositions<N>;       }
+  static   void    OnExit    ( void )                            { delete Singleton; Singleton = nullptr;               }
+  static   bool    ValID     ( PosID id )                        { return 0 <= id && id < GetSize();                    }
+  static   Coord   GetCoord  ( PosID id )                        { return Singleton->indexToCoord [ id ];               }
+  static   PosID   GetIndex  ( PosID id, CubeID rot)             { return Singleton->routerPositions[ id ][ rot ];      }
+  static   PosID   GetIndex  ( const Coord & C )                 { return GetIndex( C.x, C.y, C.z);                     }
+  static   PosID   GetIndex  ( Layer x, Layer y, Layer z )       { return Singleton->coordToIndex[ x ][ y ][ z ];       }
+  static   PosID   GetIndex  ( int x, int y, int z, CubeID rot ) { return GetNode( x, y, z ) [ rot ];                   }
+  static   Layer   GetLayer  ( Axis a, Layer l, Turn t )         { return Singleton->frameworkSlice [ a ][ l ][ t ];    }
+  static   Layer   LayerSize ( Layer l )                         { return l == 0 || l == N - 1 ? N * N : 4 * ( N - 1 ); }
 };
 
 /// ----------------------------------- Template definitions starts here ------------------------------------- ///
