@@ -26,11 +26,11 @@
 
 // Mapping between all the basic rotations and the set of one-byte size IDs:
 // Axis  --> X,Y or Z represented by integers [ 0..2 ]
-// Slice --> index of the turning slice [ 0..N ) where N isthe size of the cube
+// LAyer --> index of the turning slice [ 0..N ) where N isthe size of the cube
 // Turn  --> 1: a simple clockwise turn  2: double turn 3: tripple (or inverse) turn
 //
 // to get ID we use a mixed radix system:
-// ID = 3 * N * Axis + 3 * Slice + Turn 
+// ID = 3 * N * Axis + 3 * Layer + Turn 
 // ID < 3 * N * 3
 
  // RotID from components

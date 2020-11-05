@@ -1,6 +1,4 @@
 #include <simplex.h>
-#include <text_output.h>
-#include <text_output.h>
 
 Simplex * Simplex::Singleton = nullptr;
 
@@ -95,7 +93,6 @@ void Simplex::initMetric()
         else if ( depth[ next ] == depth[ *qeueuOut ] + 1 )
         {
           ++ redund[ next ];
-          clog ( "Warn." , depth[ *qeueuOut ] + 1 );
         }
       }
     }
@@ -107,8 +104,6 @@ void Simplex::initMetric()
     all_id ( b )
     {
       metric[a][b] = depth[ Transform( a, b ) ];
-      slog_ ( "", (int) metric[a][b], '(', (int) redund[ Transform( a, b ) ], ") " );
     }
-    NL();
   }
 }
