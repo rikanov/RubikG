@@ -68,15 +68,15 @@ void Simplex::initGroup()
 
 void Simplex::initMetric()
 {
-  byte redund[24] = {};
-  byte depth [24] = {};
-  byte qeueu [24] = {};
+  byte   redund[24] = {};
+  byte   depth [24] = {};
+  CubeID qeueu [24] = {};
   
   all_id ( i ) { depth[i] = 0xFF; }
   depth[0] = 0;
   
-  byte * qeueuOut  = qeueu;
-  byte * qeueuIn   = qeueu + 1;
+  CubeID * qeueuOut  = qeueu;
+  CubeID * qeueuIn   = qeueu + 1;
   
   while ( qeueuOut != qeueuIn )
   {

@@ -8,8 +8,8 @@
 
 struct Slot
 {
-  PosID pos = 0;
-  RotID rot = 0;
+  PosID  pos = 0;
+  CubeID rot = 0;
 };
 
 template<unsigned int N> 
@@ -41,8 +41,8 @@ public:
   Engine ( CFramework<N> & C, const std::initializer_list<PosID> & P );
   ~Engine();
   
-  int solve( const byte& depth );
-  const std::vector< RotID >& getSolution( void ) const;
+  CubeID solve( const int& depth );
+  const  std::vector< RotID >& getSolution( void ) const;
 };
 
 template<unsigned int N> Engine<N>::Engine( CFramework<N>& C, const std::initializer_list<PosID> & P )
@@ -53,6 +53,8 @@ template<unsigned int N> Engine<N>::Engine( CFramework<N>& C, const std::initial
   Slot * slotPointer = m_selectedCubes;
   for ( PosID pos: P )
   {
+    if( pos == 0xFF )
+      continue;
     slotPointer -> pos = pos;
     slotPointer -> rot = m_CFramework.getCubeID( m_CFramework.whereIs( pos ) );
     addCube( slotPointer ++ );    
@@ -66,13 +68,17 @@ template<unsigned int N> Engine<N>::~Engine()
 
 template<unsigned int N> bool Engine<N>::isSolved() const
 {
-  for ( int t = 0; t < m_numberOfCubes; ++ t )
+  for ( unsigned t = 1; t < m_numberOfCubes; ++ t )
   {
-    if ( 0 !=  m_selectedCubes[ t ].rot )
+    if ( m_selectedCubes[ 0 ].rot !=  m_selectedCubes[ t ].rot )
     {
       return false;
     }
-  }clog( "depth:", (int)m_depth);
+  }
+  for ( unsigned t = 0; t < m_numberOfCubes; ++ t )
+  {
+    clog( CPositions<N>::GetCoord( m_selectedCubes[ t ].pos ).toString(), Simplex::GetCube( m_selectedCubes[ t ].rot ).toString() );
+  }
   return true;
 }
 
@@ -118,9 +124,9 @@ bool  Engine<N>::testLayer( const Axis axis, const Layer layer )
     for ( Turn turn : { 1, 2, 3 } )
     {
       turnLayer( axis, layer );
-      if ( isSolved() || ( m_depth < m_maxDepth && extend( axis, layer + 1 ) ) )
+      if ( extend( axis, layer + 1 ) )
       {
-        m_solution.push_back( getRotID <N> ( axis, layer, turn ) ); clog( toString<N>(getRotID <N> ( axis, layer, turn ) ), m_solution.size() );
+        m_solution.push_back( getRotID <N> ( axis, layer, turn ) );
         return true;
       }
     }
@@ -133,13 +139,17 @@ bool  Engine<N>::testLayer( const Axis axis, const Layer layer )
 template<unsigned int N> 
 bool Engine<N>::extend( const Axis axis, const Layer layer )
 {
+  if ( m_depth == m_maxDepth )
+  {
+    return isSolved();
+  }
   for ( Axis A: { _X, _Y, _Z } )
   {
-    for ( Layer L = ( A == axis ? layer : 0 ); L < N; ++L )
+    for ( Layer L = ( A == axis ? layer : 0 ); L < N; ++ L )
     {
       if ( testLayer( A, L ) )
       {
-        return true; clog("S", m_solution.size() );
+        return true;
       }
     }
   }
@@ -147,20 +157,29 @@ bool Engine<N>::extend( const Axis axis, const Layer layer )
 }
 
 template<unsigned int N> 
-int Engine<N>::solve( const byte& depth )
+CubeID Engine<N>::solve( const int& depth )
 {
-  m_solution.clear();
-  m_depth = 0;
-  m_maxDepth = depth;
-  const bool success = extend( _NA, 0 );
-  std::reverse( m_solution.begin(), m_solution.end() );
-  clog( m_solution.size(), "rotations" );
-  for ( RotID rotID: m_solution )
+  for ( int test = 0; test < depth; ++ test )
   {
-    clog ( toString<N>( rotID ) );
-    m_CFramework.rotate( rotID );
+    m_solution.clear();
+    m_depth = 0;
+    m_maxDepth = test;
+
+    const bool success = extend( _NA, 0 );
+  
+    if ( success )
+    {
+      std::reverse( m_solution.begin(), m_solution.end() );
+      clog( m_solution.size(), "rotations" );
+      for ( RotID rotID: m_solution )
+      {
+        clog ( toString<N>( rotID ) );
+        m_CFramework.rotate( rotID );
+      }
+      return m_selectedCubes[ 0 ].rot;
+    }
   }
-  return success ? m_depth : -1 ;
+  return 0; // solution not found
 }
 
 #endif // !ENGINE_HEADER

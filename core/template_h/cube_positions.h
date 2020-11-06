@@ -25,17 +25,22 @@
 
 static const bool SHOW_LOG = false; // setting true is only for debuging purposes
 
-#define for_vector( x,y,z, N )    \
-  for ( Layer x = 0; x < N; ++x )  \
-    for ( Layer y = 0; y < N; ++y ) \
-       for ( Layer z = 0; z < N; ++z )
+#define for_vector( x, y, z, N )   \
+   for ( Layer x = 0; x < N; ++x )  \
+     for ( Layer y = 0; y < N; ++y ) \
+        for ( Layer z = 0; z < N; ++z )
 
 
 struct Coord 
 {
-  Layer x = 0;
-  Layer y = 0;
-  Layer z = 0; 
+  Layer x ;
+  Layer y ;
+  Layer z ; 
+
+  Coord(): x( 0 ), y( 0 ), z( 0 )
+  {}
+  Coord( Layer x, Layer y, Layer z): x( x ), y( y ), z( z ) 
+  {}  
   std::string toString() const 
   { 
     return "< " + std::to_string( x ) + ' ' + std::to_string( y ) + ' ' + std::to_string( z ) + " >";
@@ -49,10 +54,10 @@ class CPositions
   static constexpr unsigned int FrameworkSize [] = { 0, 1, 8 - 0, 27 - 1, 64 - 8, 125 - 27, 216 - 64, 341 - 125, 512 - 216, 721 - 341, 1000 - 512 }; //  N > 1 :  N ^ 3 - ( N - 2 ) ^ 3
   static CPositions * Singleton; 
   
-  PosID routerPositions [ FrameworkSize [ N ] ][ 24 ];
-  PosID frameworkLayer  [ 3 ] [ N ] [ N * N ]; // [axis] [layer index] [cubes] 
-  PosID coordToIndex    [ N ] [ N ] [ N ];
-  Layer indexToCoord    [ FrameworkSize [ N ] ][ 3 ]; // [ PosID ] [ Axis ]
+  PosID routerPositions [ FrameworkSize [ N ] ][ 24 ] = {};
+  PosID frameworkLayer  [ 3 ] [ N ] [ N * N ]         = {}; // [axis] [layer index] [cubes] 
+  PosID coordToIndex    [ N ] [ N ] [ N ]             = {};
+  Layer indexToCoord    [ FrameworkSize [ N ] ][ 3 ]  = {}; // [ PosID ] [ Axis ]
   
   CPositions();
   
@@ -78,10 +83,18 @@ public:
   static   PosID   GetIndex  ( const Coord & C )                 { return GetIndex( C.x, C.y, C.z);                          }
   static   PosID   GetIndex  ( Layer x, Layer y, Layer z )       { return Singleton->coordToIndex[ x ][ y ][ z ];            }
   static   PosID   GetIndex  ( int x, int y, int z, CubeID rot ) { return GetNode( x, y, z ) [ rot ];                        }
-  static   Layer   GetLayer  ( Axis a, Layer l, byte id )        { return Singleton->frameworkLayer [ a ][ l ][ id ];        }
+  static   PosID   GetLayer  ( Axis a, Layer l, byte id )        { return Singleton->frameworkLayer [ a ][ l ][ id ];        }
+  static   Layer   LayerSize ( Layer l )                         { return l == 0 || l == N - 1 ? N * N : 4 * ( N - 1 );      }
   static   Layer   GetCoord  ( PosID p, Axis a )                 { return Singleton->indexToCoord [ p ][ a ];                }
   static   Layer   GetCoord  ( PosID p, RotID r, Axis a )        { return Singleton->indexToCoord [ GetIndex( p, r ) ][ a ]; }
-  static   Layer   LayerSize ( Layer l )                         { return l == 0 || l == N - 1 ? N * N : 4 * ( N - 1 );      }
+  static   Coord   GetCoord  ( PosID p ) 
+  { 
+    return Coord( 
+      Singleton->indexToCoord [ p ][ _X ], 
+      Singleton->indexToCoord [ p ][ _Y ], 
+      Singleton->indexToCoord [ p ][ _Z ]
+      ); 
+  }
 };
 
 /// ----------------------------------- Template definitions starts here ------------------------------------- ///
@@ -150,13 +163,13 @@ void CPositions<N>::initPositions()
   initIndices();
   for_vector ( x, y, z, N )
   {
-    if ( GetIndex( x, y, z ) != -1 )
+    if ( GetIndex( x, y, z ) != 0xFF )
     {
-      if ( SHOW_LOG ) clog ( '\n', N, 'X', N,"  ... ", x,  y, z, "\t  ",  GetIndex( x, y, z) );
+      if ( SHOW_LOG ) clog ( '\n', N, 'X', N,"  ... ", (int)x, (int)y, (int)z, "\t  ", (int) GetIndex( x, y, z) );
       all_id ( id )
       {
         const Coord C = rotate ( x, y, z, id );
-        if ( SHOW_LOG ) clog ( Simplex::GetCube ( id ).toString(), " --> ", C.toString() , "\t| ",GetIndex( C ) );
+        if ( SHOW_LOG ) clog ( Simplex::GetCube ( id ).toString(), " --> ", C.toString() , "\t| ", (int) GetIndex( C ) );
         routerPositions[ GetIndex( x, y, z ) ][ id ] = GetIndex( C );
       }
     }

@@ -28,12 +28,6 @@
 template<unsigned int N>
 class CFramework
 {
-  static CFramework<N> * BaseRotations;
-
-  static inline CFramework<N> BaseRotation   ( RotID rotID );
-  static inline CFramework<N> BaseRotation   ( Axis A, Layer layer, Turn turn );
-  static inline CFramework<N> RandomRotation ();
-  
   static constexpr size_t Fsize = CPositions<N>::GetSize();
   CubeID * frameworkSpace;
 
@@ -53,7 +47,7 @@ public:
   CFramework<N> inverse    ( void ) const;
   void          rotate     ( const Axis, const Layer, const Turn turn = 1 );
   void          rotate     ( const RotID rotID );
-  void          shuffle    ( void );
+  void          shuffle    ( int depth = 0 );
   
   static CFramework<N> Transform  ( const CFramework<N>& A, const CFramework<N>& C ) { return CFramework<N>( A.inverse(), C ); } // transform( A, C ) returns with B where A + B = C
   
@@ -90,49 +84,6 @@ public:
 #endif
 
 /// ----------------------------------- Template definitions starts here ------------------------------------- ///
-
- // Non-operational static functions
-// ---------------------------------
-template<unsigned int N> 
-CFramework<N> CFramework<N>::BaseRotation( RotID rotID )
-{
-  return BaseRotations[rotID];
-}
-
-template<unsigned int N> 
-CFramework<N> CFramework<N>::BaseRotation( Axis A, Layer layer, Turn turn )
-{
-  return BaseRotations[ getRotID<N>( A, layer, turn ) ];
-}
-
-template<unsigned int N> CFramework<N> CFramework<N>::RandomRotation()
-{
-  return BaseRotations[ randomRotID<N>() ];
-}
-
-template<unsigned int N> 
-void CFramework<N>::InitializeBase()
-{
-  if ( BaseRotations )
-  {
-    return;
-  }
-  const RotID maxRotID = 3 * N * 3;
-  BaseRotations = new CFramework<N> [ maxRotID + 1 ];
-  for ( RotID rotID = 0; rotID <= maxRotID; ++rotID )
-  {
-    BaseRotations[rotID].rotate( rotID );
-  }
-}
-
-template<unsigned int N> void CFramework<N>::DeleteBase()
-{
-  delete[] BaseRotations;
-  BaseRotations = nullptr;
-}
-  
-template<unsigned int N>
-CFramework<N> * CFramework<N>::BaseRotations = nullptr;
 
  // Constructors
 //  ------------
@@ -202,7 +153,7 @@ template<unsigned int N>
 void CFramework<N>::rotate( const Axis axis, const Layer layer, const Turn turn )
 {
   const int cubes = CPositions<N>::LayerSize( layer );
-  CubeID state  [ cubes ]; // to store rotational states temporarily.
+  CubeID state  [ N * N ]; // to store rotational states temporarily.
   
   const CubeID twist = Simplex::Tilt( axis, turn );
   for ( int index = 0; index < cubes; ++index )
@@ -226,11 +177,11 @@ template<unsigned int N> void CFramework<N>::rotate( const RotID rotID )
 }
 
 template<unsigned int N> 
-void CFramework<N>::shuffle()
+void CFramework<N>::shuffle( int depth )
 {
   static std::default_random_engine engine( static_cast<unsigned int>( time( 0 ) ) );
   static std::uniform_int_distribution<int> dist( 2 * N * N, 3 * N * N);
-  int counter = dist( engine ); 
+  int counter = depth == 0 ? dist( engine ) : depth; 
   while ( 0 < counter-- )
   {
     CFramework<N>::rotate( randomRotID<N>() );

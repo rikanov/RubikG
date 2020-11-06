@@ -1,4 +1,5 @@
 #include <oriented_cube.h>
+#include <string>
 
 const char OCube::Tokens [7] = "FRUDLB";
 
