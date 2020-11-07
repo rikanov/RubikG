@@ -34,23 +34,6 @@ template<unsigned int N> Engine<N>::~Engine()
 }
 
 template<unsigned int N> 
-bool Engine<N>::isSolved() const
-{
-  for ( unsigned t = 1; t < m_numberOfCubes; ++ t )
-  {
-    if ( m_selectedCubes[ 0 ].rot !=  m_selectedCubes[ t ].rot )
-    {
-      return false;
-    }
-  }
-  for ( unsigned t = 0; t < m_numberOfCubes; ++ t )
-  {
-    clog( CPositions<N>::GetCoord( m_selectedCubes[ t ].pos ).toString(), Simplex::GetCube( m_selectedCubes[ t ].rot ).toString() );
-  }
-  return true;
-}
-
-template<unsigned int N> 
 bool Engine<N>::isTwistedOnAxis( Axis axis ) const
 {
   for ( Layer layer = 0; layer < N; ++ layer )

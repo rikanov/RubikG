@@ -36,7 +36,7 @@ class OCube
 
   Facet  m_whereIs [6];
   Facet  m_whatIs  [6];
-  bool   m_aligned [6];
+  bool   m_aligned [7];
   CubeID m_groupID;
 
   std::string m_readable;

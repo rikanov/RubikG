@@ -44,31 +44,31 @@ const Facet OCube::FrontSides [ 6 /*Right*/ ][ 6 /*Up*/ ] = {
 
 void OCube::init( Facet r, Facet u, CubeID groupID )
 {
-	m_whatIs[_R] = r;
-	m_whatIs[_U] = u;
-	m_whatIs[_F] = FrontSide( r, u );
+  m_whatIs[_R] = r;
+  m_whatIs[_U] = u;
+  m_whatIs[_F] = FrontSide( r, u );
 
-	m_whatIs[_L] = SideOpposite( m_whatIs[_R] );
-	m_whatIs[_D] = SideOpposite( m_whatIs[_U] );
-	m_whatIs[_B] = SideOpposite( m_whatIs[_F] );
+  m_whatIs[_L] = SideOpposite( m_whatIs[_R] );
+  m_whatIs[_D] = SideOpposite( m_whatIs[_U] );
+  m_whatIs[_B] = SideOpposite( m_whatIs[_F] );
 
-	all_facet( ID )
-	{
-		m_whereIs[m_whatIs[ID]] = ID;
-		m_aligned[ID] = ( m_whatIs[ID] == ID );
-	}
+  all_facet( ID )
+  {
+    m_whereIs[m_whatIs[ID]] = ID;
+    m_aligned[ID] = ( m_whatIs[ID] == ID );
+  }
+  m_aligned[_NF] = false;
+  m_groupID = groupID;
 
-	m_groupID = groupID;
-
-	// Set a readable name 
-	m_readable.push_back( Token ( whatIs( _R ) ) );
-	m_readable.push_back( Token ( whatIs( _U ) ) );
-	m_readable.push_back( Token ( whatIs( _F ) ) );
-	m_readable.push_back( '(' );
-	if (m_groupID < 10)
-	{
-		m_readable.push_back( ' ' );
-	}
-	m_readable.append( std::to_string( m_groupID ) );
-	m_readable.push_back( ')' );
+  // Set a readable name 
+  m_readable.push_back( Token ( whatIs( _R ) ) );
+  m_readable.push_back( Token ( whatIs( _U ) ) );
+  m_readable.push_back( Token ( whatIs( _F ) ) );
+  m_readable.push_back( '(' );
+  if (m_groupID < 10)
+  {
+      m_readable.push_back( ' ' );
+  }
+  m_readable.append( std::to_string( m_groupID ) );
+  m_readable.push_back( ')' );
 }

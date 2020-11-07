@@ -40,19 +40,19 @@ class Engine
    // Results
   //  -------
   std::vector<RotID> m_solution;    // path to solution
-  
-  // inline functions to maintain counter data
-  void addCube( Slot * S )  { for ( Axis axis : { _X, _Y, _Z } ) ++ m_counter[ axis ][ CPositions<N>::GetCoord( S -> pos, S -> rot, axis ) ]; }
-  void delCube( Slot * S )  { for ( Axis axis : { _X, _Y, _Z } ) -- m_counter[ axis ][ CPositions<N>::GetCoord( S -> pos, S -> rot, axis ) ]; }
-  
   // Query functions
   bool isTwistedOnAxis( Axis A ) const;
   bool isSolved() const;
   
-  // search engines
+   // search engines
+  //  --------------
   bool  extend    ( const Axis, const Layer );
   bool  testLayer ( const Axis, const Layer );
   void  turnLayer ( const Axis, const Layer );
+  // inline functions to maintain counter data
+  void  addCube   ( Slot * S )  { for ( Axis axis : { _X, _Y, _Z } ) ++ m_counter[ axis ][ CPositions<N>::GetCoord( S -> pos, S -> rot, axis ) ]; }
+  void  delCube   ( Slot * S )  { for ( Axis axis : { _X, _Y, _Z } ) -- m_counter[ axis ][ CPositions<N>::GetCoord( S -> pos, S -> rot, axis ) ]; }
+  
   
 public:
   

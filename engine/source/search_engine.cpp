@@ -5,6 +5,21 @@
 
 
 template<unsigned int N> 
+bool Engine<N>::isSolved() const
+{
+  bool solved = true;
+  for ( unsigned t = 1; solved && t < m_numberOfCubes; ++ t )
+  {
+    solved = ( m_selectedCubes[ 0 ].rot ==  m_selectedCubes[ t ].rot );
+  }
+  for ( unsigned t = 0; solved && t < m_numberOfCubes; ++ t )
+  {
+    clog( CPositions<N>::GetCoord( m_selectedCubes[ t ].pos ).toString(), Simplex::GetCube( m_selectedCubes[ t ].rot ).toString() );
+  }
+  return solved;
+}
+
+template<unsigned int N> 
 bool  Engine<N>::testLayer( const Axis axis, const Layer layer )
 {
   ++ m_depth;

@@ -57,6 +57,8 @@ class CPositions
   PosID routerPositions [ FrameworkSize [ N ] ][ 24 ] = {};
   PosID frameworkLayer  [ 3 ] [ N ] [ N * N ]         = {}; // [axis] [layer index] [cubes] 
   PosID coordToIndex    [ N ] [ N ] [ N ]             = {};
+  Facet align           [ FrameworkSize [ N ] ]       = {};
+  int   cubeType        [ FrameworkSize [ N ] ]       = {};
   Layer indexToCoord    [ FrameworkSize [ N ] ][ 3 ]  = {}; // [ PosID ] [ Axis ]
   
   CPositions();
@@ -76,17 +78,19 @@ class CPositions
 public:
   static constexpr int GetSize ( ) { return Singleton->FrameworkSize [ N ]; }
   
-  static   void    Instance  ( void )                            { if ( Singleton == nullptr ) new CPositions<N>;            }
-  static   void    OnExit    ( void )                            { delete Singleton; Singleton = nullptr;                    }
-  static   bool    ValID     ( PosID id )                        { return 0 <= id && id < GetSize();                         }
-  static   PosID   GetIndex  ( PosID id, CubeID rot)             { return Singleton->routerPositions[ id ][ rot ];           }
-  static   PosID   GetIndex  ( const Coord & C )                 { return GetIndex( C.x, C.y, C.z);                          }
-  static   PosID   GetIndex  ( Layer x, Layer y, Layer z )       { return Singleton->coordToIndex[ x ][ y ][ z ];            }
-  static   PosID   GetIndex  ( int x, int y, int z, CubeID rot ) { return GetNode( x, y, z ) [ rot ];                        }
-  static   PosID   GetLayer  ( Axis a, Layer l, byte id )        { return Singleton->frameworkLayer [ a ][ l ][ id ];        }
-  static   Layer   LayerSize ( Layer l )                         { return l == 0 || l == N - 1 ? N * N : 4 * ( N - 1 );      }
-  static   Layer   GetCoord  ( PosID p, Axis a )                 { return Singleton->indexToCoord [ p ][ a ];                }
-  static   Layer   GetCoord  ( PosID p, RotID r, Axis a )        { return Singleton->indexToCoord [ GetIndex( p, r ) ][ a ]; }
+  static   void    Instance  ( void )                            { if ( Singleton == nullptr ) new CPositions<N>;              }
+  static   void    OnExit    ( void )                            { delete Singleton; Singleton = nullptr;                      }
+  static   bool    ValID     ( PosID id )                        { return 0 <= id && id < GetSize();                           }
+  static   int     Type      ( PosID id )                        { return Singleton -> cubeType[ id ];                         }
+  static   Facet   Side      ( PosID id )                        { return Singleton -> align[ id ];                            }
+  static   PosID   GetIndex  ( PosID id, CubeID rot)             { return Singleton -> routerPositions[ id ][ rot ];           }
+  static   PosID   GetIndex  ( const Coord & C )                 { return GetIndex( C.x, C.y, C.z);                            }
+  static   PosID   GetIndex  ( Layer x, Layer y, Layer z )       { return Singleton -> coordToIndex[ x ][ y ][ z ];            }
+  static   PosID   GetIndex  ( int x, int y, int z, CubeID rot ) { return GetNode( x, y, z ) [ rot ];                          }
+  static   PosID   GetLayer  ( Axis a, Layer l, byte id )        { return Singleton -> frameworkLayer [ a ][ l ][ id ];        }
+  static   Layer   LayerSize ( Layer l )                         { return l == 0 || l == N - 1 ? N * N : 4 * ( N - 1 );        }
+  static   Layer   GetCoord  ( PosID p, Axis a )                 { return Singleton -> indexToCoord [ p ][ a ];                }
+  static   Layer   GetCoord  ( PosID p, RotID r, Axis a )        { return Singleton -> indexToCoord [ GetIndex( p, r ) ][ a ]; }
   static   Coord   GetCoord  ( PosID p ) 
   { 
     return Coord( 
@@ -138,11 +142,38 @@ void CPositions<N>::initIndices()
   idX [N] = {}, idY [N] = {}, idZ [N] = {}; // slice indices
   for_vector ( x, y, z, N )
   {
-    if ( x == 0 || x == N - 1 || y == 0 || y == N - 1 || z == 0 || z == N - 1 )
-    {
-      frameworkLayer [ _X ][ x ][ idX[x]++ ] = index;
-      frameworkLayer [ _Y ][ y ][ idY[y]++ ] = index;
-      frameworkLayer [ _Z ][ z ][ idZ[z]++ ] = index;
+    //  cType:
+    //    0: inner cube
+    //    1: side
+    //    2: edge
+    //    3: corner
+    const int cType = ( x == 0 || x == N - 1 ) + ( y == 0 || y == N - 1 ) + ( z == 0 || z == N - 1 );
+       
+    if ( cType != 0 )
+    { 
+      cubeType[ index ] = cType;
+      
+      Facet F = _NF;
+      if ( cType == 1 )
+      {
+        if ( x == 0 )
+          F = _L;
+        else if ( x == N - 1 )
+          F = _R;
+        else if ( y == 0 )
+          F = _D;
+        else if ( y == N - 1 )
+          F = _U;
+        else if ( z == 0 )
+          F = _B;
+        else if ( z == N - 1 )
+          F = _F;
+      }
+      align[ index ] = F;
+      
+      frameworkLayer [ _X ][ x ][ idX[x] ++ ] = index;
+      frameworkLayer [ _Y ][ y ][ idY[y] ++ ] = index;
+      frameworkLayer [ _Z ][ z ][ idZ[z] ++ ] = index;
       
       indexToCoord [ index ][ _X ] = x;
       indexToCoord [ index ][ _Y ] = y;
