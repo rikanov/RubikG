@@ -74,7 +74,7 @@ CubeID Engine<N>::solve( const int& depth )
     m_solution.clear();
     m_depth = 0;
     m_maxDepth = test;
-  
+    clog( test );
     if ( extend( _NA, 0 ) )
     {
       std::reverse( m_solution.begin(), m_solution.end() );

@@ -14,6 +14,7 @@ add_library(test  test.h
                   common/test_launchers.cpp  
                   core/u_simplex.cpp 
                   core/u_cframework.cpp
+                  engine/u_engine.cpp
                  )
 
 
