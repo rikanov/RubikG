@@ -64,6 +64,11 @@ void Simplex::initGroup()
       tilt [a][t] = Simplex::Composition( tilt [a][t-1], tilt [a][1] );
     }
   }
+  all_id( id )
+  {
+    for( Facet F: { _F, _R, _U, _L, _D, _B } )
+      align[ id ][F] = GetCube( id ).aligned( F ); 
+  }
 }
 
 void Simplex::initMetric()

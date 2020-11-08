@@ -34,8 +34,8 @@ class OCube
   static const char  Tokens [7];
   static const Facet FrontSides [ 6 /*Right*/ ][ 6 /*Up*/ ];
 
-  Facet  m_whereIs [6];
-  Facet  m_whatIs  [6];
+  Facet  m_whereIs [7];
+  Facet  m_whatIs  [7];
   bool   m_aligned [7];
   CubeID m_groupID;
 

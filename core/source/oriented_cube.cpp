@@ -57,6 +57,8 @@ void OCube::init( Facet r, Facet u, CubeID groupID )
     m_whereIs[m_whatIs[ID]] = ID;
     m_aligned[ID] = ( m_whatIs[ID] == ID );
   }
+  m_whatIs[_NF]  = _NF;
+  m_whereIs[_NF] = _NF;
   m_aligned[_NF] = false;
   m_groupID = groupID;
 

@@ -22,8 +22,9 @@ void Engine<N>::constrain( const std::initializer_list<PosID> & P )
   Slot * slotPointer = m_selectedCubes;
   for ( PosID pos: P )
   {
-    slotPointer -> pos = pos;
-    slotPointer -> rot = m_CFramework.getCubeID( m_CFramework.whereIs( pos ) );
+    slotPointer -> facet = CPositions<N>::Side( pos );
+    slotPointer -> pos   = pos;
+    slotPointer -> rot   = m_CFramework.getCubeID( m_CFramework.whereIs( pos ) );
     addCube( slotPointer ++ );    
   }
 }

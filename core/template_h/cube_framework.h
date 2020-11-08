@@ -60,10 +60,13 @@ public:
   ~CFramework( );
   
   // Query functions
-  CubeID       getCubeID ( PosID id ) const { return frameworkSpace[id];                   }
-  OCube        getCube   ( PosID id ) const { return Simplex::GetCube( getCubeID ( id ) ); }
+  CubeID       getCubeID ( PosID id, RotID rot ) const { return frameworkSpace[ CPositions<N>::GetIndex( id, rot ) ]; }
+  CubeID       getCubeID ( PosID id )            const { return frameworkSpace[id];                                   }
+  OCube        getCube   ( PosID id )            const { return Simplex::GetCube( getCubeID ( id ) );                 }
+  
   inline PosID whatIs    ( PosID id ) const ;
   inline PosID whereIs   ( PosID id ) const ;
+  
   Coord        whatIs    ( Coord C )  const { return CPositions<N>::getCoord( whatIs ( CPositions<N>::getIndex( C ) ) ); }
   Coord        whereIs   ( Coord C )  const { return CPositions<N>::getCoord( whereIs( CPositions<N>::getIndex( C ) ) ); }
   bool         integrity ( void    )  const ;

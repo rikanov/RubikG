@@ -83,7 +83,8 @@ public:
   static   bool    ValID     ( PosID id )                        { return 0 <= id && id < GetSize();                           }
   static   int     Type      ( PosID id )                        { return Singleton -> cubeType[ id ];                         }
   static   Facet   Side      ( PosID id )                        { return Singleton -> align[ id ];                            }
-  static   PosID   GetIndex  ( PosID id, CubeID rot)             { return Singleton -> routerPositions[ id ][ rot ];           }
+  static   Facet   Side      ( PosID id, CubeID rot )            { return Singleton -> align[ GetIndex( id, rot ) ];           }
+  static   PosID   GetIndex  ( PosID id, CubeID rot )            { return Singleton -> routerPositions[ id ][ rot ];           }
   static   PosID   GetIndex  ( const Coord & C )                 { return GetIndex( C.x, C.y, C.z);                            }
   static   PosID   GetIndex  ( Layer x, Layer y, Layer z )       { return Singleton -> coordToIndex[ x ][ y ][ z ];            }
   static   PosID   GetIndex  ( int x, int y, int z, CubeID rot ) { return GetNode( x, y, z ) [ rot ];                          }

@@ -8,9 +8,15 @@ template<unsigned int N>
 bool Engine<N>::isSolved() const
 {
   bool solved = true;
+  const CubeID& orient = m_selectedCubes[ 0 ].rot;
   for ( unsigned t = 1; solved && t < m_numberOfCubes; ++ t )
   {
-    solved = ( m_selectedCubes[ 0 ].rot ==  m_selectedCubes[ t ].rot );
+    const Slot& next = m_selectedCubes[ t ];
+    solved  = ( orient ==  next.rot );
+    if ( m_solidColor )
+    {
+      solved |= next.facet != _NF && Simplex::GetCube( orient ).whatIs( CPositions<N>::Side( next.pos, next.rot ) ) == next.facet; 
+    }
   }
   for ( unsigned t = 0; solved && t < m_numberOfCubes; ++ t )
   {
@@ -63,15 +69,13 @@ bool Engine<N>::extend( const Axis axis, const Layer layer )
 template<unsigned int N> 
 CubeID Engine<N>::solve( const int& depth )
 {
-  for ( int test = 0; test < depth; ++ test )
+  for ( int test = 0; !isSolved() && test < depth; ++ test )
   {
     m_solution.clear();
     m_depth = 0;
     m_maxDepth = test;
-
-    const bool success = extend( _NA, 0 );
   
-    if ( success )
+    if ( extend( _NA, 0 ) )
     {
       std::reverse( m_solution.begin(), m_solution.end() );
       clog( m_solution.size(), "rotations" );

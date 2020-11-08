@@ -16,8 +16,9 @@ enum SolutionType
 
 struct Slot
 {
-  PosID  pos = 0;
-  CubeID rot = 0;
+  Facet  facet = _NF;
+  PosID  pos   = 0;
+  CubeID rot   = 0;
 };
 
 template<unsigned int N> 
