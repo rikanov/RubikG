@@ -10,6 +10,7 @@ Engine<N>::Engine( CFramework<N>& C, const bool solidColor )
  , m_selectedCubes ( nullptr )
  , m_numberOfCubes ( 0 )
  , m_solidColor    ( solidColor )
+ , m_cache         ( nullptr )
 {
 }
 
@@ -32,6 +33,9 @@ void Engine<N>::constrain( const std::initializer_list<PosID> & P )
 template<unsigned int N> Engine<N>::~Engine()
 {
   delete[] m_selectedCubes;
+  delete[] m_cache;
+  m_selectedCubes = nullptr;
+  m_cache         = nullptr;
 }
 
 template<unsigned int N> 

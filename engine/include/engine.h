@@ -6,14 +6,6 @@
 #include <vector>
 #include <initializer_list>
 
-enum SolutionType
-{
-  None,
-  Position, // the cublet must be placed into the original position                     ( SLL = 1 )
-  Aligned,  // one side of a cublet must be aligned to the cube color                   ( OLL = 2 )
-  Perfect   // the cublet must be put back into the original position and orientation   ( PLL = 3 )
-};
-
 struct Slot
 {
   Facet  facet = _NF;
@@ -38,6 +30,11 @@ class Engine
   int     m_counter[ 3 ][ N ] = {}; // the number of selected cubes on a layer [ Axis ][ Layer index ]
   int     m_depth;                  // current level of the search
   
+    // Cache
+   //  -----
+   CubeID * m_cache;
+   
+  
    // Results
   //  -------
   std::vector<RotID> m_solution;    // path to solution
@@ -54,6 +51,9 @@ class Engine
   void  addCube   ( Slot * S )  { for ( Axis axis : { _X, _Y, _Z } ) ++ m_counter[ axis ][ CPositions<N>::GetCoord( S -> pos, S -> rot, axis ) ]; }
   void  delCube   ( Slot * S )  { for ( Axis axis : { _X, _Y, _Z } ) -- m_counter[ axis ][ CPositions<N>::GetCoord( S -> pos, S -> rot, axis ) ]; }
   
+   // cache functions
+  //  ---------------
+  void initCache();
   
 public:
   
