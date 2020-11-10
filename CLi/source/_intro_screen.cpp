@@ -29,5 +29,4 @@ void CLi::intro( void )
   clog( Color::gray, "\t\t CONTAINED IN THE SOURCE FOLDER               ", Color::yellow, " ╚══════╝╚═╝╚══════╝╚═╝      " );
   slog_( "", Color::white, "\t\t                                                             (v ", CURRENT_VERSION_NUMBERS[0], '.', CURRENT_VERSION_NUMBERS[1], '.', CURRENT_VERSION_NUMBERS[2], ')' );
   NL( Color::off );
-
 }

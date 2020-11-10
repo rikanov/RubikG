@@ -16,6 +16,7 @@ namespace Color
     DEFAULT       = 7, 
 	BOLD          = FOREGROUND_INTENSITY,
 	ULINE         = FOREGROUND_INTENSITY,
+	FLASH         = FOREGROUND_INTENSITY,
     BLACK         = 0,
     BLUE          = 1,
     GREEN         = 2,

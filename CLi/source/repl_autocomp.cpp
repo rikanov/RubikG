@@ -1,6 +1,22 @@
 #include <cli.h>
 #include <stdio.h>
 #include <vector>
+
+#ifdef _WIN32
+char ** CLi::completion( const char * stem_text,int start,int end ) 
+{
+  char ** matches = NULL;
+  return matches ;
+}
+
+char * CLi::getCommands( const char * stem_text,int state ) 
+{
+
+ // No more matches
+  return nullptr;
+}
+#else
+
 #include <readline/readline.h>
 
 char ** CLi::completion( const char * stem_text,int start,int end ) 
@@ -38,3 +54,4 @@ char * CLi::getCommands( const char * stem_text,int state )
  // No more matches
   return nullptr;
 }
+#endif

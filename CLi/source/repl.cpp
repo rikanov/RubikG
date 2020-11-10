@@ -1,4 +1,12 @@
 #include <cli.h>
+
+#ifdef _WIN32
+void CLi::REPL(std::istream & IS, std::ostream & OS)
+{
+  ;
+}
+#else
+
 #include <readline/readline.h>
 #include <readline/history.h>
 
@@ -39,3 +47,4 @@ void CLi::REPL(std::istream & IS, std::ostream & OS)
     ; // ToDo
   }
 }
+#endif
