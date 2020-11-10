@@ -39,7 +39,6 @@ class Engine
   //  -------
   std::vector<RotID> m_solution;    // path to solution
   // Query functions
-  bool isTwistedOnAxis( Axis A ) const;
   bool isSolved() const;
   
    // search engines
@@ -53,7 +52,7 @@ class Engine
   
    // cache functions
   //  ---------------
-  void initCache();
+  void initCache( const int& );
   
 public:
   

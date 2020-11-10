@@ -39,23 +39,6 @@ template<unsigned int N> Engine<N>::~Engine()
 }
 
 template<unsigned int N> 
-bool Engine<N>::isTwistedOnAxis( Axis axis ) const
-{
-  for ( Layer layer = 0; layer < N; ++ layer )
-  {
-    const PosID first = CPositions<N>::GetLayer( axis, layer, 0 );
-    for ( PosID index = 1; index <= CPositions<N>::LayerSize( layer ); ++ index )
-    {
-      if ( m_CFramework.getCubeID( CPositions<N>::GetLayer( axis, layer, index ) ) != m_CFramework.getCubeID( first ) )
-      {
-        return false;
-      }
-    }
-  }
-  return true;
-}
-
-template<unsigned int N> 
 void Engine<N>::turnLayer( const Axis axis, const Layer layer )
 {
   int parts = m_counter[ axis ][ layer ];
