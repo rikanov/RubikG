@@ -30,14 +30,6 @@ void Engine<N>::constrain( const std::initializer_list<PosID> & P )
   }
 }
 
-template<unsigned int N> Engine<N>::~Engine()
-{
-  delete[] m_selectedCubes;
-  delete[] m_cache;
-  m_selectedCubes = nullptr;
-  m_cache         = nullptr;
-}
-
 template<unsigned int N> 
 void Engine<N>::turnLayer( const Axis axis, const Layer layer )
 {
@@ -52,5 +44,13 @@ void Engine<N>::turnLayer( const Axis axis, const Layer layer )
       -- parts;
     }
   }
+}
+
+template<unsigned int N> Engine<N>::~Engine()
+{
+  delete[] m_selectedCubes;
+  delete[] m_cache;
+  m_selectedCubes = nullptr;
+  m_cache         = nullptr;
 }
 

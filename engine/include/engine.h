@@ -1,17 +1,10 @@
 #ifndef ENGINE_HEADER
 #define ENGINE_HEADER
 
-#include <cube_node.h>
+#include <slot.h>
 #include <algorithm>
 #include <vector>
 #include <initializer_list>
-
-struct Slot
-{
-  Facet  facet = _NF;
-  PosID  pos   = 0;
-  CubeID rot   = 0;
-};
 
 template<unsigned int N> 
 class Engine
@@ -32,8 +25,11 @@ class Engine
   
     // Cache
    //  -----
-   CubeID * m_cache;
-   
+   CubeID  * m_cache ;
+   CacheID * m_qeueu ;
+   CacheID * m_qeuIn ;
+   CacheID * m_qeuOut;
+  
   
    // Results
   //  -------
@@ -53,7 +49,10 @@ class Engine
    // cache functions
   //  ---------------
   void initCache( const int& );
-  
+  void initQeueu();
+  void addToQeueu();
+  void setFromQeueu();
+  CacheID getCacheID() const;
 public:
   
   // constructor & destructor
@@ -68,5 +67,5 @@ public:
 
 #include <../source/engine.cpp>        // template engine definitions
 #include <../source/search_engine.cpp> // search engine definitions
-
+#include <../source/cache.cpp>         // cache engine definitions
 #endif // !ENGINE_HEADER
