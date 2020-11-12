@@ -21,28 +21,33 @@ static inline CacheID GetCacheID (const CubeID x0, const CubeID x1 = 0, const Cu
 template<const unsigned int N>
 void Engine<N>::initQeueu()
 {
-  delete[] m_qeueu;
-  m_qeueu  = new CacheID [ pow24[ m_numberOfCubes ] ];
+  clog( "init qeueu" );
+  m_qeueu  = new CacheID [ pow24[ m_numberOfCachedCubes ] ];
   m_qeuIn  = m_qeueu;
   m_qeuOut = m_qeueu;
   
+  m_qeueuLevel = 0;
   all_id( cubeID )
   {
-    CubeID ids[6] = {};
-    for ( Counter i = 0; i < m_numberOfCubes; ++ i )
+    for ( Counter i = 0; i < m_numberOfCachedCubes; ++ i )
     {
-      ids[i] = cubeID;
+      m_selectedCubes[i].rot = cubeID;
     }
-    const CacheID   cacheID   = GetCacheID( ids[0], ids[1], ids[2], ids[3], ids[4], ids[5] );
-    m_cacheCounter[ cacheID ] = 1;
-    *( m_qeuIn ++ ) = cacheID;
+    addToQeueu();
   }
+  for ( Counter i = 0; i < m_numberOfCachedCubes; ++ i )
+  {
+    m_selectedCubes[i].rot = 0;
+    addCube( m_selectedCubes + i );
+  }
+  clog( "Done." );
 }
+
 template<const unsigned int N>
 void Engine<N>::setFromQeueu()
 {
   m_qeueuLevel = m_cacheLevel[ *m_qeuOut ] + 1; 
-  for ( Counter x = *( m_qeuOut ++ ), i = 0; i < m_numberOfCubes; ++ i, x /= 24 )
+  for ( Counter x = *( m_qeuOut ++ ), i = 0; i < m_numberOfCachedCubes; ++ i, x /= 24 )
   {
     delCube( m_selectedCubes + i );
     m_selectedCubes[i].rot = x % 24;
@@ -53,7 +58,7 @@ void Engine<N>::setFromQeueu()
 template<const unsigned int N>
 void Engine<N>::addToQeueu()
 {
-  static Counter counter = 24;
+  static Counter counter = 0;
   static Counter max = 0;
   const CacheID cacheID = getCacheID();
   if ( m_cacheCounter[ cacheID ] == 0 )
@@ -75,39 +80,29 @@ void Engine<N>::addToQeueu()
 template<const unsigned int N>
 void Engine<N>::allocateCache()
 {
-  clog( "Allocate cache size:", pow24[ m_numberOfCubes ] );
-  delete[] m_cache;
-  delete[] m_cacheLevel;
-  delete[] m_cacheCounter;
-
-  m_cache        = new CubeID  [ pow24[ m_numberOfCubes ] * CacheBufferSize ] ();
-  m_cacheLevel   = new Counter [ pow24[ m_numberOfCubes ] ] ();
-  m_cacheCounter = new Counter [ pow24[ m_numberOfCubes ] ] ();
+  clog( "Allocate cache size:", pow24[ m_numberOfCachedCubes ] );
+  m_cache        = new CubeID  [ pow24[ m_numberOfCachedCubes ] * CacheBufferSize ] ();
+  m_cacheLevel   = new Counter [ pow24[ m_numberOfCachedCubes ] ] ();
+  m_cacheCounter = new Counter [ pow24[ m_numberOfCachedCubes ] ] ();
   clog( "Done." );
 }
 
 template<const unsigned int N>
-void Engine<N>::initCache( Counter numberOfCubes, const std::initializer_list<PosID>& P )
+void Engine<N>::initCache( )
 {
-  for ( Counter i = 0; i < numberOfCubes; ++ i )
+  CubeSlot * pCubes = m_selectedCubes;
+  for ( PosID pos: m_cachePositions )
   {
-    m_selectedCubes[i].rot = 0;
-    m_selectedCubes[i].pos = *( P.begin() + i );
-    addCube( m_selectedCubes + i );
+    pCubes -> rot = 0;
+    pCubes -> pos = pos;
+    addCube( pCubes ++ );
   }
 
-  const int storedNumberOfCubes = m_numberOfCubes;
-  m_numberOfCubes = numberOfCubes;
-  
   allocateCache();
   initQeueu();
   buildCache();
-   
-  m_numberOfCubes = storedNumberOfCubes;
-  for ( Counter i = 0; i < numberOfCubes; ++i )
-  {
-    delCube( m_selectedCubes + i );
-  }
+  
+  m_numberOfCubes += m_numberOfCachedCubes;
 }
 
 template<const unsigned int N>
@@ -120,8 +115,8 @@ void Engine<N>::buildCache()
     all_turns( axis, layer, turn )
     {
       if ( m_counter[axis][layer] > 0  )
-      {
-        turnLayer( axis, layer );
+      {clog("teszt", toString<N>( getRotID<N>( axis, layer, turn) ) );
+        turnLayer( axis, layer );clog("teszt");
         addToQeueu();
       }
       turnLayer( axis, layer ); // turn back to original position
@@ -132,10 +127,21 @@ void Engine<N>::buildCache()
 template<const unsigned int N>
 CacheID Engine<N>::getCacheID() const
 {
-  CubeID ids[6] = {};
-  for ( Counter i = 0; i < m_numberOfCubes; ++ i )
+  switch( m_numberOfCachedCubes )
   {
-    ids[i] = m_selectedCubes[i].rot;
+    case 1:
+      return m_selectedCubes[0].rot;
+    case 2:
+      return m_selectedCubes[0].rot + pow24[1] * m_selectedCubes[1].rot;
+    case 3:
+      return m_selectedCubes[0].rot + pow24[1] * m_selectedCubes[1].rot + pow24[2] * m_selectedCubes[2].rot;
+    case 4:
+      return m_selectedCubes[0].rot + pow24[1] * m_selectedCubes[1].rot + pow24[2] * m_selectedCubes[2].rot + pow24[3] * m_selectedCubes[3].rot;
+    case 5:
+      return m_selectedCubes[0].rot + pow24[1] * m_selectedCubes[1].rot + pow24[2] * m_selectedCubes[2].rot + pow24[3] * m_selectedCubes[3].rot + pow24[4] * m_selectedCubes[4].rot;
+    case 6:
+      return m_selectedCubes[0].rot + pow24[1] * m_selectedCubes[1].rot + pow24[2] * m_selectedCubes[2].rot + pow24[3] * m_selectedCubes[3].rot + pow24[4] * m_selectedCubes[4].rot + pow24[5] * m_selectedCubes[5].rot;
+    default:
+      return 0;
   }
-  return GetCacheID( ids[0], ids[1], ids[2], ids[3], ids[4], ids[5] );
 }

@@ -9,7 +9,7 @@
 template<unsigned int N> 
 class Engine
 {
-  CFramework<N> & m_CFramework;
+  CFramework<N> * m_CFramework;
   
    // Searching parameters
   //  --------------------
@@ -25,6 +25,7 @@ class Engine
   
    // Cache
   //  -----
+  const Counter   m_numberOfCachedCubes;
   CubeID  * m_cache ;
   CacheID * m_qeueu ;
   CacheID * m_qeuIn ;
@@ -32,6 +33,7 @@ class Engine
   Counter * m_cacheCounter;
   Counter * m_cacheLevel;
   Counter   m_qeueuLevel;
+  const std::initializer_list<PosID>& m_cachePositions;
   
    // Results
   //  -------
@@ -47,11 +49,11 @@ class Engine
   // inline functions to maintain counter data
   void  addCube   ( CubeSlot * S )  { for ( Axis axis : { _X, _Y, _Z } ) ++ m_counter[ axis ][ CPositions<N>::GetCoord( S -> pos, S -> rot, axis ) ]; }
   void  delCube   ( CubeSlot * S )  { for ( Axis axis : { _X, _Y, _Z } ) -- m_counter[ axis ][ CPositions<N>::GetCoord( S -> pos, S -> rot, axis ) ]; }
-  
+  void  updateCubes();
    // cache functions
   //  ---------------
-  void initCache( Counter, const std::initializer_list<PosID>& );
   void allocateCache();
+  void initCache();
   void buildCache();
   void initQeueu();
   void addToQeueu();
@@ -60,10 +62,11 @@ class Engine
 public:
   
   // constructor & destructor
-  Engine ( CFramework<N> & C, const bool solidColor = true );
+  Engine ( const std::initializer_list<PosID>&, const bool solidColor = true );
   ~Engine();
   
   // search engine functions
+  void   toSolve( CFramework<N> * );
   void   constrain( const std::initializer_list<PosID>& );
   CubeID solve( const int& depth );
   const  std::vector< RotID >& getSolution( void ) const;

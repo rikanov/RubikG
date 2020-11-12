@@ -82,7 +82,7 @@ CubeID Engine<N>::solve( const int& depth )
       for ( RotID rotID: m_solution )
       {
         clog ( toString<N>( rotID ) );
-        m_CFramework.rotate( rotID );
+        m_CFramework -> rotate( rotID );
       }
       return m_selectedCubes[ 0 ].rot;
     }

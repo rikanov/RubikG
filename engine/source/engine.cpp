@@ -5,31 +5,49 @@
 
 
 template<unsigned int N> 
-Engine<N>::Engine( CFramework<N>& C, const bool solidColor )
- : m_CFramework    ( C )
- , m_numberOfCubes ( 0 )
- , m_solidColor    ( solidColor )
- , m_selectedCubes ( nullptr )
+Engine<N>::Engine( const std::initializer_list<PosID> & P, const bool solidColor )
+ : m_numberOfCubes       ( 0 )
+ , m_numberOfCachedCubes ( P.size() )
+ , m_solidColor          ( solidColor )
+ , m_cachePositions( P )
+ , m_selectedCubes ( new CubeSlot [ CPositions<N>::GetSize() ] )
+ , m_CFramework    ( nullptr )
  , m_qeueu         ( nullptr )
  , m_cache         ( nullptr )
  , m_cacheCounter  ( nullptr )
  , m_cacheLevel    ( nullptr )
 {
+  initCache();
+}
+
+template<unsigned int N> 
+void Engine<N>::toSolve( CFramework<N> * C )
+{
+  m_CFramework = C;
+  updateCubes();
+}
+
+template<unsigned int N> 
+void Engine<N>::updateCubes()
+{
+  for ( Counter i = 0; i < m_numberOfCachedCubes; ++ i )
+  {
+    delCube( m_selectedCubes + i );
+    m_selectedCubes[i].rot = m_CFramework -> getCubeID( m_CFramework -> whereIs( m_selectedCubes[i].pos ) );
+    addCube( m_selectedCubes + i );
+  }
 }
 
 template<unsigned int N> 
 void Engine<N>::constrain( const std::initializer_list<PosID> & P )
 {
-  m_numberOfCubes = P.size();
-  delete[] m_selectedCubes;
-  m_selectedCubes = new CubeSlot [ m_numberOfCubes ];
-  CubeSlot * slotPointer = m_selectedCubes;
-  initCache( 3, P );
+  CubeSlot * slotPointer = m_selectedCubes + m_numberOfCachedCubes;
+  m_numberOfCubes += P.size();
   for ( PosID pos: P )
   {
     slotPointer -> facet = CPositions<N>::Side( pos );
     slotPointer -> pos   = pos;
-    slotPointer -> rot   = m_CFramework.getCubeID( m_CFramework.whereIs( pos ) );
+    slotPointer -> rot   = m_CFramework ? m_CFramework -> getCubeID( m_CFramework -> whereIs( pos ) ) : 0;
     addCube( slotPointer ++ );    
   }
 }
