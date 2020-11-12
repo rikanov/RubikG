@@ -19,8 +19,8 @@ void Engine<N>::constrain( const std::initializer_list<PosID> & P )
 {
   m_numberOfCubes = P.size();
   delete[] m_selectedCubes;
-  m_selectedCubes = new Slot [ m_numberOfCubes ];
-  Slot * slotPointer = m_selectedCubes;
+  m_selectedCubes = new CubeSlot [ m_numberOfCubes ];
+  CubeSlot * slotPointer = m_selectedCubes;
   for ( PosID pos: P )
   {
     slotPointer -> facet = CPositions<N>::Side( pos );
@@ -34,7 +34,7 @@ template<unsigned int N>
 void Engine<N>::turnLayer( const Axis axis, const Layer layer )
 {
   int parts = m_counter[ axis ][ layer ];
-  for( Slot * slotPointer = m_selectedCubes; parts > 0; ++ slotPointer )
+  for( CubeSlot * slotPointer = m_selectedCubes; parts > 0; ++ slotPointer )
   {
     if ( CPositions<N>::GetCoord( slotPointer -> pos, slotPointer -> rot, axis ) == layer )
     {

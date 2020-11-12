@@ -3,7 +3,7 @@
 
 #include <cube_framework.h>
 
-struct Slot
+struct CubeSlot
 {
   Facet  facet = _NF;
   PosID  pos   = 0;

@@ -11,7 +11,7 @@ bool Engine<N>::isSolved() const
   const CubeID& orient = m_selectedCubes[ 0 ].rot;
   for ( unsigned t = 1; solved && t < m_numberOfCubes; ++ t )
   {
-    const Slot& next = m_selectedCubes[ t ];
+    const CubeSlot& next = m_selectedCubes[ t ];
     solved  = ( orient ==  next.rot );
     if ( m_solidColor )
     {

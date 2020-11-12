@@ -18,7 +18,7 @@ class Engine
   
    // Inner states
   //  ------------
-  Slot *  m_selectedCubes;          // selected cubes to solve: pos = original position  rot = current rotational state
+  CubeSlot *  m_selectedCubes;          // selected cubes to solve: pos = original position  rot = current rotational state
   size_t  m_numberOfCubes;          // number of cubes > 1
   int     m_counter[ 3 ][ N ] = {}; // the number of selected cubes on a layer [ Axis ][ Layer index ]
   int     m_depth;                  // current level of the search
@@ -43,8 +43,8 @@ class Engine
   bool  testLayer ( const Axis, const Layer );
   void  turnLayer ( const Axis, const Layer );
   // inline functions to maintain counter data
-  void  addCube   ( Slot * S )  { for ( Axis axis : { _X, _Y, _Z } ) ++ m_counter[ axis ][ CPositions<N>::GetCoord( S -> pos, S -> rot, axis ) ]; }
-  void  delCube   ( Slot * S )  { for ( Axis axis : { _X, _Y, _Z } ) -- m_counter[ axis ][ CPositions<N>::GetCoord( S -> pos, S -> rot, axis ) ]; }
+  void  addCube   ( CubeSlot * S )  { for ( Axis axis : { _X, _Y, _Z } ) ++ m_counter[ axis ][ CPositions<N>::GetCoord( S -> pos, S -> rot, axis ) ]; }
+  void  delCube   ( CubeSlot * S )  { for ( Axis axis : { _X, _Y, _Z } ) -- m_counter[ axis ][ CPositions<N>::GetCoord( S -> pos, S -> rot, axis ) ]; }
   
    // cache functions
   //  ---------------

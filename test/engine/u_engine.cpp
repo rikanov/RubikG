@@ -20,13 +20,13 @@ bool UnitTests::unit_Engine() const
   for ( int i = 0; i < 10; ++ i)
   {
     CFramework<4> A;
-    A.shuffle( 6 );
+    A.shuffle();
     A.print();
     const std::initializer_list<PosID> middle = {
       CPositions<4>::GetIndex( 0, 1, 1),
       CPositions<4>::GetIndex( 0, 2, 1),
       CPositions<4>::GetIndex( 0, 1, 2),
-      CPositions<4>::GetIndex( 0, 2, 2),
+      CPositions<4>::GetIndex( 0, 2, 2) /*,
       CPositions<4>::GetIndex( 3, 1, 1),
       CPositions<4>::GetIndex( 3, 2, 1),
       CPositions<4>::GetIndex( 3, 1, 2),
@@ -46,7 +46,7 @@ bool UnitTests::unit_Engine() const
       CPositions<4>::GetIndex( 1, 1, 3),
       CPositions<4>::GetIndex( 2, 1, 3),
       CPositions<4>::GetIndex( 1, 2, 3),
-      CPositions<4>::GetIndex( 2, 2, 3)
+      CPositions<4>::GetIndex( 2, 2, 3) */
       };
     Engine<4> test( A, true );
     test.constrain( middle  );
@@ -54,7 +54,7 @@ bool UnitTests::unit_Engine() const
     clog( Simplex::GetCube( test.solve( 7 ) ).toString() );
     A.print(); 
   }
-  
+  /*
   for ( int i = 0; i < 20; ++ i)
   {
     CFramework<3> A;
@@ -73,7 +73,7 @@ bool UnitTests::unit_Engine() const
     clog( Simplex::GetCube( test.solve( 8 ) ).toString() );
     A.print(); 
   }
-  
+  */
   clog_( "Cube positions:", Color::bold, "onExit()", Color::off, ':' );
   CPositions<2>::OnExit();
   CPositions<3>::OnExit();
