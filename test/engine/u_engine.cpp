@@ -17,7 +17,7 @@ bool UnitTests::unit_Engine() const
   CPositions<5>::Instance();
   done();
 
-  for ( int i = 0; i < 10; ++ i)
+  for ( int i = 0; i < 1; ++ i )
   {
     CFramework<4> A;
     A.shuffle();

@@ -7,10 +7,13 @@
 template<unsigned int N> 
 Engine<N>::Engine( CFramework<N>& C, const bool solidColor )
  : m_CFramework    ( C )
- , m_selectedCubes ( nullptr )
  , m_numberOfCubes ( 0 )
  , m_solidColor    ( solidColor )
+ , m_selectedCubes ( nullptr )
+ , m_qeueu         ( nullptr )
  , m_cache         ( nullptr )
+ , m_cacheCounter  ( nullptr )
+ , m_cacheLevel    ( nullptr )
 {
 }
 
@@ -21,6 +24,7 @@ void Engine<N>::constrain( const std::initializer_list<PosID> & P )
   delete[] m_selectedCubes;
   m_selectedCubes = new CubeSlot [ m_numberOfCubes ];
   CubeSlot * slotPointer = m_selectedCubes;
+  initCache( 3, P );
   for ( PosID pos: P )
   {
     slotPointer -> facet = CPositions<N>::Side( pos );
@@ -50,7 +54,12 @@ template<unsigned int N> Engine<N>::~Engine()
 {
   delete[] m_selectedCubes;
   delete[] m_cache;
+  delete[] m_cacheLevel;
+  delete[] m_cacheCounter;
+
   m_selectedCubes = nullptr;
   m_cache         = nullptr;
+  m_cacheLevel    = nullptr;
+  m_cacheCounter  = nullptr;
 }
 

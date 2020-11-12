@@ -11,6 +11,7 @@ struct CubeSlot
 };
 
 using CacheID = unsigned int;
+using Counter = unsigned int;
 
 #endif // ! CUBE_SLOT__H
 

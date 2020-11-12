@@ -18,18 +18,20 @@ class Engine
   
    // Inner states
   //  ------------
-  CubeSlot *  m_selectedCubes;          // selected cubes to solve: pos = original position  rot = current rotational state
-  size_t  m_numberOfCubes;          // number of cubes > 1
-  int     m_counter[ 3 ][ N ] = {}; // the number of selected cubes on a layer [ Axis ][ Layer index ]
-  int     m_depth;                  // current level of the search
+  CubeSlot * m_selectedCubes;          // selected cubes to solve: pos = original position  rot = current rotational state
+  Counter    m_numberOfCubes;          // number of cubes > 1
+  Counter    m_counter[ 3 ][ N ] = {}; // the number of selected cubes on a layer [ Axis ][ Layer index ]
+  Counter    m_depth;                  // current level of the search
   
-    // Cache
-   //  -----
-   CubeID  * m_cache ;
-   CacheID * m_qeueu ;
-   CacheID * m_qeuIn ;
-   CacheID * m_qeuOut;
-  
+   // Cache
+  //  -----
+  CubeID  * m_cache ;
+  CacheID * m_qeueu ;
+  CacheID * m_qeuIn ;
+  CacheID * m_qeuOut;
+  Counter * m_cacheCounter;
+  Counter * m_cacheLevel;
+  Counter   m_qeueuLevel;
   
    // Results
   //  -------
@@ -48,7 +50,9 @@ class Engine
   
    // cache functions
   //  ---------------
-  void initCache( const int& );
+  void initCache( Counter, const std::initializer_list<PosID>& );
+  void allocateCache();
+  void buildCache();
   void initQeueu();
   void addToQeueu();
   void setFromQeueu();
