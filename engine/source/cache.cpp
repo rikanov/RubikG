@@ -22,7 +22,7 @@ template<const unsigned int N>
 void Engine<N>::initQeueu()
 {
   clog( "init qeueu" );
-  m_qeueu  = new CacheID [ pow24[ m_numberOfCachedCubes ] ];
+  m_qeueu  = new CacheID [ pow24[ m_numberOfCachedCubes ] ] ();
   m_qeuIn  = m_qeueu;
   m_qeuOut = m_qeueu;
   
@@ -71,7 +71,7 @@ void Engine<N>::addToQeueu()
   {
     if ( ++ m_cacheCounter[ cacheID ] > max )
       max = m_cacheCounter[ cacheID ];
-    clog_( '\r', counter, " --> ", m_cacheLevel[ cacheID ], max, (int)( m_qeuIn - m_qeuOut ) );
+    clog_( "\r                              \r", counter, " --> ", m_cacheLevel[ cacheID ], max, (int)( m_qeuIn - m_qeuOut ) );
   }
 }
 
@@ -103,6 +103,7 @@ void Engine<N>::initCache( )
   buildCache();
   
   m_numberOfCubes += m_numberOfCachedCubes;
+  clog( "number of cubes", m_numberOfCubes, m_numberOfCachedCubes );
 }
 
 template<const unsigned int N>
@@ -115,8 +116,8 @@ void Engine<N>::buildCache()
     all_turns( axis, layer, turn )
     {
       if ( m_counter[axis][layer] > 0  )
-      {clog("teszt", toString<N>( getRotID<N>( axis, layer, turn) ) );
-        turnLayer( axis, layer );clog("teszt");
+      {
+        turnLayer( axis, layer );
         addToQeueu();
       }
       turnLayer( axis, layer ); // turn back to original position

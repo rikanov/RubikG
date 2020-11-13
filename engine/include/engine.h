@@ -1,7 +1,10 @@
 #ifndef ENGINE_HEADER
 #define ENGINE_HEADER
 
-#include <slot.h>
+#include <sentinel.h>
+#include <qeueu.h>
+#include <cache.h>
+
 #include <algorithm>
 #include <vector>
 #include <initializer_list>
@@ -18,11 +21,11 @@ class Engine
   
    // Inner states
   //  ------------
-  CubeSlot * m_selectedCubes;          // selected cubes to solve: pos = original position  rot = current rotational state
-  Counter    m_numberOfCubes;          // number of cubes > 1
-  Counter    m_counter[ 3 ][ N ] = {}; // the number of selected cubes on a layer [ Axis ][ Layer index ]
-  Counter    m_depth;                  // current level of the search
-  
+  CubeSlot *  m_selectedCubes;          // selected cubes to solve: pos = original position  rot = current rotational state
+  Counter     m_numberOfCubes;          // number of cubes > 1
+  Counter     m_counter[ 3 ][ N ] = {}; // the number of selected cubes on a layer [ Axis ][ Layer index ]
+  Counter     m_depth;                  // current level of the search
+  Sentinel<N> m_sentinel;
    // Cache
   //  -----
   const Counter   m_numberOfCachedCubes;

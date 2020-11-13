@@ -7,6 +7,7 @@
 template<unsigned int N> 
 Engine<N>::Engine( const std::initializer_list<PosID> & P, const bool solidColor )
  : m_numberOfCubes       ( 0 )
+ , m_sentinel            ( P )
  , m_numberOfCachedCubes ( P.size() )
  , m_solidColor          ( solidColor )
  , m_cachePositions( P )
@@ -33,7 +34,8 @@ void Engine<N>::updateCubes()
   for ( Counter i = 0; i < m_numberOfCachedCubes; ++ i )
   {
     delCube( m_selectedCubes + i );
-    m_selectedCubes[i].rot = m_CFramework -> getCubeID( m_CFramework -> whereIs( m_selectedCubes[i].pos ) );
+    m_selectedCubes[i].facet = CPositions<N>::Side( m_selectedCubes[i].pos );
+    m_selectedCubes[i].rot   = m_CFramework -> getCubeID( m_CFramework -> whereIs( m_selectedCubes[i].pos ) );
     addCube( m_selectedCubes + i );
   }
 }
@@ -41,7 +43,7 @@ void Engine<N>::updateCubes()
 template<unsigned int N> 
 void Engine<N>::constrain( const std::initializer_list<PosID> & P )
 {
-  CubeSlot * slotPointer = m_selectedCubes + m_numberOfCachedCubes;
+  CubeSlot * slotPointer = m_selectedCubes + m_numberOfCubes;
   m_numberOfCubes += P.size();
   for ( PosID pos: P )
   {
