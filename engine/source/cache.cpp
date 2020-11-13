@@ -9,8 +9,6 @@
 
 static constexpr int CacheBufferSize = 8;
 
-static constexpr int pow24[] = { 1, 24, 576, 13824, 331776, 7962624 };
-
 static inline CacheID GetCacheID (const CubeID x0, const CubeID x1 = 0, const CubeID x2 = 0, const CubeID x3 = 0, const CubeID x4 = 0, const CubeID x5 = 0 )
 {
   return x0 * pow24[0] + x1 * pow24[1] + x2 * pow24[2] + x3 * pow24[3] + x4 * pow24[4] + x5 * pow24[5];
@@ -22,23 +20,18 @@ template<const unsigned int N>
 void Engine<N>::initQeueu()
 {
   clog( "init qeueu" );
-  m_qeueu  = new CacheID [ pow24[ m_numberOfCachedCubes ] ] ();
-  m_qeuIn  = m_qeueu;
-  m_qeuOut = m_qeueu;
-  
   m_qeueuLevel = 0;
   all_id( cubeID )
   {
-    for ( Counter i = 0; i < m_numberOfCachedCubes; ++ i )
+    for ( auto pSlot = m_sentinel.start(); pSlot; pSlot = m_sentinel.next())
     {
-      m_selectedCubes[i].rot = cubeID;
+      pSlot -> rot = cubeID;
     }
-    addToQeueu();
+    m_cacheQeueu << m_sentinel.getCacheID();
   }
-  for ( Counter i = 0; i < m_numberOfCachedCubes; ++ i )
+  for ( auto pSlot = m_sentinel.start(); pSlot; pSlot = m_sentinel.next())
   {
-    m_selectedCubes[i].rot = 0;
-    addCube( m_selectedCubes + i );
+    pSlot -> rot = 0;
   }
   clog( "Done." );
 }
@@ -46,12 +39,15 @@ void Engine<N>::initQeueu()
 template<const unsigned int N>
 void Engine<N>::setFromQeueu()
 {
-  m_qeueuLevel = m_cacheLevel[ *m_qeuOut ] + 1; 
-  for ( Counter x = *( m_qeuOut ++ ), i = 0; i < m_numberOfCachedCubes; ++ i, x /= 24 )
+  m_qeueuLevel = m_cubeCache.level( m_cacheQeueu.head() ) + 1; 
+  Counter x;
+  m_cacheQeueu >> x;
+  for ( auto pSlot = m_sentinel.start(); pSlot; pSlot = m_sentinel.next() )
   {
-    delCube( m_selectedCubes + i );
-    m_selectedCubes[i].rot = x % 24;
-    addCube( m_selectedCubes + i );
+    m_sentinel.delCube( pSlot );
+    pSlot -> rot = x % 24;
+    m_sentinel.addCube( pSlot );
+    x /= 24;
   }
 }
 
@@ -60,17 +56,17 @@ void Engine<N>::addToQeueu()
 {
   static Counter counter = 0;
   static Counter max = 0;
-  const CacheID cacheID = getCacheID();
-  if ( m_cacheCounter[ cacheID ] == 0 )
+  const CacheID cacheID = m_sentinel.getCacheID();
+  if ( m_cubeCache.counter( cacheID ) == 0 )
   {
-    m_cacheLevel[ cacheID ] = m_qeueuLevel;
-    *( m_qeuIn ++ ) = cacheID;
+    m_cubeCache.counter( cacheID ) = m_qeueuLevel;
+    m_cacheQeueu << cacheID;
     ++ counter;
   }
   if ( m_cacheLevel[ cacheID ] == m_qeueuLevel )
   {
-    if ( ++ m_cacheCounter[ cacheID ] > max )
-      max = m_cacheCounter[ cacheID ];
+    if ( ++ m_cubeCache.counter( cacheID ) > max )
+      max = m_cubeCache.counter( cacheID )
     clog_( "\r                              \r", counter, " --> ", m_cacheLevel[ cacheID ], max, (int)( m_qeuIn - m_qeuOut ) );
   }
 }

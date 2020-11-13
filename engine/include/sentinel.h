@@ -6,13 +6,12 @@
 template<unsigned int N>
 class Sentinel
 {
-  static constexpr int pow24[] = { 1, 24, 576, 13824, 331776, 7962624 };
-
   CFramework<N> * m_CFramework;
   CubeSlot      * m_container;
   CubeSlot      * m_containerEnd;
   CubeSlot      * m_slotPointer;
   const Counter m_cacheSize;
+  const bool    m_solidColor;
   Counter       m_size;
   Counter       m_counter[ 3 ][ N ] = {};
   public:
@@ -21,27 +20,58 @@ class Sentinel
   ~Sentinel();
 
   // inline functions to maintain counter data
-  void addCube ( CubeSlot * S ) { for ( Axis axis : { _X, _Y, _Z } ) ++ m_counter[ axis ][ CPositions<N>::GetCoord( S -> pos, S -> rot, axis ) ]; }
-  void delCube ( CubeSlot * S ) { for ( Axis axis : { _X, _Y, _Z } ) -- m_counter[ axis ][ CPositions<N>::GetCoord( S -> pos, S -> rot, axis ) ]; }
-  
-  Counter    id () const        { return m_slotPointer - m_container; }
-  CubeSlot & id ( Counter & id) { return m_container[id];             }
-  
-  CubeSlot * start() { m_slotPointer = m_container; return next();          }
-  CubeSlot * next () { return m_slotPointer == m_containerEnd ? nullptr : m_slotPointer ++ ; }
+  void addCube ( CubeSlot * S ) 
+  { 
+    for ( Axis axis : { _X, _Y, _Z } ) 
+      ++ m_counter[ axis ][ CPositions<N>::GetCoord( S -> pos, S -> rot, axis ) ]; 
+  }
 
-  void update();
-  void toSolve( CFramework<N> * CF );
-  void addConstrain( CubeList );
-  CacheID getCacheID() const;
+  void delCube ( CubeSlot * S ) 
+  { 
+    for ( Axis axis : { _X, _Y, _Z } ) 
+      -- m_counter[ axis ][ CPositions<N>::GetCoord( S -> pos, S -> rot, axis ) ]; 
+  }
+  
+  Counter id () const        
+  { 
+    return m_slotPointer - m_container; 
+  }
+  
+  CubeSlot & id ( Counter & id) 
+  { 
+    return m_container[id];             
+  }
+  
+  CubeSlot * start() 
+  { 
+    m_slotPointer = m_container; return next();          
+  }
+  
+  CubeSlot * next () 
+  { 
+    return m_slotPointer == m_containerEnd ? nullptr : m_slotPointer ++ ; 
+  }
+
+  Counter counter( Axis a, Layer l )
+  {
+    return m_counter[a][l];
+  }
 
   void turnLayer( Axis, Layer );
+  void update();
+  void toSolve( CFramework<N> * CF );
+  bool isSolved() const;
+  void addConstrain( CubeList );
+
+  CacheID getCacheID() const;
+
 };
 
 template<unsigned int N>
 Sentinel<N>::Sentinel( CubeList P )
  : m_CFramework ( nullptr )
  , m_container  ( new CubeSlot [ CPositions<N>::GetSize() ] )
+ , m_solidColor ( true )
  , m_size       ( 0 )
  , m_cacheSize  ( P.size() )
 {
@@ -124,6 +154,25 @@ CacheID Sentinel<N>::getCacheID() const
   }
 }
 
+template<unsigned int N>
+bool Sentinel<N>::isSolved() const
+{
+  bool solved = true;
+  const CubeID& orient = m_container -> rot;
+  for ( auto pSlot = start(); pSlot; pSlot = next() )
+  {
+    solved  = ( orient ==  pSlot -> rot );
+    if ( m_solidColor )
+    {
+      solved |= pSlot -> facet != _NF && Simplex::GetCube( orient ).whatIs( CPositions<N>::Side( pSlot -> pos, pSlot -> rot ) ) == pSlot -> facet; 
+    }
+  }
+  for ( auto pSlot = start(); pSlot; pSlot = next() )
+  {
+    clog( CPositions<N>::GetCoord( pSlot -> pos ).toString(), Simplex::GetCube( pSlot -> rot ).toString() );
+  }
+  return solved;
+}
 template<unsigned int N>
 Sentinel<N>::~Sentinel()
 {

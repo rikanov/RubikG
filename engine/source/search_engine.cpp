@@ -29,18 +29,18 @@ template<unsigned int N>
 bool  Engine<N>::testLayer( const Axis axis, const Layer layer )
 {
   ++ m_depth;
-  if ( m_counter[ axis ][ layer ] > 0 )
+  if ( m_sentinel.count( axis, layer ) > 0 )
   {
     for ( Turn turn : { 1, 2, 3 } )
     {
-      turnLayer( axis, layer );
+      m_sentinel.turnLayer( axis, layer );
       if ( extend( axis, layer + 1 ) )
       {
         m_solution.push_back( getRotID <N> ( axis, layer, turn ) );
         return true;
       }
     }
-    turnLayer( axis, layer ); // turn back to original position
+    m_sentinel.turnLayer( axis, layer ); // turn back to original position
   }
   -- m_depth;
   return false; // solution not found on this branch

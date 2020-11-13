@@ -14,54 +14,18 @@ class Engine
 {
   CFramework<N> * m_CFramework;
   
-   // Searching parameters
-  //  --------------------
-  int           m_maxDepth;         // depth of the searching tree
-  const bool    m_solidColor;       // it is true if the sides colored with solid pattern
-  
-   // Inner states
-  //  ------------
-  CubeSlot *  m_selectedCubes;          // selected cubes to solve: pos = original position  rot = current rotational state
-  Counter     m_numberOfCubes;          // number of cubes > 1
-  Counter     m_counter[ 3 ][ N ] = {}; // the number of selected cubes on a layer [ Axis ][ Layer index ]
-  Counter     m_depth;                  // current level of the search
   Sentinel<N> m_sentinel;
-   // Cache
-  //  -----
-  const Counter   m_numberOfCachedCubes;
-  CubeID  * m_cache ;
-  CacheID * m_qeueu ;
-  CacheID * m_qeuIn ;
-  CacheID * m_qeuOut;
-  Counter * m_cacheCounter;
-  Counter * m_cacheLevel;
-  Counter   m_qeueuLevel;
-  const std::initializer_list<PosID>& m_cachePositions;
-  
+  Qeueu       m_cacheQeueu;
+  CCache      m_cubeCache;
+
    // Results
-  //  -------
   std::vector<RotID> m_solution;    // path to solution
   // Query functions
   bool isSolved() const;
   
-   // search engines
-  //  --------------
+   // search engine
   bool  extend    ( const Axis, const Layer );
   bool  testLayer ( const Axis, const Layer );
-  void  turnLayer ( const Axis, const Layer );
-  // inline functions to maintain counter data
-  void  addCube   ( CubeSlot * S )  { for ( Axis axis : { _X, _Y, _Z } ) ++ m_counter[ axis ][ CPositions<N>::GetCoord( S -> pos, S -> rot, axis ) ]; }
-  void  delCube   ( CubeSlot * S )  { for ( Axis axis : { _X, _Y, _Z } ) -- m_counter[ axis ][ CPositions<N>::GetCoord( S -> pos, S -> rot, axis ) ]; }
-  void  updateCubes();
-   // cache functions
-  //  ---------------
-  void allocateCache();
-  void initCache();
-  void buildCache();
-  void initQeueu();
-  void addToQeueu();
-  void setFromQeueu();
-  CacheID getCacheID() const;
 public:
   
   // constructor & destructor

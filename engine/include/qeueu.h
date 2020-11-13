@@ -8,20 +8,31 @@ class Qeueu
   CacheID * m_qeueudCubes ;
   CacheID * m_qeuIn ;
   CacheID * m_qeuOut;
-
+  CacheID * m_qeuEnd;
 public:
   
   Qeueu( const int& size ) : m_qeueudCubes( new CacheID [ size ] )
   {
+    m_qeuEnd = m_qeueudCubes + size;
+    reset();
+  }
+
+  void reset()
+  {
     m_qeuIn = m_qeuOut = m_qeueudCubes;
   }
 
-  void in( const CacheID& id )
+  bool operator << ( const CacheID& id )
   {
-    *( m_qeuIn ++ ) = id;
+    if ( m_qeuIn != m_qeuEnd )
+    {
+      *( m_qeuIn ++ ) = id;
+      return true;
+    }
+    return false;
   }
 
-  bool out( CacheID& id ) 
+  bool operator >> ( CacheID& id ) 
   {
     if ( m_qeuOut < m_qeuIn )
     {
@@ -31,6 +42,32 @@ public:
     return false;
   }
   
+  bool operator >> ( void ) 
+  {
+    if ( m_qeuOut < m_qeuIn )
+    {
+      ++ m_qeuOut;
+      return true;
+    }
+    return false;
+
+  }
+
+  CacheID head() const
+  {
+    return *m_qeuOut;
+  }
+
+  Counter size() const
+  {
+    return m_qeuEnd - m_qeueudCubes;
+  }
+
+  Counter count() const
+  {
+    return m_qeuIn - m_qeuOut;
+  }
+
   ~Qeueu()
   {
     delete[] m_qeueudCubes;
