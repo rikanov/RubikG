@@ -71,10 +71,10 @@ public:
   Facet        getFacet  ( const Facet front, const Facet up, int x, int y) const; // left-bottom corner: x = 0, y = 0
   
   // Printer
-  void show ( Facet                  ) const;
-  void show ( Facet, Facet, int, int ) const;
-  void print( Facet, Facet           ) const;
-  void print( bool separator = true  ) const;
+  void show ( Facet, Facet, Layer, Layer ) const;
+  void show ( Facet                 ) const;
+  void print( Facet, Facet          ) const;
+  void print( bool separator = true ) const;
 };
 
 // print a single facet on different operating systems
@@ -271,7 +271,7 @@ void CFramework<N>::show( Facet F ) const
 }
 
 template<unsigned int N>
-void CFramework<N>::show( Facet right, Facet up, int x, int y ) const
+void CFramework<N>::show( Facet right, Facet up, Layer x, Layer y ) const
 {
   const Facet F = getFacet( right, up, x, y );
   show( F );
@@ -297,7 +297,7 @@ void CFramework<N>::print( bool separator ) const
 {
   const int SideSize = separator ? N + 1 : N; 
   // print UP side
-  for ( Layer y = SideSize - 1; y >= 0; --y )
+  for ( Layer y = SideSize; y > 0; --y )
   {
     for ( Layer x = 0; x < SideSize; ++x )
     {
@@ -305,25 +305,25 @@ void CFramework<N>::print( bool separator ) const
     }
     for ( Layer x = 0; x < SideSize; ++x )
     {
-      show( _R, _B, x, y );
+      show( _R, _B, x, y - 1 );
     }
     NL();
   }
   // print middle sides Left - Front - Right - Back
   Facet orientations [] = { _F, _R, _B, _L };
-  for ( Layer y = SideSize - 1; y >= 0; --y )
+  for ( Layer y = SideSize; y > 0; --y )
   {
     for ( Facet right: orientations )
     {
       for ( Layer x = 0; x < SideSize; ++x )
       {
-        show( right, _U, x, y );
+        show( right, _U, x, y - 1 );
       }
 	}
 	NL();
   }
   // print DOWN side
-  for ( Layer y = SideSize - 1; y >= 0; --y )
+  for ( Layer y = SideSize ; y > 0; --y )
   {
     for ( Layer x = 0; x < SideSize; ++x )
     {
@@ -331,7 +331,7 @@ void CFramework<N>::print( bool separator ) const
     }
     for ( Layer x = 0; x < SideSize; ++x )
     {
-      show( _R, _F, x, y );
+      show( _R, _F, x, y - 1 );
     }
     NL();
   }

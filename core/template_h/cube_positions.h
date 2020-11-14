@@ -78,20 +78,20 @@ class CPositions
 public:
   static constexpr int GetSize ( ) { return Singleton->FrameworkSize [ N ]; }
   
-  static   void    Instance  ( void )                            { if ( Singleton == nullptr ) new CPositions<N>;              }
-  static   void    OnExit    ( void )                            { delete Singleton; Singleton = nullptr;                      }
-  static   bool    ValID     ( PosID id )                        { return 0 <= id && id < GetSize();                           }
-  static   int     Type      ( PosID id )                        { return Singleton -> cubeType[ id ];                         }
-  static   Facet   Side      ( PosID id )                        { return Singleton -> align[ id ];                            }
-  static   Facet   Side      ( PosID id, CubeID rot )            { return Singleton -> align[ GetIndex( id, rot ) ];           }
-  static   PosID   GetIndex  ( PosID id, CubeID rot )            { return Singleton -> routerPositions[ id ][ rot ];           }
-  static   PosID   GetIndex  ( const Coord & C )                 { return GetIndex( C.x, C.y, C.z);                            }
-  static   PosID   GetIndex  ( Layer x, Layer y, Layer z )       { return Singleton -> coordToIndex[ x ][ y ][ z ];            }
-  static   PosID   GetIndex  ( int x, int y, int z, CubeID rot ) { return GetNode( x, y, z ) [ rot ];                          }
-  static   PosID   GetLayer  ( Axis a, Layer l, byte id )        { return Singleton -> frameworkLayer [ a ][ l ][ id ];        }
-  static   Layer   LayerSize ( Layer l )                         { return l == 0 || l == N - 1 ? N * N : 4 * ( N - 1 );        }
-  static   Layer   GetCoord  ( PosID p, Axis a )                 { return Singleton -> indexToCoord [ p ][ a ];                }
-  static   Layer   GetCoord  ( PosID p, RotID r, Axis a )        { return Singleton -> indexToCoord [ GetIndex( p, r ) ][ a ]; }
+  static   void    Instance  ( void )                                  { if ( Singleton == nullptr ) new CPositions<N>;              }
+  static   void    OnExit    ( void )                                  { delete Singleton; Singleton = nullptr;                      }
+  static   bool    ValID     ( PosID id )                              { return 0 <= id && id < GetSize();                           }
+  static   int     Type      ( PosID id )                              { return Singleton -> cubeType[ id ];                         }
+  static   Facet   Side      ( PosID id )                              { return Singleton -> align[ id ];                            }
+  static   Facet   Side      ( PosID id, CubeID rot )                  { return Singleton -> align[ GetIndex( id, rot ) ];           }
+  static   PosID   GetIndex  ( PosID id, CubeID rot )                  { return Singleton -> routerPositions[ id ][ rot ];           }
+  static   PosID   GetIndex  ( const Coord & C )                       { return GetIndex( C.x, C.y, C.z);                            }
+  static   PosID   GetIndex  ( Layer x, Layer y, Layer z )             { return Singleton -> coordToIndex[ x ][ y ][ z ];            }
+  static   PosID   GetIndex  ( Layer x, Layer y, Layer z, CubeID rot ) { return GetNode( x, y, z ) [ rot ];                          }
+  static   PosID   GetLayer  ( Axis a, Layer l, byte id )              { return Singleton -> frameworkLayer [ a ][ l ][ id ];        }
+  static   Layer   LayerSize ( Layer l )                               { return l == 0 || l == N - 1 ? N * N : 4 * ( N - 1 );        }
+  static   Layer   GetCoord  ( PosID p, Axis a )                       { return Singleton -> indexToCoord [ p ][ a ];                }
+  static   Layer   GetCoord  ( PosID p, RotID r, Axis a )              { return Singleton -> indexToCoord [ GetIndex( p, r ) ][ a ]; }
   static   Coord   GetCoord  ( PosID p ) 
   { 
     return Coord( 
@@ -184,7 +184,7 @@ void CPositions<N>::initIndices()
     }
     else
     {
-      coordToIndex[ x ][ y ][ z ] = -1;
+      coordToIndex[ x ][ y ][ z ] = 0xFF;
     }
   } // getIndex() is fully working now
 }

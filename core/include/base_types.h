@@ -27,9 +27,9 @@ typedef unsigned char byte;
  // ID types
 //  --------
 
-typedef unsigned char CubeID;
-typedef unsigned char PosID;
-typedef unsigned char RotID;
+typedef unsigned short CubeID;
+typedef unsigned short PosID;
+typedef unsigned short RotID;
 
  // Facets
 //  ------
@@ -47,8 +47,8 @@ enum Axis
   _X, _Y, _Z, _NA
 };
 
-typedef char Layer;
-typedef char Turn;
+typedef unsigned short Layer;
+typedef unsigned short Turn;
 
 
  // Auxiliary inline functions
