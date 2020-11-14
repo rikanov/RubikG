@@ -24,25 +24,17 @@ public:
 
   bool operator << ( const CacheID& id )
   {
-    if ( m_qeuIn != m_qeuEnd )
-    {
       *( m_qeuIn ++ ) = id;
       return true;
-    }
-    return false;
   }
 
   bool operator >> ( CacheID& id ) 
   {
-    if ( m_qeuOut < m_qeuIn )
-    {
       id = *( m_qeuOut ++ );
       return true;
-    }
-    return false;
   }
   
-  bool operator >> ( void ) 
+  bool skip ( void ) 
   {
     if ( m_qeuOut < m_qeuIn )
     {

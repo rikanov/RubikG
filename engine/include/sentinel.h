@@ -6,17 +6,20 @@
 template<unsigned int N>
 class Sentinel
 {
-  CFramework<N> * m_CFramework;
-  CubeSlot      * m_container;
-  CubeSlot      * m_containerEnd;
-  CubeSlot      * m_slotPointer;
-  const Counter m_cacheSize;
-  const bool    m_solidColor;
-  Counter       m_size;
-  Counter       m_counter[ 3 ][ N ] = {};
+  CFramework<N>  * m_CFramework;
+  CubeSlot       * m_container;
+  CubeSlot       * m_containerEnd;
+  CubeSlot       * m_slotPointer;
+  const Counter  m_cacheSize;
+  const bool     m_solidColor;
+  Counter        m_size;
+  Counter        m_counter[ 3 ][ N ] = {};
+  
+  mutable const CubeSlot * m_cSlotPointer;
+  
   public:
 
-  Sentinel( CubeList );
+  Sentinel( CubeList, const bool );
   ~Sentinel();
 
   // inline functions to maintain counter data
@@ -47,12 +50,22 @@ class Sentinel
     m_slotPointer = m_container; return next();          
   }
   
+  const CubeSlot * start() const
+  { 
+    m_cSlotPointer = m_container; return next();          
+  }
+  
   CubeSlot * next () 
   { 
     return m_slotPointer == m_containerEnd ? nullptr : m_slotPointer ++ ; 
   }
-
-  Counter counter( Axis a, Layer l )
+  
+  const CubeSlot * next () const
+  { 
+    return m_cSlotPointer == m_containerEnd ? nullptr : m_cSlotPointer ++ ; 
+  }
+  
+  Counter count( Axis a, Layer l )
   {
     return m_counter[a][l];
   }
@@ -68,10 +81,10 @@ class Sentinel
 };
 
 template<unsigned int N>
-Sentinel<N>::Sentinel( CubeList P )
+Sentinel<N>::Sentinel( CubeList P, const bool solidColor )
  : m_CFramework ( nullptr )
  , m_container  ( new CubeSlot [ CPositions<N>::GetSize() ] )
- , m_solidColor ( true )
+ , m_solidColor ( solidColor )
  , m_size       ( 0 )
  , m_cacheSize  ( P.size() )
 {
@@ -119,7 +132,7 @@ template<unsigned int N>
 void Sentinel<N>::turnLayer( const Axis axis, const Layer layer )
 {
   int parts = m_counter[ axis ][ layer ];
-  for( CubeSlot * slotPointer = m_selectedCubes; parts > 0; ++ slotPointer )
+  for( CubeSlot * slotPointer = m_container; parts > 0; ++ slotPointer )
   {
     if ( CPositions<N>::GetCoord( slotPointer -> pos, slotPointer -> rot, axis ) == layer )
     {
@@ -138,17 +151,17 @@ CacheID Sentinel<N>::getCacheID() const
   switch( m_cacheSize )
   {
     case 1:
-      return m_selectedCubes[0].rot;
+      return m_container[0].rot;
     case 2:
-      return m_selectedCubes[0].rot + pow24[1] * m_selectedCubes[1].rot;
+      return m_container[0].rot + pow24[1] * m_container[1].rot;
     case 3:
-      return m_selectedCubes[0].rot + pow24[1] * m_selectedCubes[1].rot + pow24[2] * m_selectedCubes[2].rot;
+      return m_container[0].rot + pow24[1] * m_container[1].rot + pow24[2] * m_container[2].rot;
     case 4:
-      return m_selectedCubes[0].rot + pow24[1] * m_selectedCubes[1].rot + pow24[2] * m_selectedCubes[2].rot + pow24[3] * m_selectedCubes[3].rot;
+      return m_container[0].rot + pow24[1] * m_container[1].rot + pow24[2] * m_container[2].rot + pow24[3] * m_container[3].rot;
     case 5:
-      return m_selectedCubes[0].rot + pow24[1] * m_selectedCubes[1].rot + pow24[2] * m_selectedCubes[2].rot + pow24[3] * m_selectedCubes[3].rot + pow24[4] * m_selectedCubes[4].rot;
+      return m_container[0].rot + pow24[1] * m_container[1].rot + pow24[2] * m_container[2].rot + pow24[3] * m_container[3].rot + pow24[4] * m_container[4].rot;
     case 6:
-      return m_selectedCubes[0].rot + pow24[1] * m_selectedCubes[1].rot + pow24[2] * m_selectedCubes[2].rot + pow24[3] * m_selectedCubes[3].rot + pow24[4] * m_selectedCubes[4].rot + pow24[5] * m_selectedCubes[5].rot;
+      return m_container[0].rot + pow24[1] * m_container[1].rot + pow24[2] * m_container[2].rot + pow24[3] * m_container[3].rot + pow24[4] * m_container[4].rot + pow24[5] * m_container[5].rot;
     default:
       return 0;
   }
