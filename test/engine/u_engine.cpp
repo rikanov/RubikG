@@ -3,7 +3,8 @@
 
 bool UnitTests::unit_Engine() const
 {
-  bool success = true;
+  bool success = true; 
+  /*
   head( "Engine" );
 
   clog_( "Start Simplex instance..." );
@@ -58,7 +59,7 @@ bool UnitTests::unit_Engine() const
     clog( Simplex::GetCube( test.solve( 7 ) ).toString() );
     A.print(); 
   }
-  /*
+  
   for ( int i = 0; i < 20; ++ i)
   {
     CFramework<3> A;
@@ -77,7 +78,7 @@ bool UnitTests::unit_Engine() const
     clog( Simplex::GetCube( test.solve( 8 ) ).toString() );
     A.print(); 
   }
-  */
+  
   clog_( "Cube positions:", Color::bold, "onExit()", Color::off, ':' );
   CPositions<2>::OnExit();
   CPositions<3>::OnExit();
@@ -88,7 +89,7 @@ bool UnitTests::unit_Engine() const
   clog_( "Simplex:", Color::bold, "onExit()", Color::off, ':' );
   Simplex::OnExit();
   done();
-
+*/
   finish( "Engine", success );
   return success;
 }

@@ -77,6 +77,7 @@ class Sentinel
   void addConstrain( CubeList );
 
   CacheID getCacheID() const;
+  void    setCacheID( CacheID );
 
 };
 
@@ -168,6 +169,20 @@ CacheID Sentinel<N>::getCacheID() const
 }
 
 template<unsigned int N>
+void Sentinel<N>::setCacheID( CacheID cID )
+{
+  for ( int i = 0; i < m_cacheSize; ++ i )
+    m_container[i] = 0;
+  
+  while ( cID != 0 )
+  {
+    m_container[cID].rot = cID % 24;
+    cID /= 24;
+  }
+  update();
+}
+
+template<unsigned int N>
 bool Sentinel<N>::isSolved() const
 {
   bool solved = true;
@@ -186,6 +201,7 @@ bool Sentinel<N>::isSolved() const
   }
   return solved;
 }
+
 template<unsigned int N>
 Sentinel<N>::~Sentinel()
 {

@@ -11,9 +11,9 @@ class CCache
   const Counter m_bufferSize;
 public:
   CCache( const int& size, const int& buf_size )
-   : m_cachedMoves ( new RotID [ pow24[size] * buf_size ] () )
-   , m_cacheCounter( new Counter [ size ] () )
-   , m_cacheLevel  ( new Counter [ size ] () )
+   : m_cachedMoves ( new RotID   [ pow24[size] * buf_size ] () )
+   , m_cacheCounter( new Counter [ pow24[size]            ] () )
+   , m_cacheLevel  ( new Counter [ pow24[size]            ] () )
    , m_bufferSize  ( buf_size )
   {
   }
