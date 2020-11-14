@@ -32,7 +32,6 @@ private: // functions
   Simplex();
   void init();
   void initGroup();
-  void initMetric();
 
 private: // array datamembers
   OCube                  simplexGroup     [ 24 /* ID */ ];
@@ -40,7 +39,6 @@ private: // array datamembers
   CubeID /* X: [0 23] */ composition      [ 24 /* A */  ][ 24 /*B*/ ]; // X = AB
   CubeID /* X: [0 23] */ transform        [ 24 /* A */  ][ 24 /*B*/ ]; // AX = B => X = inv(A) B
   bool                   align            [ 24 /* ID */ ][ 6  /*F*/ ]; // [ id ] [ facet ]
-  byte                   metric           [ 24 /* A */  ][ 24 /*B*/ ];
   
 public:
 

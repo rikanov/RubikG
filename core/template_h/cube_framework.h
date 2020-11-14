@@ -22,13 +22,12 @@
 
 #include <basic_functions.h>
 #include <cube_positions.h>
-#include <cstring> // memcmp, memcpy
 
 /// ----------------------------------- Template declarations starts here ------------------------------------- ///
 template<unsigned int N>
 class CFramework
 {
-  static constexpr size_t Fsize = CPositions<N>::GetSize();
+  static constexpr int Fsize = CPositions<N>::GetSize();
   CubeID * frameworkSpace;
 
 public:
@@ -39,7 +38,6 @@ public:
   // Constructors
   CFramework( void );
   CFramework( const CFramework<N>&, const CFramework<N>& );
-  CFramework( const CFramework<N>&, RotID );
   CFramework( const CFramework<N>& );
   CFramework( CFramework<N>&& f );
   
@@ -52,8 +50,8 @@ public:
   static CFramework<N> Transform  ( const CFramework<N>& A, const CFramework<N>& C ) { return CFramework<N>( A.inverse(), C ); } // transform( A, C ) returns with B where A + B = C
   
   // Operators
-  constexpr CFramework<N>& operator=  ( const CFramework<N>& C ) { std::memcpy( frameworkSpace, C.frameworkSpace, Fsize ); return *this; }
-  bool                     operator== ( const CFramework<N>& X ) { return std::memcmp( frameworkSpace, X.frameworkSpace, Fsize ) == 0;   }
+  constexpr CFramework<N>& operator=  ( const CFramework<N>& B );
+  bool                     operator== ( const CFramework<N>& X ) ;
   const     CFramework<N>  operator+  ( const CFramework<N>& B ) { return CFramework<N> ( *this, B ); }
   const     CFramework<N>  operator-  ( const CFramework<N>& B ) { return Transform( B, *this );      }
   // Destructor
@@ -116,15 +114,8 @@ template<unsigned int N>
 CFramework<N>::CFramework( const CFramework<N>& C )
  : frameworkSpace( new CubeID [ Fsize ] )
 {
-  std::memcpy( frameworkSpace, C.frameworkSpace, Fsize );
-}
-
-template<unsigned int N> 
-CFramework<N>::CFramework( const CFramework<N>& C, RotID rotID )
- : frameworkSpace( new CubeID [ Fsize ] )
-{
-  std::memcpy( frameworkSpace, C.frameworkSpace, Fsize );
-  rotate( rotID );
+  for ( int i = 0; i < Fsize; ++ i )
+    frameworkSpace[i] = C.frameworkSpace[i];
 }
 
 template<unsigned int N>
@@ -136,6 +127,27 @@ CFramework<N>::CFramework( CFramework<N> && f )
 
  // Operations
 //  ----------
+
+// assignement
+template<unsigned int N>
+constexpr CFramework<N>& CFramework<N>::operator = ( const CFramework<N>& C )
+{
+  for ( int i = 0; i < Fsize; ++ i )
+    frameworkSpace[i] = C.frameworkSpace[i];
+  return *this;
+}
+
+// equlity
+template<unsigned int N>
+bool CFramework<N>::operator == ( const CFramework<N>& C )
+{
+  for ( int i = 0; i < Fsize; ++ i )
+  {
+    if ( frameworkSpace[i] != C.frameworkSpace[i] )
+      return false;
+  }
+  return true;
+}
 
 // inverse
 template<unsigned int N> 

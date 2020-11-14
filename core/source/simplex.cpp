@@ -8,7 +8,6 @@ Simplex::Simplex()
   Singleton = this;
   init();
   initGroup();
-  initMetric();
 }
 
 void Simplex::init()
@@ -68,47 +67,5 @@ void Simplex::initGroup()
   {
     for( Facet F: { _F, _R, _U, _L, _D, _B } )
       align[ id ][F] = GetCube( id ).aligned( F ); 
-  }
-}
-
-void Simplex::initMetric()
-{
-  byte   redund[24] = {};
-  byte   depth [24] = {};
-  CubeID qeueu [24] = {};
-  
-  all_id ( i ) { depth[i] = 0xFF; }
-  depth[0] = 0;
-  
-  CubeID * qeueuOut  = qeueu;
-  CubeID * qeueuIn   = qeueu + 1;
-  
-  while ( qeueuOut != qeueuIn )
-  {
-    for ( Axis axis : { _X, _Y, _Z } )
-    {  
-      for ( RotID rot : { 1, 2, 3 } )
-      {
-        const CubeID next = Composition( *qeueuOut, Tilt( axis, rot) );
-        if ( depth[ next ] == 0xFF )
-        {
-          depth[ next ] = depth[ *qeueuOut ] + 1;
-          *( qeueuIn ++ ) = next;
-        }
-        else if ( depth[ next ] == depth[ *qeueuOut ] + 1 )
-        {
-          ++ redund[ next ];
-        }
-      }
-    }
-    ++ qeueuOut;
-  }
-  
-  all_id ( a )
-  {
-    all_id ( b )
-    {
-      metric[a][b] = depth[ Transform( a, b ) ];
-    }
   }
 }
