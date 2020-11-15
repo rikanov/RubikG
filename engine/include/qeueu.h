@@ -22,6 +22,16 @@ public:
     m_qeuIn = m_qeuOut = m_qeueudCubes;
   }
 
+  void qeuIn( CacheID id )
+  {
+    *( m_qeuIn ++ ) = id;
+  }
+  
+  CacheID qeuOut()
+  {
+    return *( m_qeuOut ++ );
+  }
+  
   bool operator << ( const CacheID& id )
   {
       *( m_qeuIn ++ ) = id;

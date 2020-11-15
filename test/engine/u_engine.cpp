@@ -4,7 +4,7 @@
 bool UnitTests::unit_Engine() const
 {
   bool success = true; 
-  /*
+  
   head( "Engine" );
 
   clog_( "Start Simplex instance..." );
@@ -26,7 +26,7 @@ bool UnitTests::unit_Engine() const
     const std::initializer_list<PosID> cache = {
       CPositions<4>::GetIndex( 0, 1, 1),
       CPositions<4>::GetIndex( 0, 2, 1),
-    //  CPositions<4>::GetIndex( 0, 1, 2),
+      CPositions<4>::GetIndex( 0, 1, 2),
       CPositions<4>::GetIndex( 0, 2, 2) 
     };
     const std::initializer_list<PosID> middle = {
@@ -52,7 +52,7 @@ bool UnitTests::unit_Engine() const
       CPositions<4>::GetIndex( 2, 2, 3)
       };
     Engine<4> test( cache, true );
-    test.toSolve( &A );
+  }/*  test.toSolve( &A );
     test.constrain( middle  );
     clog( " start ");
     A.print();

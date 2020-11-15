@@ -10,7 +10,7 @@ class Engine
 {
   CFramework<N> * m_CFramework;
   Sentinel<N>   * m_sentinel;
-  CCache        * m_cachedRotations;  
+  const CCache  * m_cachedRotations;  
   
   Counter     m_depth;
   Counter     m_maxDepth;
@@ -26,8 +26,7 @@ public:
 
 template<unsigned int N>
 Engine<N>::Engine( CubeList P, const bool& solidColor )
-  : m_sentinel ( P, solidColor )
-  , m_cachedRotations ( nullptr )
+  : m_sentinel ( new Sentinel<N>( P, solidColor ) )
 {
   CGenerator<N> CGen( P, solidColor );
   m_cachedRotations = CGen.getCache();

@@ -172,12 +172,11 @@ template<unsigned int N>
 void Sentinel<N>::setCacheID( CacheID cID )
 {
   for ( int i = 0; i < m_cacheSize; ++ i )
-    m_container[i] = 0;
+    m_container[i].rot = 0;
   
-  while ( cID != 0 )
+  for ( int slotID = 0; cID != 0; ++ slotID, cID /= 24 )
   {
-    m_container[cID].rot = cID % 24;
-    cID /= 24;
+    m_container[slotID].rot = cID % 24;
   }
   update();
 }

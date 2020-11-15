@@ -4,8 +4,6 @@
 
 int main()
 {
-  unsigned short t = 0xFF;
-  clog(t);
   clog( Color::off, "Press", Color::white, Color::bold, "ENTER", Color::off,"to start." ); 
   init();
   std::cin.get();
