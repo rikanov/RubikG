@@ -10,7 +10,8 @@ class Engine
 {
   CFramework<N> * m_CFramework;
   Sentinel<N>   * m_sentinel;
-  const CCache  * m_cachedRotations;  
+
+  std::shared_ptr< const CCache > m_cachedRotations;  
   
   Counter     m_depth;
   Counter     m_maxDepth;
@@ -36,7 +37,6 @@ template<unsigned int N>
 Engine<N>::~Engine()
 {
   delete m_sentinel;
-  delete m_cachedRotations;
 }
 
   

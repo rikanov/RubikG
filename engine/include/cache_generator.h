@@ -4,6 +4,7 @@
 #include <sentinel.h>
 #include <qeueu.h>
 #include <cache.h>
+#include <memory>
 
 template<unsigned int N>
 class CGenerator
@@ -11,7 +12,8 @@ class CGenerator
   Sentinel<N> * m_sentinel;
   Counter     m_qeueuLevel;
   Qeueu       * m_qeueudCacheIDs;
-  CCache      * m_cachedRotations;
+  
+  std::shared_ptr< CCache > m_cachedRotations;
 
   void initQeueu();
   void generate();
@@ -20,7 +22,7 @@ public:
   CGenerator( CubeList P, const bool& solidColor );
   ~CGenerator();
   
-  const CCache * getCache() const
+  std::shared_ptr< const CCache > getCache() const
   {
     return m_cachedRotations;
   }
