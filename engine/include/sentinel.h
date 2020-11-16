@@ -171,7 +171,7 @@ CacheID Sentinel<N>::getCacheID() const
 template<unsigned int N>
 void Sentinel<N>::setCacheID( CacheID cID )
 {
-  for ( int i = 0; i < m_cacheSize; ++ i )
+  for ( Counter i = 0; i < m_cacheSize; ++ i )
     m_container[i].rot = 0;
   
   for ( int slotID = 0; cID != 0; ++ slotID, cID /= 24 )

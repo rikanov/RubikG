@@ -40,9 +40,8 @@ CGenerator<N>::CGenerator( CubeList P, const bool& solidColor )
 template<unsigned int N> 
 void CGenerator<N>::initQeueu()
 {
-  clog( "init qeueu" );
   all_id( id )
-  {clog_( (int) id );
+  {
     for ( auto pSlot = m_sentinel -> start(); pSlot; pSlot = m_sentinel -> next() )
     {
       pSlot -> rot = id;
@@ -51,7 +50,6 @@ void CGenerator<N>::initQeueu()
     *m_qeueudCacheIDs << next;
     m_cachedRotations -> set( next, 0 );clog_( '_' );
   }
-  clog( "\ndone." );
 }
 
 template<unsigned int N> 
@@ -61,9 +59,12 @@ void CGenerator<N>::generate()
   Counter counter  = 0;
   Counter maxLevel = 0;
   Counter maxCache = 0;
+  int distCache[ 9 * N ] = {};
+  int distLevel[ 10 ] = {};
   while( m_qeueudCacheIDs -> count() > 0 )
   {
-    clog_( '\r', counter++, " : ", m_qeueudCacheIDs->count(), " - maxLevel: ", maxLevel, " maxCache: ", maxCache );
+    ++counter;
+    // clog_( '\r', counter, " : ", m_qeueudCacheIDs->count(), " - maxLevel: ", maxLevel, " maxCache: ", maxCache );
     const Counter parent = m_qeueudCacheIDs -> qeuOut();
     const Counter nLevel = m_cachedRotations -> level( parent ) + 1;
     // generate child nodes
@@ -82,18 +83,34 @@ void CGenerator<N>::generate()
             m_cachedRotations -> level( id ) = nLevel;
             if( nLevel > maxLevel )
               maxLevel = nLevel;
+            ++ distLevel[ nLevel ];
           }
           if ( m_cachedRotations -> level( id ) == nLevel )
           {
+            -- distCache[ m_cachedRotations -> count( id ) ];
             m_cachedRotations -> set  ( id, getRotID<N>( axis, layer, 4 - turn ) ); // add inverse
             if ( m_cachedRotations -> count( id ) > maxCache )
               maxCache = m_cachedRotations -> count( id );
+            
+            ++ distCache[ m_cachedRotations -> count( id ) ];
+            
           }
         } // turn
         m_sentinel->turnLayer( axis, layer ); // fourth turn: get back to the original position
       } // layer
     }// axis
   }
+    clog_( '\r', counter, " : ", m_qeueudCacheIDs->count(), " - maxLevel: ", maxLevel, " maxCache: ", maxCache );
+    clog( "\nDistribution by level: ");
+    for( int i = 0; i < 9; ++ i )
+    {
+      clog( Color::gray, i, Color::white, distLevel[i] );
+    }
+    clog( "\nDistribution by size: ");
+    for( int i = 0; i < 9 * N; ++ i )
+    {
+      clog( Color::gray, i, Color::white, distCache[i] );
+    }
 }
 
 template<unsigned int N> 

@@ -1,5 +1,6 @@
 #include <test.h>
 #include <engine.h>
+#include <ctime>
 
 bool UnitTests::unit_Engine() const
 {
@@ -18,41 +19,49 @@ bool UnitTests::unit_Engine() const
   CPositions<5>::Instance();
   done();
 
-  for ( int i = 0; i < 1; ++ i )
+  const std::initializer_list<PosID> cache = {
+    CPositions<4>::GetIndex( 0, 1, 1),
+    CPositions<4>::GetIndex( 0, 2, 1),
+    CPositions<4>::GetIndex( 0, 1, 2),
+    CPositions<4>::GetIndex( 0, 2, 2) 
+  };
+  const std::initializer_list<PosID> middle = {
+    CPositions<4>::GetIndex( 3, 1, 1),
+    CPositions<4>::GetIndex( 3, 2, 1),
+    CPositions<4>::GetIndex( 3, 1, 2),
+    CPositions<4>::GetIndex( 3, 2, 2),
+    CPositions<4>::GetIndex( 1, 0, 1),
+    CPositions<4>::GetIndex( 2, 0, 1),
+    CPositions<4>::GetIndex( 1, 0, 2),
+    CPositions<4>::GetIndex( 2, 0, 2),
+    CPositions<4>::GetIndex( 1, 3, 1),
+    CPositions<4>::GetIndex( 2, 3, 1),
+    CPositions<4>::GetIndex( 1, 3, 2),
+    CPositions<4>::GetIndex( 2, 3, 2),
+    CPositions<4>::GetIndex( 1, 1, 0),
+    CPositions<4>::GetIndex( 2, 1, 0),
+    CPositions<4>::GetIndex( 1, 2, 0),
+    CPositions<4>::GetIndex( 2, 2, 0),
+    CPositions<4>::GetIndex( 1, 1, 3),
+    CPositions<4>::GetIndex( 2, 1, 3),
+    CPositions<4>::GetIndex( 1, 2, 3),
+    CPositions<4>::GetIndex( 2, 2, 3)
+  };
+  std::time_t start;
+  std::time( &start );
+  Engine<4> engine( cache, true );
+  std::time_t end;
+  std::time( &end );
+  NL();
+  clog( cache.size(), "dimension cache has built in", end - start, "seconds." );
+
+  for ( int i = 0; i < 1; ++i )
   {
     CFramework<4> A;
     A.shuffle();
     A.print();
-    const std::initializer_list<PosID> cache = {
-      CPositions<4>::GetIndex( 0, 1, 1),
-      CPositions<4>::GetIndex( 0, 2, 1),
-      CPositions<4>::GetIndex( 0, 1, 2),
-      CPositions<4>::GetIndex( 0, 2, 2) 
-    };
-    const std::initializer_list<PosID> middle = {
-      CPositions<4>::GetIndex( 3, 1, 1),
-      CPositions<4>::GetIndex( 3, 2, 1),
-      CPositions<4>::GetIndex( 3, 1, 2),
-      CPositions<4>::GetIndex( 3, 2, 2),
-      CPositions<4>::GetIndex( 1, 0, 1),
-      CPositions<4>::GetIndex( 2, 0, 1),
-      CPositions<4>::GetIndex( 1, 0, 2),
-      CPositions<4>::GetIndex( 2, 0, 2),
-      CPositions<4>::GetIndex( 1, 3, 1),
-      CPositions<4>::GetIndex( 2, 3, 1),
-      CPositions<4>::GetIndex( 1, 3, 2),
-      CPositions<4>::GetIndex( 2, 3, 2),
-      CPositions<4>::GetIndex( 1, 1, 0),
-      CPositions<4>::GetIndex( 2, 1, 0),
-      CPositions<4>::GetIndex( 1, 2, 0),
-      CPositions<4>::GetIndex( 2, 2, 0),
-      CPositions<4>::GetIndex( 1, 1, 3),
-      CPositions<4>::GetIndex( 2, 1, 3),
-      CPositions<4>::GetIndex( 1, 2, 3),
-      CPositions<4>::GetIndex( 2, 2, 3)
-      };
-    Engine<4> test( cache, true );
-  }/*  test.toSolve( &A );
+  }
+  /*  test.toSolve( &A );
     test.constrain( middle  );
     clog( " start ");
     A.print();
