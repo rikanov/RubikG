@@ -6,7 +6,7 @@ template<unsigned int N>
 Engine<N>::Engine( CubeList P, const bool& solidColor )
   : m_CFramework      ( nullptr )
   , m_sentinel        ( new Sentinel<N>( P, solidColor ) )
-  , m_cachedRotations ( CGenerator<N>  ( P, solidColor ).getCache() )
+  , m_cachedRotations ( CGenerator<N>  ( P ).getCache() )
 {
 
 }

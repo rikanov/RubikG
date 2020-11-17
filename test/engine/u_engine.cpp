@@ -19,13 +19,13 @@ bool UnitTests::unit_Engine() const
   CPositions<5>::Instance();
   done();
 
-  const std::initializer_list<PosID> cache = {
+  CubeList cache = {
     CPositions<4>::GetIndex( 0, 1, 1),
     CPositions<4>::GetIndex( 0, 2, 1),
     CPositions<4>::GetIndex( 0, 1, 2),
     CPositions<4>::GetIndex( 0, 2, 2) 
   };
-  const std::initializer_list<PosID> middle = {
+  CubeList middle = {
     CPositions<4>::GetIndex( 3, 1, 1),
     CPositions<4>::GetIndex( 3, 2, 1),
     CPositions<4>::GetIndex( 3, 1, 2),
@@ -62,12 +62,10 @@ bool UnitTests::unit_Engine() const
     A.shuffle();
     A.print();
     engine.toSolve( A );
-  }
-  /*  test.toSolve( &A );
-    test.constrain( middle  );
+    engine.addConstrain( middle  );
     clog( " start ");
     A.print();
-    clog( Simplex::GetCube( test.solve( 7 ) ).toString() );
+    clog( engine.solve( 7 ) );
     A.print(); 
   }
   
@@ -76,15 +74,14 @@ bool UnitTests::unit_Engine() const
     CFramework<3> A;
     A.shuffle( 10 );
     A.print();
-    const std::initializer_list<PosID> middle = {
+    CubeList middle = {
       CPositions<3>::GetIndex( 1, 0, 0),
       CPositions<3>::GetIndex( 0, 1, 0),
       CPositions<3>::GetIndex( 1, 1, 0),
       CPositions<3>::GetIndex( 2, 1, 0),
       CPositions<3>::GetIndex( 1, 2, 0)
       };
-    Engine<3> test( A, false );
-    test.constrain( middle  );
+    Engine<3> test( middle, false );
     clog( " start ");
     clog( Simplex::GetCube( test.solve( 8 ) ).toString() );
     A.print(); 
@@ -100,7 +97,7 @@ bool UnitTests::unit_Engine() const
   clog_( "Simplex:", Color::bold, "onExit()", Color::off, ':' );
   Simplex::OnExit();
   done();
-*/
+  
   finish( "Engine", success );
   return success;
 }

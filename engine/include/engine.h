@@ -29,10 +29,15 @@ public:
   Engine( const CGenerator<N>& CGen, const bool& solidColor );
 
   void toSolve( CFramework<N> & CF );
-  int  solve( Counter, bool exec = true );
+  Counter solve( Counter, bool exec = true );
   
   ~Engine();
   
+  void addConstrain( CubeList P )
+  {
+    m_sentinel -> addConstrain( P );
+  }
+
   CacheID cacheID() const
   {
     return m_sentinel -> getCacheID();
