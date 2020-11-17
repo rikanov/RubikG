@@ -49,7 +49,8 @@ bool UnitTests::unit_Engine() const
   };
   std::time_t start;
   std::time( &start );
-  Engine<4> engine( cache, true );
+  CGenerator<4> gen( cache );
+  Engine<4> engine( gen, true );
   std::time_t end;
   std::time( &end );
   NL();
@@ -60,6 +61,7 @@ bool UnitTests::unit_Engine() const
     CFramework<4> A;
     A.shuffle();
     A.print();
+    engine.toSolve( A );
   }
   /*  test.toSolve( &A );
     test.constrain( middle  );

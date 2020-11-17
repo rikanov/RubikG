@@ -12,29 +12,36 @@ class CGenerator
   Sentinel<N> * m_sentinel;
   Counter     m_qeueuLevel;
   Qeueu       * m_qeueudCacheIDs;
-  
+  CubeList    m_cacheGenerators;
+
   std::shared_ptr< CCache > m_cachedRotations;
 
   void initQeueu();
   void generate();
   
 public:
-  CGenerator( CubeList P, const bool& solidColor );
+  CGenerator( CubeList P );
   ~CGenerator();
   
   std::shared_ptr< const CCache > getCache() const
   {
     return m_cachedRotations;
   }
+
+  CubeList getGenerators() const
+  {
+    return m_cacheGenerators;
+  }
 };
 
 
 template<unsigned int N> 
-CGenerator<N>::CGenerator( CubeList P, const bool& solidColor )
- : m_sentinel        ( new Sentinel<N>( P, solidColor ) )
+CGenerator<N>::CGenerator( CubeList P )
+ : m_sentinel        ( new Sentinel<N>( P, false ) )
  , m_qeueuLevel      ( 0 )
  , m_qeueudCacheIDs  ( new Qeueu ( pow24[ P.size() ] ) )
  , m_cachedRotations ( new CCache( P.size(), 9 * N ) ) /* OWNERSHIP */
+ , m_cacheGenerators ( P )
 {
   generate();
 }
