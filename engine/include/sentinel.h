@@ -186,7 +186,7 @@ bool Sentinel<N>::isSolved() const
 {
   bool solved = true;
   const CubeID& orient = m_container -> rot;
-  for ( auto pSlot = start(); pSlot; pSlot = next() )
+  for ( auto pSlot = start(); pSlot && solved; pSlot = next() )
   {
     solved  = ( orient ==  pSlot -> rot );
     if ( m_solidColor )

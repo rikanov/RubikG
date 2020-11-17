@@ -23,10 +23,10 @@ bool UnitTests::unit_Engine() const
     CPositions<4>::GetIndex( 0, 1, 1),
     CPositions<4>::GetIndex( 0, 2, 1),
     CPositions<4>::GetIndex( 0, 1, 2),
-    CPositions<4>::GetIndex( 0, 2, 2) 
+    CPositions<4>::GetIndex( 0, 2, 2),
+    CPositions<4>::GetIndex( 3, 1, 1)
   };
   CubeList middle = {
-    CPositions<4>::GetIndex( 3, 1, 1),
     CPositions<4>::GetIndex( 3, 2, 1),
     CPositions<4>::GetIndex( 3, 1, 2),
     CPositions<4>::GetIndex( 3, 2, 2),
@@ -60,11 +60,11 @@ bool UnitTests::unit_Engine() const
   for ( int i = 0; i < 3; ++ i )
   {
     CFramework<4> A;
-    A.shuffle();
+    A.shuffle( 7 );
     A.print();
     engine.toSolve( A );
     clog( " start ", engine.isSolved() );
-    clog( engine.solve( 7, true ) );
+    clog( engine.solve( 8, true ) );
     A.print(); 
   }
   
@@ -79,7 +79,7 @@ bool UnitTests::unit_Engine() const
   for ( int i = 0; i < 3; ++ i)
   {
     CFramework<3> A;
-    A.shuffle( 10 );
+    A.shuffle( 6 );
     A.print();
     engine3.toSolve( A );
     clog( " start ");

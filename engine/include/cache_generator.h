@@ -65,15 +65,8 @@ template<unsigned int N>
 void CGenerator<N>::generate()
 {
   initQeueu();
-  Counter counter  = 0;
-  Counter maxLevel = 0;
-  Counter maxCache = 0;
-  int distCache[ 9 * N ] = {};
-  int distLevel[ 10 ] = {};
   while( m_qeueudCacheIDs -> count() > 0 )
   {
-    ++counter;
-    // clog_( '\r', counter, " : ", m_qeueudCacheIDs->count(), " - maxLevel: ", maxLevel, " maxCache: ", maxCache );
     const Counter parent = m_qeueudCacheIDs -> qeuOut();
     const Counter nLevel = m_cachedRotations -> level( parent ) + 1;
     // generate child nodes
@@ -90,36 +83,16 @@ void CGenerator<N>::generate()
           {
             m_qeueudCacheIDs  -> qeuIn( id ); 
             m_cachedRotations -> level( id ) = nLevel;
-            if( nLevel > maxLevel )
-              maxLevel = nLevel;
-            ++ distLevel[ nLevel ];
           }
           if ( m_cachedRotations -> level( id ) == nLevel )
           {
-            -- distCache[ m_cachedRotations -> count( id ) ];
-            m_cachedRotations -> set  ( id, getRotID<N>( axis, layer, 4 - turn ) ); // add inverse
-            if ( m_cachedRotations -> count( id ) > maxCache )
-              maxCache = m_cachedRotations -> count( id );
-            
-            ++ distCache[ m_cachedRotations -> count( id ) ];
-            
+            m_cachedRotations -> set  ( id, getRotID<N>( axis, layer, 4 - turn ) ); // add inverse            
           }
         } // turn
         m_sentinel->turnLayer( axis, layer ); // fourth turn: get back to the original position
       } // layer
     }// axis
   }
-    clog_( '\r', counter, " : ", m_qeueudCacheIDs->count(), " - maxLevel: ", maxLevel, " maxCache: ", maxCache );
-    clog( "\nDistribution by level: ");
-    for( int i = 0; i < 9; ++ i )
-    {
-      clog( Color::gray, i, Color::white, distLevel[i] );
-    }
-    clog( "\nDistribution by size: ");
-    for( int i = 0; i < 9 * N; ++ i )
-    {
-      clog( Color::gray, i, Color::white, distCache[i] );
-    }
 }
 
 template<unsigned int N> 

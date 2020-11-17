@@ -44,6 +44,21 @@ bool Engine<N>::testLayer( const Axis axis, const Layer layer )
 template<unsigned int N>
 bool Engine<N>::extend( const Axis axis, const Layer layer )
 {
+  if ( m_cachedRotations -> level( cacheID() ) > m_maxDepth - m_depth )
+  {
+    return false;
+  }
+  for ( RotID rotID = m_cachedRotations -> start( cacheID() ); rotID; rotID = m_cachedRotations -> next() )
+  {
+      if ( testLayer( getAxis <N> ( rotID ), getLayer <N> ( rotID ) ) )
+      {
+        return true;
+      }
+  }
+  if ( m_cachedRotations -> level( cacheID() ) == m_maxDepth - m_depth )
+  {
+    return false;
+  }
   for ( Axis A: { _X, _Y, _Z } )
   {
     for ( Layer L = ( A == axis ? layer : 0 ); L < N; ++L )
