@@ -57,7 +57,7 @@ bool UnitTests::unit_Engine() const
   NL();
   clog( cache.size(), "dimension cache has built in", end - start, "seconds." );
 
-  for ( int i = 0; i < 3; ++ i )
+  for ( int i = 0; i < 10; ++ i )
   {
     CFramework<4> A;
     A.shuffle( 7 );
@@ -75,8 +75,12 @@ bool UnitTests::unit_Engine() const
     CPositions<3>::GetIndex( 2, 1, 0),
     CPositions<3>::GetIndex( 1, 2, 0)
     };
+  std::time( &start );
   Engine<3> engine3 ( cross3, true );
-  for ( int i = 0; i < 3; ++ i)
+  std::time( &end );
+  NL();
+  clog( cross3.size(), "dimension cache has built in", end - start, "seconds." );
+  for ( int i = 0; i < 10; ++ i)
   {
     CFramework<3> A;
     A.shuffle( 6 );

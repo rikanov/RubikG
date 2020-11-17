@@ -57,7 +57,7 @@ void CGenerator<N>::initQeueu()
     }
     const CacheID next = m_sentinel -> getCacheID();;
     *m_qeueudCacheIDs << next;
-    m_cachedRotations -> set( next, 0 );clog_( '_' );
+    m_cachedRotations -> set( next, 0 );
   }
 }
 
