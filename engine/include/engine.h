@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <vector>
 
+using RotPath = std::vector<RotID>;
+
 template<unsigned int N> 
 class Engine
 {
@@ -16,47 +18,33 @@ class Engine
   Counter     m_depth;
   Counter     m_maxDepth;
   
-  std::vector<RotID> m_solution;    // path to solution
-   
+  RotPath m_solution;    // path to solution
+
+  bool testLayer( const Axis , const Layer );
+  bool extend   ( const Axis , const Layer );
+
 public:
 
   Engine( CubeList P, const bool& solidColor );
   Engine( const CGenerator<N>& CGen, const bool& solidColor );
+
   void toSolve( CFramework<N> & CF );
+  int  solve( Counter, bool exec = true );
+  
   ~Engine();
   
+  CacheID cacheID() const
+  {
+    return m_sentinel -> getCacheID();
+  }
+
+  const RotPath & getsolution() const
+  {
+    return m_solution;
+  }
 };
 
-template<unsigned int N>
-Engine<N>::Engine( CubeList P, const bool& solidColor )
-  : m_CFramework      ( nullptr )
-  , m_sentinel        ( new Sentinel<N>( P, solidColor ) )
-  , m_cachedRotations ( CGenerator<N>  ( P, solidColor ).getCache() )
-{
+#include <../template_cpp/engine.cpp>        // engine base definitions
+#include <../template_cpp/engine_search.cpp> // engine search definitions 
 
-}
-
-
-template<unsigned int N>
-Engine<N>::Engine( const CGenerator<N>& CGen, const bool& solidColor )
-  : m_CFramework      ( nullptr )
-  , m_sentinel        ( new Sentinel<N> ( CGen.getGenerators(), solidColor ) )
-  , m_cachedRotations ( CGen.getCache() )
-{
-
-}
-
-template<unsigned int N>
-void Engine<N>::toSolve( CFramework<N> & CF)
-{
-  m_CFramework = &CF;
-}
-
-template<unsigned int N> 
-Engine<N>::~Engine()
-{
-  delete m_sentinel;
-}
-
-  
 #endif // !ENGINE_HEADER

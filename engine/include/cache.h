@@ -9,12 +9,17 @@ class CCache
   Counter     * m_cacheCounter;
   Counter     * m_cacheLevel;
   const Counter m_bufferSize;
+
+  mutable 
+  const RotID * m_readMoves;
+
 public:
   CCache( const int& size, const int& buf_size )
    : m_cachedMoves ( new RotID   [ pow24[size] * buf_size ] () )
    , m_cacheCounter( new Counter [ pow24[size]            ] () )
    , m_cacheLevel  ( new Counter [ pow24[size]            ] () )
    , m_bufferSize  ( buf_size )
+   , m_readMoves   ( nullptr )
   {
   }
 
@@ -31,6 +36,17 @@ public:
   Counter & level( CacheID level )
   {
     return m_cacheLevel[level];
+  }
+
+  const RotID & start( CacheID id ) const
+  {
+    m_readMoves = m_cachedMoves + ( id * m_bufferSize );
+    return next();
+  }
+
+  const RotID & next() const
+  {
+    return *( m_readMoves ++ );
   }
 };
 
