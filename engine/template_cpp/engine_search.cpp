@@ -5,19 +5,29 @@
 template<unsigned int N>
 Counter Engine<N>::solve( Counter depth, bool exec )
 {
-  m_depth = 0;
-  m_maxDepth = depth;
-  m_solution.clear();
-  const bool success = m_sentinel -> isSolved() || extend( _NA, 0 );
-  std::reverse( m_solution.begin(), m_solution.end() );
-  if ( exec )
+  if ( m_sentinel -> isSolved() )
   {
-    for ( RotID r: m_solution )
-    {clog( toString<N>( r ));
-      m_CFramework -> rotate( r );
+    return 0;
+  }
+  for( m_maxDepth = 1; m_maxDepth <= depth; ++ m_maxDepth )
+  {
+    m_depth = 0;
+    m_solution.clear();
+    if ( extend( _NA, 0 ) )
+    {
+      std::reverse( m_solution.begin(), m_solution.end() );
+      if ( exec )
+      {
+        for ( RotID r: m_solution )
+        {
+          clog( toString<N>( r ));
+          m_CFramework -> rotate( r );
+        }
+      }
+      break;
     }
-  }clog( "success:", success, "exec:", exec);
-  return success ? m_depth : -1 ;
+  }
+  return m_maxDepth <= depth ? m_depth : -1 ;
 }
 
 template<unsigned int N> 
