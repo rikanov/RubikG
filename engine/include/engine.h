@@ -47,6 +47,11 @@ public:
   {
     return m_solution;
   }
+
+  bool isSolved() const
+  {
+    return m_sentinel -> isSolved();
+  }
 };
 
 #include <../template_cpp/engine.cpp>        // engine base definitions

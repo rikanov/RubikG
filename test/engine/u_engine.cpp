@@ -51,39 +51,39 @@ bool UnitTests::unit_Engine() const
   std::time( &start );
   CGenerator<4> gen( cache );
   Engine<4> engine( gen, true );
+  engine.addConstrain( middle  );
   std::time_t end;
   std::time( &end );
   NL();
   clog( cache.size(), "dimension cache has built in", end - start, "seconds." );
 
-  for ( int i = 0; i < 1; ++i )
+  for ( int i = 0; i < 3; ++ i )
   {
     CFramework<4> A;
     A.shuffle();
     A.print();
     engine.toSolve( A );
-    engine.addConstrain( middle  );
-    clog( " start ");
-    A.print();
-    clog( engine.solve( 7 ) );
+    clog( " start ", engine.isSolved() );
+    clog( engine.solve( 7, true ) );
     A.print(); 
   }
   
-  for ( int i = 0; i < 20; ++ i)
+  CubeList cross3 = {
+    CPositions<3>::GetIndex( 1, 0, 0),
+    CPositions<3>::GetIndex( 0, 1, 0),
+    CPositions<3>::GetIndex( 1, 1, 0),
+    CPositions<3>::GetIndex( 2, 1, 0),
+    CPositions<3>::GetIndex( 1, 2, 0)
+    };
+  Engine<3> engine3 ( cross3, true );
+  for ( int i = 0; i < 3; ++ i)
   {
     CFramework<3> A;
     A.shuffle( 10 );
     A.print();
-    CubeList middle = {
-      CPositions<3>::GetIndex( 1, 0, 0),
-      CPositions<3>::GetIndex( 0, 1, 0),
-      CPositions<3>::GetIndex( 1, 1, 0),
-      CPositions<3>::GetIndex( 2, 1, 0),
-      CPositions<3>::GetIndex( 1, 2, 0)
-      };
-    Engine<3> test( middle, false );
+    engine3.toSolve( A );
     clog( " start ");
-    clog( Simplex::GetCube( test.solve( 8 ) ).toString() );
+    clog( engine3.solve( 8, true ) );
     A.print(); 
   }
   
@@ -97,7 +97,7 @@ bool UnitTests::unit_Engine() const
   clog_( "Simplex:", Color::bold, "onExit()", Color::off, ':' );
   Simplex::OnExit();
   done();
-  
+
   finish( "Engine", success );
   return success;
 }

@@ -13,10 +13,10 @@ Counter Engine<N>::solve( Counter depth, bool exec )
   if ( exec )
   {
     for ( RotID r: m_solution )
-    {
+    {clog( toString<N>( r ));
       m_CFramework -> rotate( r );
     }
-  }
+  }clog( "success:", success, "exec:", exec);
   return success ? m_depth : -1 ;
 }
 

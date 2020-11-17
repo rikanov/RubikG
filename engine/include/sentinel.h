@@ -194,7 +194,7 @@ bool Sentinel<N>::isSolved() const
       solved |= pSlot -> facet != _NF && Simplex::GetCube( orient ).whatIs( CPositions<N>::Side( pSlot -> pos, pSlot -> rot ) ) == pSlot -> facet; 
     }
   }
-  for ( auto pSlot = start(); pSlot; pSlot = next() )
+  for ( auto pSlot = start(); pSlot && solved; pSlot = next() )
   {
     clog( CPositions<N>::GetCoord( pSlot -> pos ).toString(), Simplex::GetCube( pSlot -> rot ).toString() );
   }
