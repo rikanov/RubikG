@@ -41,9 +41,9 @@ Counter Engine<N>::solve( Counter depth, bool exec )
 template<unsigned int N> 
 bool Engine<N>::testLayer( const Axis axis, const Layer layer )
 {
-  ++ m_depth;
   if ( m_depth < m_maxDepth && m_sentinel -> count( axis, layer ) > 0 )
   {
+    ++ m_depth;
     for ( Turn turn : { 1, 2, 3 } )
     {
       m_sentinel -> turnLayer( axis, layer );
@@ -57,14 +57,12 @@ bool Engine<N>::testLayer( const Axis axis, const Layer layer )
     -- m_depth;
     return false;
   }
-  -- m_depth;
-  return m_sentinel -> isSolved(); // evaluate leaf nodes
+  return false; // m_sentinel -> isSolved(); // evaluate leaf nodes
 }
 
 template<unsigned int N> 
 bool Engine<N>::testRotation( const Axis axis, const Layer layer, const Turn turn )
 {
-  ++ m_depth;
   m_sentinel -> turnLayer( axis, layer, turn );
   if ( speedSolver() )
   {
@@ -72,19 +70,28 @@ bool Engine<N>::testRotation( const Axis axis, const Layer layer, const Turn tur
     return true;
   }
   m_sentinel -> turnLayer( axis, layer, 4 - turn ); // turn back to original position
-  -- m_depth;
   return false;
 }
 
 template<unsigned int N>
 bool Engine<N>::speedSolver()
 {
+  if ( m_depth == m_maxDepth )
+  {
+    if ( m_sentinel -> isSolved( true ) )
+    {
+      clog( "speedsolver" );
+    }
+    return m_sentinel -> isSolved( true );
+  }
   for ( RotID rotID = m_cachedRotations -> start( cacheID() ); rotID; rotID = m_cachedRotations -> next() )
   {
+      ++ m_depth;
       if ( testRotation( getAxis <N> ( rotID ), getLayer <N> ( rotID ), getTurn <N> ( rotID ) ) )
       {
         return true;
       }
+      -- m_depth;
   }
   return false;
 }
