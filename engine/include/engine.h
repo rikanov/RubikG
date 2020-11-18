@@ -20,8 +20,10 @@ class Engine
   
   RotPath m_solution;    // path to solution
 
-  bool testLayer( const Axis , const Layer );
-  bool extend   ( const Axis , const Layer );
+  bool speedSolver ();
+  bool testRotation( const Axis , const Layer, const Turn turn );
+  bool testLayer   ( const Axis , const Layer );
+  bool extend      ( const Axis , const Layer );
 
 public:
 

@@ -17,11 +17,6 @@ class Sentinel
   
   mutable const CubeSlot * m_cSlotPointer;
   
-  public:
-
-  Sentinel( CubeList, const bool );
-  ~Sentinel();
-
   // inline functions to maintain counter data
   void addCube ( CubeSlot * S ) 
   { 
@@ -35,6 +30,11 @@ class Sentinel
       -- m_counter[ axis ][ CPositions<N>::GetCoord( S -> pos, S -> rot, axis ) ]; 
   }
   
+  public:
+
+  Sentinel( CubeList, const bool );
+  ~Sentinel();
+
   Counter id () const        
   { 
     return m_slotPointer - m_container; 
@@ -45,14 +45,16 @@ class Sentinel
     return m_container[id];             
   }
   
-  CubeSlot * start() 
+  CubeSlot * start( const bool & withoutCache = false ) 
   { 
-    m_slotPointer = m_container; return next();          
+    m_slotPointer = withoutCache ? m_container + m_cacheSize : m_container; 
+    return next();          
   }
-  
-  const CubeSlot * start() const
+
+  const CubeSlot * start( const bool & withoutCache = false ) const
   { 
-    m_cSlotPointer = m_container; return next();          
+    m_cSlotPointer = withoutCache ? m_container + m_cacheSize : m_container;
+    return next();          
   }
   
   CubeSlot * next () 
@@ -70,10 +72,10 @@ class Sentinel
     return m_counter[a][l];
   }
 
-  void turnLayer( Axis, Layer );
+  void turnLayer( const Axis, const Layer, const Turn turn = 1 );
   void update();
   void toSolve( CFramework<N> * CF );
-  bool isSolved() const;
+  bool isSolved( const bool & w = false ) const;
   void addConstrain( CubeList );
 
   CacheID getCacheID() const;
@@ -130,7 +132,7 @@ void Sentinel<N>::toSolve( CFramework<N> * CF )
 }
 
 template<unsigned int N> 
-void Sentinel<N>::turnLayer( const Axis axis, const Layer layer )
+void Sentinel<N>::turnLayer( const Axis axis, const Layer layer, const Turn turn )
 {
   int parts = m_counter[ axis ][ layer ];
   for( CubeSlot * slotPointer = m_container; parts > 0; ++ slotPointer )
@@ -138,7 +140,7 @@ void Sentinel<N>::turnLayer( const Axis axis, const Layer layer )
     if ( CPositions<N>::GetCoord( slotPointer -> pos, slotPointer -> rot, axis ) == layer )
     {
       delCube( slotPointer );        
-      slotPointer -> rot = Simplex::Composition( slotPointer -> rot, Simplex::Tilt( axis ) );
+      slotPointer -> rot = Simplex::Composition( slotPointer -> rot, Simplex::Tilt( axis, turn ) );
       addCube( slotPointer );
       -- parts;
     }
@@ -182,11 +184,15 @@ void Sentinel<N>::setCacheID( CacheID cID )
 }
 
 template<unsigned int N>
-bool Sentinel<N>::isSolved() const
+bool Sentinel<N>::isSolved( const bool & withoutCache ) const
 {
+  if ( withoutCache && m_size == m_cacheSize )
+  {
+    return true; // no more cube to check
+  }
   bool solved = true;
   const CubeID& orient = m_container -> rot;
-  for ( auto pSlot = start(); pSlot && solved; pSlot = next() )
+  for ( auto pSlot = start( withoutCache ); pSlot && solved; pSlot = next() )
   {
     solved  = ( orient ==  pSlot -> rot );
     if ( m_solidColor )
