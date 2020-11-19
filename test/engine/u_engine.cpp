@@ -60,11 +60,11 @@ bool UnitTests::unit_Engine() const
   for ( int i = 0; i < 10; ++ i )
   {
     CFramework<4> A;
-    A.shuffle( 7 );
+    A.shuffle( 4 );
     A.print();
     engine.toSolve( A );
     clog( " start ", engine.isSolved() );
-    clog( engine.solve( 8, true ) );
+    clog( engine.solve( 11, true ) );
     A.print(); 
   }
   
@@ -83,7 +83,7 @@ bool UnitTests::unit_Engine() const
   for ( int i = 0; i < 10; ++ i)
   {
     CFramework<3> A;
-    A.shuffle( 6 );
+    A.shuffle(4);
     A.print();
     engine3.toSolve( A );
     clog( " start ");

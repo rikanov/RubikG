@@ -188,7 +188,7 @@ bool Sentinel<N>::isSolved( const bool & withoutCache ) const
 {
   if ( withoutCache && m_size == m_cacheSize )
   {
-    return true; // no more cube to check
+    return true; // no more cubes to check
   }
   bool solved = true;
   const CubeID& orient = m_container -> rot;
@@ -199,10 +199,6 @@ bool Sentinel<N>::isSolved( const bool & withoutCache ) const
     {
       solved |= pSlot -> facet != _NF && Simplex::GetCube( orient ).whatIs( CPositions<N>::Side( pSlot -> pos, pSlot -> rot ) ) == pSlot -> facet; 
     }
-  }
-  for ( auto pSlot = start(); pSlot && solved; pSlot = next() )
-  {
-    clog( CPositions<N>::GetCoord( pSlot -> pos ).toString(), Simplex::GetCube( pSlot -> rot ).toString() );
   }
   return solved;
 }

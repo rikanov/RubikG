@@ -9,29 +9,28 @@ Counter Engine<N>::solve( Counter depth, bool exec )
   {
     return 0;
   }
+  m_depth = 0;
+  m_maxDepth = m_cachedRotations -> level( cacheID() );
+  m_solution.clear();
+  if ( speedSolver() )
+  {
+    std::reverse( m_solution.begin(), m_solution.end() );
+    applySolution( exec );
+    return m_depth;
+  }
   if ( m_cachedRotations -> level( cacheID() ) > depth )
   {
     return 0xFF;
-  }
-  if ( m_cachedRotations -> level( cacheID() ) == depth )
-  {
-    return speedSolver();
   }
   for( m_maxDepth = 1; m_maxDepth <= depth; ++ m_maxDepth )
   {
     m_depth = 0;
     m_solution.clear();
+    clog( m_maxDepth );
     if ( extend( _NA, 0 ) )
     {
       std::reverse( m_solution.begin(), m_solution.end() );
-      if ( exec )
-      {
-        for ( RotID r: m_solution )
-        {
-          clog( toString<N>( r ));
-          m_CFramework -> rotate( r );
-        }
-      }
+      applySolution( exec );
       break;
     }
   }
@@ -55,13 +54,12 @@ bool Engine<N>::testLayer( const Axis axis, const Layer layer )
     }
     m_sentinel -> turnLayer( axis, layer ); // turn back to original position
     -- m_depth;
-    return false;
   }
-  return false; // m_sentinel -> isSolved(); // evaluate leaf nodes
+  return false; //  evaluate leaf nodes
 }
 
 template<unsigned int N> 
-bool Engine<N>::testRotation( const Axis axis, const Layer layer, const Turn turn )
+bool Engine<N>::speedSolverStep( const Axis axis, const Layer layer, const Turn turn )
 {
   m_sentinel -> turnLayer( axis, layer, turn );
   if ( speedSolver() )
@@ -78,20 +76,16 @@ bool Engine<N>::speedSolver()
 {
   if ( m_depth == m_maxDepth )
   {
-    if ( m_sentinel -> isSolved( true ) )
-    {
-      clog( "speedsolver" );
-    }
     return m_sentinel -> isSolved( true );
   }
   for ( RotID rotID = m_cachedRotations -> start( cacheID() ); rotID; rotID = m_cachedRotations -> next() )
   {
-      ++ m_depth;
-      if ( testRotation( getAxis <N> ( rotID ), getLayer <N> ( rotID ), getTurn <N> ( rotID ) ) )
-      {
-        return true;
-      }
-      -- m_depth;
+    ++ m_depth;
+    if ( speedSolverStep( getAxis <N> ( rotID ), getLayer <N> ( rotID ), getTurn <N> ( rotID ) ) )
+    {
+      return true; 
+    }
+    -- m_depth;
   }
   return false;
 }
@@ -118,4 +112,17 @@ bool Engine<N>::extend( const Axis axis, const Layer layer )
     }
   }
   return false;
+}
+
+template<unsigned int N>
+void Engine<N>::applySolution( const bool & exec )
+{
+  if ( exec )
+  {
+    for ( RotID r: m_solution )
+    {
+      clog( toString<N>( r ));
+      m_CFramework -> rotate( r );
+    }
+  }
 }

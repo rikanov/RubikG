@@ -21,7 +21,7 @@ class Engine
   RotPath m_solution;    // path to solution
 
   bool speedSolver ();
-  bool testRotation( const Axis , const Layer, const Turn turn );
+  bool speedSolverStep( const Axis , const Layer, const Turn turn );
   bool testLayer   ( const Axis , const Layer );
   bool extend      ( const Axis , const Layer );
 
@@ -31,10 +31,11 @@ public:
   Engine( const CGenerator<N>& CGen, const bool& solidColor );
 
   void toSolve( CFramework<N> & CF );
-  Counter solve( Counter, bool exec = true );
+  Counter solve( Counter, bool exec = true ); 
+  void applySolution( const bool & );
   
   ~Engine();
-  
+ 
   void addConstrain( CubeList P )
   {
     m_sentinel -> addConstrain( P );
