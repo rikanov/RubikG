@@ -21,6 +21,7 @@ class CGenerator
   
 public:
   CGenerator( CubeList P );
+  CGenerator( const Sentinel<N> * S );
   ~CGenerator();
   
   std::shared_ptr< const CCache > getCache() const
@@ -45,6 +46,15 @@ CGenerator<N>::CGenerator( CubeList P )
 {
   generate();
 }
+
+template<unsigned int N> CGenerator<N>::CGenerator( const Sentinel<N>* S )
+ : m_sentinel        ( S )
+ , m_qeueuLevel      ( 0 )
+ , m_qeueudCacheIDs  ( new Qeueu ( pow24[ S -> size() ] ) )
+ , m_cachedRotations ( new CCache( S -> size(), 9 * N ) ) /* OWNERSHIP */
+{
+}
+
 
 template<unsigned int N> 
 void CGenerator<N>::initQeueu()

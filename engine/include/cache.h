@@ -38,23 +38,11 @@ public:
     return m_cacheLevel[level];
   }
   
-  const Counter & level ( CacheID level ) const
+  const Counter & level ( CacheID id ) const
   {
-    return m_cacheLevel[level];
+    return m_cacheLevel[id];
   }
-  
-  bool suggested ( CacheID cid, RotID rid ) const
-  {
-    for ( RotID rotID = start( cid ); rotID; rotID = next() )
-    {
-      if ( rid == rotID )
-      {
-        return true;
-      }
-    }
-    return false;
-  }
-  
+    
   const RotID & start( CacheID id ) const
   {
     m_readMoves = m_cachedMoves + ( id * m_bufferSize );

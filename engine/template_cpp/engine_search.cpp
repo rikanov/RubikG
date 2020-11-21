@@ -55,7 +55,7 @@ bool Engine<N>::testLayer( const Axis axis, const Layer layer )
     m_sentinel -> turnLayer( axis, layer ); // turn back to original position
     -- m_depth;
   }
-  return false; //  evaluate leaf nodes
+  return m_sentinel->isSolved(); //  evaluate leaf nodes
 }
 
 template<unsigned int N> 
