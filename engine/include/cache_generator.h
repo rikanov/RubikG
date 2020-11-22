@@ -85,6 +85,10 @@ void CGenerator<N>::generate()
     {
       for ( Layer layer = 0; layer < N; ++ layer )
       {
+        if ( m_sentinel->count( axis, layer ) == 0 )
+        {
+          continue;
+        }
         for( Turn turn: { 1, 2, 3 } )
         {
           m_sentinel -> turnLayer( axis, layer );

@@ -14,6 +14,7 @@ class Sentinel2
   
   CubeSlot  * m_operationBeg;
   CubeSlot  * m_operationEnd;
+  CubeSlot  * m_operationPtr;
   
   Sequence  * m_sequancesBeg;
   Sequence  * m_sequancesEnd;
@@ -55,7 +56,7 @@ class Sentinel2
     return m_operationEnd - m_operationBeg;
   }
   
-  Counter count( Axis a, Layer l )
+  Counter count( Axis a, Layer l ) const
   {
     return m_counter[a][l];
   }
@@ -67,12 +68,21 @@ class Sentinel2
   CacheID  getCacheID() const        { return m_operationSeq -> getCacheID();      }
   void     setCacheID( CacheID id )  { m_operationSeq -> setCacheID(id); update(); } 
   
-  const RotID & start() const        { return m_operationSeq -> start(); }
-  const RotID & next()  const        { return m_operationSeq -> next();  }
+  const RotID & start() const
+  { 
+    m_operationPtr = m_operationBeg;
+    return m_operationPtr ++; 
+  }
+  
+  const RotID & next()  const 
+  { 
+    return m_operationPtr != m_operationEnd ? m_operationPtr ++ : nullptr;
+  }
   
   void addSequence( CubeList P );
   
-  Counter level() const;
+  Level level( CubeID ) const;
+  Level level() const;
  
 };
 

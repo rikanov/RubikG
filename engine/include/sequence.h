@@ -2,6 +2,7 @@
 #define SEQUENCE__H
 
 #include <slot.h>
+#include <lcache.h>
 #include <cache_generator.h>
 
 class Sequence
@@ -10,20 +11,20 @@ class Sequence
   CubeSlot * m_sequenceEnd;
   Counter  m_size;
   
-  std::shared_ptr< const CCache  > m_cachedRotations;
+  std::shared_ptr< const LCache  > m_cachedRotations;
   
 public:
   Sequence();
   Sequence( CubeSlot * beg, CubeSlot * end );
   
-  void setCahce( std::shared_ptr< const CCache >  );
+  void setCache( std::shared_ptr< const CCache >  );
   
   CacheID getCacheID() const;
   void    setCacheID( ChacheID );
   
-  Counter level() const
+  Counter level( CubeID id ) const
   {
-    m_cachedRotations -> level( getCacheID() );
+    m_cachedRotations -> level( id, getCacheID() );
   }
   
   const RotID & start() const
@@ -51,7 +52,7 @@ Sequence::Sequence( CubeSlot * beg, CubeSlot * end)
 {  
 }
 
-void Sequence::setCahce( std::shared_ptr< const CCache > cid )
+void Sequence::setCache( std::shared_ptr< const CCache > cid )
 {
   m_cachedRotations = cid;
 }
