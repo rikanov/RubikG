@@ -1,5 +1,5 @@
-#ifndef SENTINEL__H
-#define SENTINEL__H
+#ifndef SENTINEL2__H
+#define SENTINEL2__H
 
 #include <slot.h>
 #include <sequence.h>
@@ -88,5 +88,5 @@ class Sentinel2
 
 #include <../template_cpp/sentinel2.cpp>
 
-#endif // ! SENTINEL__H
+#endif // ! SENTINEL2__H
 

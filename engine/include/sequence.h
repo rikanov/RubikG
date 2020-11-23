@@ -17,24 +17,14 @@ public:
   Sequence();
   Sequence( CubeSlot * beg, CubeSlot * end );
   
-  void setCache( std::shared_ptr< const CCache >  );
+  void setCache( const std::shared_ptr< const LCache >  );
   
   CacheID getCacheID() const;
-  void    setCacheID( ChacheID );
+  void    setCacheID( CacheID );
   
   Counter level( CubeID id ) const
   {
     m_cachedRotations -> level( id, getCacheID() );
-  }
-  
-  const RotID & start() const
-  {
-    m_cachedRotations -> start( getCacheID() );    
-  }
-  
-  const RotID & next() const
-  {
-    m_cachedRotations -> next();
   }
 };
 
@@ -52,7 +42,7 @@ Sequence::Sequence( CubeSlot * beg, CubeSlot * end)
 {  
 }
 
-void Sequence::setCache( std::shared_ptr< const CCache > cid )
+void Sequence::setCache( const std::shared_ptr< const LCache > cid )
 {
   m_cachedRotations = cid;
 }
@@ -81,7 +71,7 @@ CacheID Sequence::getCacheID() const
 
 void Sequence::setCacheID( CacheID cID )
 {
-  for ( int slotID = 0; slotID < m_size; ++ slotID, cID /= 24 )
+  for ( Counter slotID = 0; slotID < m_size; ++ slotID, cID /= 24 )
   {
     m_sequenceBeg[slotID].rot = cID % 24;
   }

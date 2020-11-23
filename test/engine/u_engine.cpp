@@ -1,5 +1,6 @@
 #include <test.h>
 #include <engine.h>
+#include <engine2.h>
 #include <ctime>
 
 bool UnitTests::unit_Engine() const
@@ -7,7 +8,7 @@ bool UnitTests::unit_Engine() const
   bool success = true; 
   
   head( "Engine" );
-
+  Engine2<5> BuildTest;
   clog_( "Start Simplex instance..." );
   Simplex::Instance();
   done();
@@ -60,7 +61,7 @@ bool UnitTests::unit_Engine() const
   for ( int i = 0; i < 10; ++ i )
   {
     CFramework<4> A;
-    A.shuffle( 4 );
+    A.shuffle( 7 );
     A.print();
     engine.toSolve( A );
     clog( " start ", engine.isSolved() );
@@ -80,14 +81,20 @@ bool UnitTests::unit_Engine() const
   std::time( &end );
   NL();
   clog( cross3.size(), "dimension cache has built in", end - start, "seconds." );
+  engine3.addConstrain( {
+    CPositions<3>::GetIndex( 0, 0, 0),
+    CPositions<3>::GetIndex( 2, 0, 0),
+    CPositions<3>::GetIndex( 0, 2, 0),
+    CPositions<3>::GetIndex( 2, 2, 0)
+  } );
   for ( int i = 0; i < 10; ++ i)
   {
     CFramework<3> A;
-    A.shuffle(4);
+    A.shuffle();
     A.print();
     engine3.toSolve( A );
     clog( " start ");
-    clog( engine3.solve( 8, true ) );
+    clog( engine3.solve( 10, true ) );
     A.print(); 
   }
   

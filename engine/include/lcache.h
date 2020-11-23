@@ -25,7 +25,7 @@ LCache::LCache( const int size )
 {
   all_id( i )
   {
-    m_level[i] = new Level [ pow24[ size ] () ];
+    m_level[i] = new Level [ pow24[ size ] ] ();
   }
 }
 

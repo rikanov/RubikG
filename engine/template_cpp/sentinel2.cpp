@@ -70,7 +70,7 @@ void Sentinel2<N>::addSequence(CubeList P)
   *m_sequancesEnd = Sequence( m_operationBeg, m_operationEnd );
    m_operationSeq = m_sequancesEnd ++ ;
   
-  CGenerator<N> CGen( this );
+  LGenerator<N> CGen( this );
   m_operationSeq -> setCache( CGen.getCache() );
   allSequence();
 }
@@ -81,9 +81,10 @@ Level Sentinel2<N>::level( CubeID id ) const
   Level result = 0;
   for ( Sequence * pSq = m_sequancesBeg; pSq != m_sequancesEnd; ++pSq )
   {
-    if ( pSq->level( id ) > result )
+    const Level lid = pSq -> level( id );
+    if ( lid > result )
     {
-      result = pSq->level( id );
+      result = lid;
     }
   }
   return result;
@@ -96,7 +97,7 @@ Level Sentinel2<N>::level() const
   all_id ( id )
   {
     const Level lid = level( id );
-    if lid < result )
+    if ( lid < result )
     {
       result = lid;
     }

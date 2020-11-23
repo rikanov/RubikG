@@ -11,7 +11,7 @@ class Qeueu
   CacheID * m_qeuEnd;
 public:
   
-  Qeueu( const int& size ) : m_qeueudCubes( new CacheID [ size ] )
+  Qeueu( const int& size ) : m_qeueudCubes( new CacheID [ pow24[ size ] ] )
   {
     m_qeuEnd = m_qeueudCubes + size;
     reset();

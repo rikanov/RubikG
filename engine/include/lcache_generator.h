@@ -22,7 +22,7 @@ public:
 
 template<unsigned int N> 
 LGenerator<N>::LGenerator( Sentinel2<N> * S)
- : m_sentinel( S );
+ : m_sentinel( S )
  , m_cachedRotations( new LCache( S -> size() ) ) /*OWNERSHIP*/
  , m_qeueudCacheIDs ( new Qeueu ( S -> size() ) ) // ToDO
  , m_qeueuLevel( 0 )

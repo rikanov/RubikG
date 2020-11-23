@@ -40,7 +40,7 @@ template<unsigned int N>
 CGenerator<N>::CGenerator( CubeList P )
  : m_sentinel        ( new Sentinel<N>( P, false ) )
  , m_qeueuLevel      ( 0 )
- , m_qeueudCacheIDs  ( new Qeueu ( pow24[ P.size() ] ) )
+ , m_qeueudCacheIDs  ( new Qeueu ( P.size() ) )
  , m_cachedRotations ( new CCache( P.size(), 9 * N ) ) /* OWNERSHIP */
  , m_cacheGenerators ( P )
 {
