@@ -5,6 +5,9 @@
 #include <sequence.h>
 
 template<unsigned int N>
+class LGenerator;
+
+template<unsigned int N>
 class Sentinel2
 {
   CFramework<N>  * m_CFramework;
@@ -15,6 +18,7 @@ class Sentinel2
   CubeSlot  * m_operationBeg;
   CubeSlot  * m_operationEnd;
   CubeSlot  * m_operationPtr;
+  mutable const CubeSlot  * m_operationCPtr;
   
   Sequence  * m_sequancesBeg;
   Sequence  * m_sequancesEnd;
@@ -69,14 +73,14 @@ class Sentinel2
   void     setCacheID( CacheID id )  { m_operationSeq -> setCacheID(id); update(); } 
   
   const RotID & start() const
-  { 
-    m_operationPtr = m_operationBeg;
-    return m_operationPtr ++; 
+  { LGenerator<N> teszt( this );
+    m_operationCPtr = m_operationBeg;
+    return m_operationCPtr ++; 
   }
   
   const RotID & next()  const 
   { 
-    return m_operationPtr != m_operationEnd ? m_operationPtr ++ : nullptr;
+    return m_operationCPtr != m_operationEnd ? m_operationCPtr ++ : nullptr;
   }
   
   void addSequence( CubeList P );

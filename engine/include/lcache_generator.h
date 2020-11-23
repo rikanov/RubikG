@@ -65,7 +65,7 @@ void LGenerator<N>::generate()
           {
             m_sentinel->turnLayer( axis, layer );
             const CacheID cid = m_sentinel -> getCacheID();
-            if ( m_cachedRotations -> level( id, cid ) = 0 )
+            if ( m_cachedRotations -> level( id, cid ) == 0 )
             {
               m_cachedRotations -> level( id, cid ) = nLevel;
               m_qeueudCacheIDs  -> qeuIn( cid );
@@ -77,4 +77,5 @@ void LGenerator<N>::generate()
     } // Qeueu is empty
   } // Finish 
 }
+
 #endif // ! LEVEL_CACHE_GENERATOR__H

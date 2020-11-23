@@ -1,5 +1,5 @@
 #include <sentinel2.h>
-
+#include <lcache_generator.h>
 
 template<unsigned int N>
 Sentinel2<N>::Sentinel2()
@@ -70,8 +70,8 @@ void Sentinel2<N>::addSequence(CubeList P)
   *m_sequancesEnd = Sequence( m_operationBeg, m_operationEnd );
    m_operationSeq = m_sequancesEnd ++ ;
   
-  LGenerator<N> CGen( this );
-  m_operationSeq -> setCache( CGen.getCache() );
+  LGenerator<N> LGen( this );
+  m_operationSeq -> setCache( LGen.getCache() );
   allSequence();
 }
 
