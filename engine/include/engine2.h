@@ -18,6 +18,20 @@ class Engine2
   
   RotPath m_solution;    // path to solution
   public:
-    Engine2() {}
+    Engine2(): m_sentinel( new Sentinel2<N> ) {}
+    ~Engine2()
+    {
+      delete m_sentinel;
+    }
+    void toSolve( CFramework<N> * CF )
+    {
+      m_CFramework = CF;
+      m_sentinel -> toSolve( CF );
+    }
+
+    void addSequence( CubeList P )
+    {
+      m_sentinel -> addSequence( P );
+    }
 };
 #endif // ! ENGINE2_HEADER

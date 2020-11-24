@@ -10,20 +10,24 @@ template<unsigned int N>
 class LGenerator
 {
   Sentinel2<N> * m_sentinel;
-  LCache       * m_cachedRotations;
   Qeueu        * m_qeueudCacheIDs;
   Counter        m_qeueuLevel;
   
+  std::shared_ptr< LCache > m_cachedRotations;
 public:
   LGenerator( Sentinel2 <N> * );
+  ~LGenerator();
+
   void generate();
   void initQeueu( CubeID );
+
+  std::shared_ptr< const LCache > getCache() const;
 };
 
 template<unsigned int N> 
 LGenerator<N>::LGenerator( Sentinel2<N> * S)
  : m_sentinel( S )
- , m_cachedRotations( new LCache( S -> size() ) ) /*OWNERSHIP*/
+ , m_cachedRotations( std::make_shared<LCache> ( S -> size() ) ) /*OWNERSHIP*/
  , m_qeueudCacheIDs ( new Qeueu ( S -> size() ) ) // ToDO
  , m_qeueuLevel( 0 )
 {
@@ -78,4 +82,15 @@ void LGenerator<N>::generate()
   } // Finish 
 }
 
+template<unsigned int N> 
+std::shared_ptr< const LCache > LGenerator<N>::getCache() const
+{
+  return m_cachedRotations;
+}
+
+template<unsigned int N> 
+LGenerator<N>::~LGenerator()
+ {
+   delete m_qeueudCacheIDs;
+ }
 #endif // ! LEVEL_CACHE_GENERATOR__H

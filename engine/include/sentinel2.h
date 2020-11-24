@@ -65,15 +65,18 @@ class Sentinel2
     return m_counter[a][l];
   }
 
-  void turnLayer( const Axis, const Layer, const Turn turn = 1 );
-  void update();
-  void toSolve( CFramework<N> * CF );
+  CacheID getCacheID() const 
+  { 
+    return m_operationSeq -> getCacheID();
+  }
   
-  CacheID  getCacheID() const        { return m_operationSeq -> getCacheID();      }
-  void     setCacheID( CacheID id )  { m_operationSeq -> setCacheID(id); update(); } 
+  void setCacheID( CacheID id )
+  { 
+    m_operationSeq -> setCacheID(id); update(); 
+  }
   
   const RotID & start() const
-  { LGenerator<N> teszt( this );
+  { 
     m_operationCPtr = m_operationBeg;
     return m_operationCPtr ++; 
   }
@@ -83,6 +86,9 @@ class Sentinel2
     return m_operationCPtr != m_operationEnd ? m_operationCPtr ++ : nullptr;
   }
   
+  void turnLayer( const Axis, const Layer, const Turn turn = 1 );
+  void update();
+  void toSolve( CFramework<N> * CF );
   void addSequence( CubeList P );
   
   Level level( CubeID ) const;

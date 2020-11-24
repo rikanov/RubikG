@@ -8,7 +8,6 @@ bool UnitTests::unit_Engine() const
   bool success = true; 
   
   head( "Engine" );
-  Engine2<5> BuildTest;
   clog_( "Start Simplex instance..." );
   Simplex::Instance();
   done();
@@ -19,6 +18,11 @@ bool UnitTests::unit_Engine() const
   CPositions<4>::Instance();
   CPositions<5>::Instance();
   done();
+  
+  Engine2<5> BuildTest;
+  clog( "Engine2 build: OK ");
+  BuildTest.addSequence( { 1, 2, 3, 4 } );
+  clog( "Engine2 cache build: OK ");
 
   CubeList cache = {
     CPositions<4>::GetIndex( 0, 1, 1),

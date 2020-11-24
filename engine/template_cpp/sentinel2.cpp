@@ -5,7 +5,7 @@ template<unsigned int N>
 Sentinel2<N>::Sentinel2()
  : m_CFramework  ( nullptr )
  , m_containerBeg( new CubeSlot [ CPositions<N>::GetSize() ] )
- , m_sequancesEnd( new Sequence [ 10 ] )
+ , m_sequancesBeg( new Sequence [ 10 ] )
 {
   m_containerEnd = m_containerBeg;
   m_sequancesEnd = m_sequancesBeg;
@@ -69,9 +69,10 @@ void Sentinel2<N>::addSequence(CubeList P)
   
   *m_sequancesEnd = Sequence( m_operationBeg, m_operationEnd );
    m_operationSeq = m_sequancesEnd ++ ;
-  
+
   LGenerator<N> LGen( this );
   m_operationSeq -> setCache( LGen.getCache() );
+
   allSequence();
 }
 
