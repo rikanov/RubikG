@@ -71,6 +71,7 @@ void Sentinel2<N>::addSequence(CubeList P)
    m_operationSeq = m_sequancesEnd ++ ;
 
   LGenerator<N> LGen( this );
+  LGen.generate();
   m_operationSeq -> setCache( LGen.getCache() );
 
   allSequence();

@@ -36,13 +36,13 @@ LGenerator<N>::LGenerator( Sentinel2<N> * S)
 template<unsigned int N> 
 void LGenerator<N>::initQeueu( CubeID id )
 {
-  m_qeueudCacheIDs -> reset();
-  for( auto pSlot = m_sentinel -> start(); pSlot; pSlot = m_sentinel -> next() )
+  m_qeueudCacheIDs -> reset(); 
+  for( CubeSlot * pSlot = m_sentinel -> start(); pSlot; pSlot = m_sentinel -> next() )
   {
-    *pSlot = id;
+    pSlot->rot = id;
   }
   m_cachedRotations -> level( id, m_sentinel -> getCacheID() ) = 1;
-  m_qeueudCacheIDs -> qeuIn( m_sentinel -> getCahceID() );
+  m_qeueudCacheIDs -> qeuIn( m_sentinel -> getCacheID() );
 }
 
 template<unsigned int N> 

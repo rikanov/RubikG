@@ -74,14 +74,25 @@ class Sentinel2
   { 
     m_operationSeq -> setCacheID(id); update(); 
   }
+
+  CubeSlot * start()
+  { 
+    m_operationPtr = m_operationBeg;
+    return m_operationPtr ++; 
+  }
   
-  const RotID & start() const
+  CubeSlot * next() 
+  { 
+    return m_operationPtr != m_operationEnd ? m_operationPtr ++ : nullptr;
+  }
+
+  const CubeSlot * start() const
   { 
     m_operationCPtr = m_operationBeg;
     return m_operationCPtr ++; 
   }
   
-  const RotID & next()  const 
+  const CubeSlot * next()  const 
   { 
     return m_operationCPtr != m_operationEnd ? m_operationCPtr ++ : nullptr;
   }
