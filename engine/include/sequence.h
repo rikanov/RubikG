@@ -9,6 +9,7 @@ class Sequence
 {
   CubeSlot * m_sequenceBeg;
   CubeSlot * m_sequenceEnd;
+  CacheID  m_cacheID;
   Counter  m_size;
   
   std::shared_ptr< const LCache  > m_cachedRotations;
@@ -22,9 +23,22 @@ public:
   CacheID getCacheID() const;
   void    setCacheID( CacheID );
   
-  Counter level( CubeID id ) const
+  Level level( CubeID id ) const
   {
     m_cachedRotations -> level( id, getCacheID() );
+  }
+
+  bool isSolved() const
+  {
+    const CubeID rot = m_sequenceBeg -> rot;
+    for ( const CubeSlot * pSq = m_sequenceBeg; pSq != m_sequenceEnd; ++ pSq )
+    {
+      if ( rot != pSq -> rot )
+      {
+        return false;
+      }
+    }
+    return true;
   }
 };
 

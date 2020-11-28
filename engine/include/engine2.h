@@ -6,11 +6,8 @@
 #include <vector>
 
 template<unsigned int N>
-class Engine2
+class Engine2: public Sentinel2<N>
 {
-  CFramework<N> * m_CFramework;
-  Sentinel2<N>  * m_sentinel;
-
   std::shared_ptr< const CCache > m_cachedRotations;  
   
   Counter     m_depth;
@@ -18,20 +15,10 @@ class Engine2
   
   RotPath m_solution;    // path to solution
   public:
-    Engine2(): m_sentinel( new Sentinel2<N> ) {}
-    ~Engine2()
-    {
-      delete m_sentinel;
-    }
-    void toSolve( CFramework<N> * CF )
-    {
-      m_CFramework = CF;
-      m_sentinel -> toSolve( CF );
-    }
+    Engine2()
+    : m_depth( 0 )
+    , m_maxDepth( 0 ) 
+    {};
 
-    void addSequence( CubeList P )
-    {
-      m_sentinel -> addSequence( P );
-    }
 };
 #endif // ! ENGINE2_HEADER

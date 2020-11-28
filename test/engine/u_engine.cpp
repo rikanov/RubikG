@@ -19,9 +19,16 @@ bool UnitTests::unit_Engine() const
   CPositions<5>::Instance();
   done();
   
+  CFramework<5> testForEngine2;
   Engine2<5> BuildTest;
   clog( "Engine2 build: OK ");
+  BuildTest.toSolve( &testForEngine2 );
   BuildTest.addSequence( { 1, 2, 3, 4 } );
+  clog( BuildTest.isSolved() );
+  testForEngine2.shuffle();
+  BuildTest.update();
+  clog( BuildTest.isSolved() );
+
   clog( "Engine2 cache build: OK ");
 
   CubeList cache = {

@@ -78,6 +78,19 @@ void Sentinel2<N>::addSequence(CubeList P)
 }
 
 template<unsigned int N>
+bool Sentinel2<N>::isSolved() const
+{
+  for ( Sequence * pSq = m_sequancesBeg; pSq != m_sequancesEnd; ++pSq )
+  {
+    if ( pSq -> isSolved() == false )
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
+template<unsigned int N>
 Level Sentinel2<N>::level( CubeID id ) const
 {
   Level result = 0;

@@ -10,15 +10,17 @@ class LGenerator;
 template<unsigned int N>
 class Sentinel2
 {
+  protected:
   CFramework<N>  * m_CFramework;
   
   CubeSlot  * m_containerBeg;
   CubeSlot  * m_containerEnd;
-  
+   
+  mutable const 
+  CubeSlot  * m_operationCPtr;
+  CubeSlot  * m_operationPtr;
   CubeSlot  * m_operationBeg;
   CubeSlot  * m_operationEnd;
-  CubeSlot  * m_operationPtr;
-  mutable const CubeSlot  * m_operationCPtr;
   
   Sequence  * m_sequancesBeg;
   Sequence  * m_sequancesEnd;
@@ -101,7 +103,7 @@ class Sentinel2
   void update();
   void toSolve( CFramework<N> * CF );
   void addSequence( CubeList P );
-  
+  bool isSolved() const;
   Level level( CubeID ) const;
   Level level() const;
  
