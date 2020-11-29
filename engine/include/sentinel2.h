@@ -74,7 +74,7 @@ class Sentinel2
   
   void setCacheID( CacheID id )
   { 
-    m_operationSeq -> setCacheID(id); update(); 
+   ToDO m_operationSeq -> setCacheID(id); update(); 
   }
 
   CubeSlot * start()

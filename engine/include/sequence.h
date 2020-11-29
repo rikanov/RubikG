@@ -28,17 +28,11 @@ public:
     m_cachedRotations -> level( id, getCacheID() );
   }
 
-  bool isSolved() const
+  bool isSolved( CubeID & fid ) const
   {
-    const CubeID rot = m_sequenceBeg -> rot;
-    for ( const CubeSlot * pSq = m_sequenceBeg; pSq != m_sequenceEnd; ++ pSq )
-    {
-      if ( rot != pSq -> rot )
-      {
-        return false;
-      }
-    }
-    return true;
+    const CacheID cid = getCacheID();
+    fid = m_cachedRotations -> getFastest( cid ); clog( "fid:", fid );
+    return m_cachedRotations -> level( fid, cid ) == 0;
   }
 };
 

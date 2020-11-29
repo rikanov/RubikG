@@ -41,7 +41,7 @@ void LGenerator<N>::initQeueu( CubeID id )
   {
     pSlot->rot = id;
   }
-  m_cachedRotations -> level( id, m_sentinel -> getCacheID() ) = 1;
+  m_cachedRotations -> setLevel( id, m_sentinel -> getCacheID(), 1 );
   m_qeueudCacheIDs -> qeuIn( m_sentinel -> getCacheID() );
 }
 
@@ -50,29 +50,29 @@ void LGenerator<N>::generate()
 {
   all_id( id )
   {
-    initQeueu( id );
+    initQeueu( id ); clog( "\nid", id, "qeueu size:", m_qeueudCacheIDs -> count() );
     while( m_qeueudCacheIDs -> count() > 0 )
     {
       const Counter parent = m_qeueudCacheIDs -> qeuOut();
       const Counter nLevel = m_cachedRotations -> level( id, parent ) + 1;
       // generate child nodes
-      m_sentinel -> setCacheID( parent );
+      m_sentinel -> setCacheID( parent ); clog( m_sentinel -> getCacheID(), ':' , parent );
       for ( Axis axis: { _X, _Y, _Z } )
       {
         for ( Layer layer = 0; layer < N; ++ layer )
         {
-          if ( m_sentinel->count( axis, layer ) == 0 )
+          if ( m_sentinel -> count( axis, layer ) == 0 )
           {
             continue;
           }
           for( Turn turn: { 1, 2, 3 } )
           {
-            m_sentinel->turnLayer( axis, layer );
+            m_sentinel -> turnLayer( axis, layer );
             const CacheID cid = m_sentinel -> getCacheID();
             if ( m_cachedRotations -> level( id, cid ) == 0 )
             {
-              m_cachedRotations -> level( id, cid ) = nLevel;
-              m_qeueudCacheIDs  -> qeuIn( cid );
+              m_cachedRotations -> setLevel( id, cid, nLevel ); 
+              m_qeueudCacheIDs  -> qeuIn( cid ); clog_( m_qeueudCacheIDs  -> count() );
             }
           }
           m_sentinel -> turnLayer( axis, layer );

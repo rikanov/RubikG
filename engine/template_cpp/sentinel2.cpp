@@ -80,9 +80,15 @@ void Sentinel2<N>::addSequence(CubeList P)
 template<unsigned int N>
 bool Sentinel2<N>::isSolved() const
 {
-  for ( Sequence * pSq = m_sequancesBeg; pSq != m_sequancesEnd; ++pSq )
+  CubeID fid;clog("teszt", fid, m_sequancesBeg -> getCacheID() );
+  if ( m_sequancesBeg -> isSolved( fid ) == false )
   {
-    if ( pSq -> isSolved() == false )
+    return false;
+  } 
+  clog( "test end" );
+  for ( Sequence * pSq = m_sequancesBeg + 1; pSq != m_sequancesEnd; ++ pSq )
+  {
+    if ( pSq -> level( fid ) > 0 )
     {
       return false;
     }
