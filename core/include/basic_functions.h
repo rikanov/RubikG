@@ -20,7 +20,7 @@
 #ifndef BASIC_ROTATIONS__H
 #define BASIC_ROTATIONS__H
 
-#include <base_types.h>
+#include <oriented_cube.h>
 #include <ctime>
 #include <random>
 
@@ -30,16 +30,28 @@
 // Turn  --> 1: a simple clockwise turn  2: double turn 3: tripple (or inverse) turn
 //
 // to get ID we use a mixed radix system:
+// ID = 0 --> no rotation
 // ID = 3 * N * Axis + 3 * Layer + Turn 
 // ID < 3 * N * 3
 
  // RotID from components
 //  ---------------------
 
+
+template<unsigned int N>
+class CRotations
+{
+  static constexpr int AllRotIDs = 3 * N * 3;
+  RotID  m_rotID [ 3 /*axes*/ ][ N /*layers*/ ][ 3 /*turns*/ ] = {};
+  Axis   m_axis  [ AllRotIDs ];
+  Layer  m_layer [ AllRotIDs ];
+  Turn   m_turn  [ AllRotIDs ];
+};
+
 template<unsigned int N>
 inline RotID getRotID( Axis A, Layer L, Turn T )
 {
-  return ( 3 * N * A ) + ( 3 * L ) + T;
+  return ( 3 * N * A ) + ( 3 * L ) + T - 1;
 }
 
  // Get components from RotID

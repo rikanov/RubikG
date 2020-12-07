@@ -20,7 +20,7 @@
 #ifndef ORIENTED_CUBE_HEADER
 #define ORIENTED_CUBE_HEADER
 
-#include <basic_functions.h>
+#include <base_types.h>
 
 // Oriented cube class, an auxiliary class for the sake of readable code. 
 // It won't be used directly by algorithms but its mapping function is very useful for UI too.

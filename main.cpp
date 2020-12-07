@@ -6,6 +6,7 @@ int main()
 {
   clog( Color::off, "Press", Color::white, Color::bold, "ENTER", Color::off,"to start." ); 
   init();
+  CRotations<5> rotationIDtest;
   std::cin.get();
   UnitTests tests;
   tests.testCore();

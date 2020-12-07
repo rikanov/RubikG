@@ -28,20 +28,21 @@ class Simplex
   
   CubeID tilt [ 3 ] [ 4 ] = {};
 
-private: // functions
+private: 
+  // functions
   Simplex();
   void init();
   void initGroup();
 
-private: // array datamembers
-  OCube                  simplexGroup     [ 24 /* ID */ ];
-  CubeID                 simplexGroupID   [ 6 /*Right*/ ][ 6 /*Up*/ ];
-  CubeID /* X: [0 23] */ composition      [ 24 /* A */  ][ 24 /*B*/ ]; // X = AB
-  CubeID /* X: [0 23] */ transform        [ 24 /* A */  ][ 24 /*B*/ ]; // AX = B => X = inv(A) B
-  bool                   align            [ 24 /* ID */ ][ 6  /*F*/ ]; // [ id ] [ facet ]
+private: 
+  // array datamembers
+  OCube   simplexGroup     [ 24 /* ID */ ];
+  CubeID  simplexGroupID   [ 6 /*Right*/ ][ 6 /*Up*/ ];
+  CubeID  composition      [ 24 /* A */  ][ 24 /*B*/ ]; // X = AB
+  CubeID  transform        [ 24 /* A */  ][ 24 /*B*/ ]; // AX = B => X = inv(A) B
+  bool    align            [ 24 /* ID */ ][ 6  /*F*/ ]; // [ id ] [ facet ]
   
 public:
-
   // create a singleton object
   static void          Instance    ( )                          { if ( Singleton == nullptr ) new Simplex;   }
   static void          OnExit      ( )                          { delete Singleton; Singleton = nullptr;     }
