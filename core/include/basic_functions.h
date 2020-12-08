@@ -37,17 +37,6 @@
  // RotID from components
 //  ---------------------
 
-
-template<unsigned int N>
-class CRotations
-{
-  static constexpr int AllRotIDs = 3 * N * 3;
-  RotID  m_rotID [ 3 /*axes*/ ][ N /*layers*/ ][ 3 /*turns*/ ] = {};
-  Axis   m_axis  [ AllRotIDs ];
-  Layer  m_layer [ AllRotIDs ];
-  Turn   m_turn  [ AllRotIDs ];
-};
-
 template<unsigned int N>
 inline RotID getRotID( Axis A, Layer L, Turn T )
 {

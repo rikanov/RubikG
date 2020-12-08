@@ -25,12 +25,6 @@
 
 static const bool SHOW_LOG = false; // setting true is only for debuging purposes
 
-#define for_vector( x, y, z, N )   \
-   for ( Layer x = 0; x < N; ++x )  \
-     for ( Layer y = 0; y < N; ++y ) \
-        for ( Layer z = 0; z < N; ++z )
-
-
 struct Coord 
 {
   Layer x ;

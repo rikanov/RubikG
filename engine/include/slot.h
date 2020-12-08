@@ -3,7 +3,7 @@
 
 #include <cube_framework.h>
 
-constexpr int pow24[] = { 1, 24, 576, 13824, 331776, 7962624 };
+constexpr unsigned int pow24[] = { 1, 24, 576, 13824, 331776, 7962624 };
 
 struct CubeSlot
 {

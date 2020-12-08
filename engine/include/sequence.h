@@ -25,7 +25,7 @@ public:
   
   Level level( CubeID id ) const
   {
-    m_cachedRotations -> level( id, getCacheID() );
+    return m_cachedRotations -> level( id, getCacheID() );
   }
 
   bool isSolved( CubeID & fid ) const

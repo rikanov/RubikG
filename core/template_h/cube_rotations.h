@@ -42,7 +42,7 @@ template<unsigned int N>
 class CRotations
 {
   static CRotations<N> * Singleton;
-  static constexpr int AllRotIDs = 3 * N * 3;
+  static constexpr int AllRotIDs = 3 * N * 3 + 1;
 
   RotID  m_rotID [ 3 /*axes*/ ][ N /*layers*/ ][ 4 /*turns*/ ] = {};
   Axis   m_axis  [ AllRotIDs ] = {};
@@ -88,10 +88,10 @@ void CRotations<N>::OnExit()
 
 template<unsigned int N>
 void CRotations<N>::init()
-{clog("size",N);
+{
   RotID rotID = 0;
   all_rot( axis, layer, turn, N )
-  {clog( rotID );
+  {
     m_rotID [axis][layer][turn] = ++ rotID;
     m_axis  [rotID] = axis;
     m_layer [rotID] = layer;

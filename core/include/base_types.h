@@ -97,4 +97,14 @@ inline Color::Modifier colorOf( Facet F )
 #define all_facet(i) for(Facet i = _F; i <= _B; ++i)
 #define  all_id(i) for(CubeID i = 0; i < 24; ++i)
 
+#define all_rot( A, L, T, N )      \
+   for ( Axis A: { _X, _Y, _Z } )   \
+     for ( Layer L = 0; L < N; ++L ) \
+       for ( Turn T: { 1, 2, 3 } )
+
+#define for_vector( x, y, z, N )   \
+   for ( Layer x = 0; x < N; ++x )  \
+     for ( Layer y = 0; y < N; ++y ) \
+        for ( Layer z = 0; z < N; ++z )
+
 #endif
