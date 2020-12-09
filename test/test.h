@@ -20,6 +20,7 @@ private:
   bool unit_Simplex()    const; // simplex.h
   bool unit_OCube()      const; // oriented_cube.h
   bool unit_CPositions() const; // cube_positions.h
+  bool unit_CRotations() const; // cube_rotations.h
   bool unit_CFramework() const; // cube_framework.h
   bool unit_Engine()     const; // engine.h 
   

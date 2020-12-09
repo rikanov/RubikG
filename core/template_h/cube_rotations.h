@@ -34,10 +34,6 @@
 // ID = 3 * N * Axis + 3 * Layer + Turn 
 // ID < 3 * N * 3
 
- // RotID from components
-//  ---------------------
-
-
 template<unsigned int N>
 class CRotations
 {
@@ -58,9 +54,9 @@ class CRotations
   static void OnExit();
 
   static  RotID   GetRotID ( Axis A, Layer L, Turn T ) { return Singleton -> m_rotID [A][L][T]; }
-  static  Axis    GetAxis  ( RotID rotID )             { return Singleton -> m_axis  [rotID];   }
-  static  Layer   GetLayer ( RotID rotID )             { return Singleton -> m_layer [rotID];   }
-  static  Turn    GetTurn  ( RotID rotID )             { return Singleton -> m_turn  [rotID];   }
+  static  Axis    GetAxis  ( RotID rotID )             { return Singleton -> m_axis  [ rotID ]; }
+  static  Layer   GetLayer ( RotID rotID )             { return Singleton -> m_layer [ rotID ]; }
+  static  Turn    GetTurn  ( RotID rotID )             { return Singleton -> m_turn  [ rotID ]; }
 
   static RotID random();
   static std::string ToString( Axis  );
