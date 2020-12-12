@@ -36,8 +36,8 @@ void Simplex::init()
 void Simplex::initGroup()
 {
   // init algebrian group
-  all_id ( a )
-    all_id ( b )
+  all_cubeid ( a )
+    all_cubeid ( b )
     {
       OCube A = GetCube ( a );
       OCube B = GetCube ( b );
@@ -63,7 +63,7 @@ void Simplex::initGroup()
       tilt [a][t] = Simplex::Composition( tilt [a][t-1], tilt [a][1] );
     }
   }
-  all_id( id )
+  all_cubeid( id )
   {
     for( Facet F: { _F, _R, _U, _L, _D, _B } )
       align[ id ][F] = GetCube( id ).aligned( F ); 

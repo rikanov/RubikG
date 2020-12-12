@@ -192,7 +192,7 @@ void CPositions<N>::initPositions()
     if ( GetIndex( x, y, z ) != 0xFF )
     {
       if ( SHOW_LOG ) clog ( '\n', N, 'X', N,"  ... ", (int)x, (int)y, (int)z, "\t  ", (int) GetIndex( x, y, z) );
-      all_id ( id )
+      all_cubeid ( id )
       {
         const Coord C = rotate ( x, y, z, id );
         if ( SHOW_LOG ) clog ( Simplex::GetCube ( id ).toString(), " --> ", C.toString() , "\t| ", (int) GetIndex( C ) );

@@ -26,14 +26,13 @@ typedef unsigned char byte;
 
  // ID types
 //  --------
-
 typedef unsigned short CubeID;
-typedef unsigned short PosID;
 typedef unsigned short RotID;
+typedef unsigned short PosID;
+typedef unsigned int   CacheID;
 
  // Facets
 //  ------
-
 enum Facet
 {
   _F, _R, _U, _D, _L, _B, _NF
@@ -41,7 +40,6 @@ enum Facet
 
  // Components
 //  ----------
-
 enum Axis 
 {
   _X, _Y, _Z, _NA
@@ -95,7 +93,7 @@ inline Color::Modifier colorOf( Facet F )
  // Auxiliary macros
 // -----------------
 #define all_facet(i) for(Facet i = _F; i <= _B; ++i)
-#define  all_id(i) for(CubeID i = 0; i < 24; ++i)
+#define  all_cubeid(i) for(CubeID i = 0; i < 24; ++i)
 
 #define all_rot( A, L, T, N )      \
    for ( Axis A: { _X, _Y, _Z } )   \

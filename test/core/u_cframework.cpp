@@ -6,17 +6,6 @@ bool UnitTests::unit_CFramework() const
   bool success = true;
   head( "cube framework" );
 
-  clog_( "Start Simplex instance..." );
-  Simplex::Instance();
-  done();
-
-  clog_( "Start 'cube positions' instances..." );
-  CPositions<2>::Instance();
-  CPositions<3>::Instance();
-  CPositions<4>::Instance();
-  CPositions<5>::Instance();
-  done();
-
   clog_( "Cube framework test..." );
   CFramework<5> test1, test2;
   done();
@@ -78,6 +67,7 @@ bool UnitTests::unit_CFramework() const
     bool integrity = true;
     test8A.shuffle();
     test8C.shuffle();
+    clog_( '\r', counter, '/', s );
     test8B = CFramework<4>::Transform( test8A, test8C );
     
     integrity &= test8A.integrity();
@@ -90,16 +80,6 @@ bool UnitTests::unit_CFramework() const
   const bool s = ( counter == num );
   tail( std::to_string( counter ) + " out of " + std::to_string( num ) + " executed", s );
   success &= s;
-  clog_( "Cube positions:", Color::bold, "onExit()", Color::off, ':' );
-  CPositions<2>::OnExit();
-  CPositions<3>::OnExit();
-  CPositions<4>::OnExit();
-  CPositions<5>::OnExit();
-  done();
-  
-  clog_( "Simplex:", Color::bold, "onExit()", Color::off, ':' );
-  Simplex::OnExit();
-  done();
 
   finish( "Cube framework", success );
   return success;

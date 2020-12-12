@@ -20,7 +20,7 @@
 #ifndef CUBE_FRAMEWORK_HEADER
 #define CUBE_FRAMEWORK_HEADER
 
-#include <basic_functions.h>
+#include <cube_rotations.h>
 #include <cube_positions.h>
 
 /// ----------------------------------- Template declarations starts here ------------------------------------- ///
@@ -185,21 +185,22 @@ void CFramework<N>::rotate( const Axis axis, const Layer layer, const Turn turn 
 // rotation by using RotID
 template<unsigned int N> void CFramework<N>::rotate( const RotID rotID )
 {
-  const Axis  axis  = getAxis  <N> ( rotID );
-  const Layer layer = getLayer <N> ( rotID );
-  const Turn  turn  = getTurn  <N> ( rotID );
+  const Axis  axis  = CRotations<N>::GetAxis  ( rotID );
+  const Layer layer = CRotations<N>::GetLayer ( rotID );
+  const Turn  turn  = CRotations<N>::GetTurn  ( rotID );
   rotate( axis, layer, turn ); 
 }
 
 template<unsigned int N> 
 void CFramework<N>::shuffle( int depth )
 {
-  static std::default_random_engine engine( static_cast<unsigned int>( time( 0 ) ) );
+  static std::random_device randomDevice;
+  static std::default_random_engine engine( randomDevice() );
   static std::uniform_int_distribution<int> dist( 2 * N * N, 3 * N * N);
   int counter = depth == 0 ? dist( engine ) : depth; 
   while ( 0 < counter-- )
   {
-    CFramework<N>::rotate( randomRotID<N>() );
+    CFramework<N>::rotate( CRotations<N>::Random() );
   }
 }
 

@@ -6,9 +6,6 @@ bool UnitTests::unit_Simplex() const
   bool resultGroup = true;
   
   head( "Simplex" );
-  clog_( Color::gray, "Start Simplex instance..." );
-  Simplex::Instance();
-  done();
   NL();
   tcase( "Testing group operations" );
   // test cases
@@ -44,17 +41,14 @@ bool UnitTests::unit_Simplex() const
   
   tcase( "Testing inverses" );
   bool resultInverse = true;
-  all_id( cube )
+  all_cubeid( cube )
   {
 	  CubeID inv = Simplex::Inverse( cube );
 	  clog_( Color::blue, "The inverse of", Simplex::GetCube( cube ), "is", Simplex::GetCube( inv ) );
 	  stamp( Simplex::Composition( cube, inv ) == 0 /* identity */, resultInverse );
   }
   tail( "Test inverse function" , resultInverse );
-  clog_( Color::gray, "Simplex exit..." );
-  Simplex::OnExit();
-  done();
-
+  
   const bool result = resultGroup && resultInverse;
   finish( "Simplex", result );
   return result;

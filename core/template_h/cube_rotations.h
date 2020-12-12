@@ -20,13 +20,12 @@
 #ifndef CUBE_ROTATIONS__H
 #define CUBE_ROTATIONS__H
 
-#include <oriented_cube.h>
-#include <ctime>
+#include <simplex.h>
 #include <random>
 
 // Mapping between all the basic rotations and the set of one-byte size IDs:
 // Axis  --> X,Y or Z represented by integers [ 0..2 ]
-// LAyer --> index of the turning slice [ 0..N ) where N isthe size of the cube
+// Layer --> index of the turning slice [ 0..N ) where N isthe size of the cube
 // Turn  --> 1: a simple clockwise turn  2: double turn 3: tripple (or inverse) turn
 //
 // to get ID we use a mixed radix system:
@@ -34,19 +33,50 @@
 // ID = 3 * N * Axis + 3 * Layer + Turn 
 // ID < 3 * N * 3
 
+static inline Facet GetBaseFacet( Axis axis )
+{
+  switch( axis )
+  {
+    case _X:
+      return _L;
+    case _Y:
+      return _D;
+    case _Z:
+      return _B;
+    default:
+      return _NF;
+  }
+}
+
+static inline Facet TransformBaseFacet( Facet base, CubeID trans )
+{
+  return Simplex::GetCube( trans ).whereIs( base );
+}
+
 template<unsigned int N>
 class CRotations
 {
   static CRotations<N> * Singleton;
   static constexpr int AllRotIDs = 3 * N * 3 + 1;
 
-  RotID  m_rotID [ 3 /*axes*/ ][ N /*layers*/ ][ 4 /*turns*/ ] = {};
-  Axis   m_axis  [ AllRotIDs ] = {};
-  Layer  m_layer [ AllRotIDs ] = {};
-  Turn   m_turn  [ AllRotIDs ] = {};
+  std::random_device                 m_randomDevice;
+  std::default_random_engine         m_randomEngine;
+  std::uniform_int_distribution<int> m_distribution; 
+
+  RotID  m_rotID  [ 3 /*axes*/][ N /*layers*/ ][ 4 /*turns*/ ] = {};
+  RotID  m_tRotID [ AllRotIDs ][ 24 ] = {};
+  Axis   m_axis   [ AllRotIDs ]       = {};
+  Layer  m_layer  [ AllRotIDs ]       = {};
+  Turn   m_turn   [ AllRotIDs ]       = {};
   
-  CRotations() = default;
-  void init();
+  CRotations()
+    : m_randomEngine( m_randomDevice() )
+    , m_distribution( 1, (int) 3 * N * 3 )
+  {}
+
+  void  init();
+  void  transformRotIDs();
+  RotID transformedRotID( Facet trans, Layer layer, Turn turn );
 
   public:
 
@@ -58,7 +88,7 @@ class CRotations
   static  Layer   GetLayer ( RotID rotID )             { return Singleton -> m_layer [ rotID ]; }
   static  Turn    GetTurn  ( RotID rotID )             { return Singleton -> m_turn  [ rotID ]; }
 
-  static RotID random();
+  static RotID Random();
   static std::string ToString( Axis  );
   static std::string ToString( RotID );
 };
@@ -92,15 +122,51 @@ void CRotations<N>::init()
     m_axis  [rotID] = axis;
     m_layer [rotID] = layer;
     m_turn  [rotID] = turn;
+    transformRotIDs();
   }
 }
 
 template<unsigned int N>
-RotID CRotations<N>::random()
+RotID CRotations<N>::transformedRotID( Facet trans, Layer layer, Turn turn )
 {
-  static std::default_random_engine engine( static_cast<unsigned int>( time( 0 ) ) );
-  static std::uniform_int_distribution<int> dist( 1, (int) 3 * N * 3 ); 
-  return dist( engine );
+  switch( trans )
+  {
+    case _L:
+      return GetRotID( _X, layer, turn );
+    case _D:
+      return GetRotID( _Y, layer, turn );
+    case _B:
+      return GetRotID( _Z, layer, turn );
+    case _R:
+      return GetRotID( _X, N - 1 - layer, 4 - turn );
+    case _U:
+      return GetRotID( _Y, N - 1 - layer, 4 - turn );
+    case _F:
+      return GetRotID( _Z, N - 1 - layer, 4 - turn );
+    default:
+      clog( "invalid facet to get axis" );
+      return 0;
+  }
+}
+template<unsigned int N>
+void CRotations<N>::transformRotIDs()
+{
+  all_rot( axis, layer, turn, N )
+  {
+    const RotID rotID = GetRotID( axis, layer, turn);
+    all_cubeid( cubeID )
+    {
+      Facet base  = GetBaseFacet( axis );
+      Facet trans = TransformBaseFacet( base, cubeID );
+      m_tRotID[ rotID ][ cubeID ] = transformedRotID( trans, layer, turn );
+    }
+  }
+}
+
+template<unsigned int N>
+RotID CRotations<N>::Random()
+{
+  return CRotations<N>::Singleton -> m_distribution( CRotations<N>::Singleton -> m_randomEngine );
 }
 
 template<unsigned int N>

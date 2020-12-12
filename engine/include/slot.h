@@ -12,7 +12,6 @@ struct CubeSlot
   CubeID rot   = 0;
 };
 
-using CacheID  = unsigned int;
 using Counter  = unsigned int;
 using CubeList = const std::initializer_list<PosID>&;
 #endif // ! CUBE_SLOT__H
