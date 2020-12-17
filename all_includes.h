@@ -6,7 +6,7 @@
 #include <test.h>
 #include <cli.h>
 #include <cube_rotations.h>
-#include <cube_framework.h>
+#include <rubik.h>
 
 
 void exit()

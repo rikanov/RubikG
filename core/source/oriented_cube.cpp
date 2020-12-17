@@ -1,23 +1,21 @@
 #include <oriented_cube.h>
 #include <string>
 
-const char OCube::Tokens [7] = "FRUDLB";
-
  /**************************************************************************************************************************
   * 
   * All the 24 cube orientations are represented as the indices of two given direction (Up and Right in our case).  
   *                                                                                                                      
   * The FrontSides[][] array contains the Front side indices belonging to the given up and Right indices,     
-  * so we can determine all the other indices for any facets / directions. 
+  * so we can determine all the other indices for any Orients / directions. 
   *  ( by using SideOpposite() function as it happens in the init() method )
   *
-  * An example: if the Left facet lies on upside and the Down facet on the right, the front facet is:
+  * An example: if the Left Orient lies on upside and the Down Orient on the right, the front Orient is:
   * 
-  * Facet front = FrontSides [ Down = 3 ][ Left = 4 ] = Back (aka 5)
+  * Orient front = FrontSides [ Down = 3 ][ Left = 4 ] = Back (aka 5)
   * 
   *************************************************************************************************************************/
 
-const Facet OCube::FrontSides [ 6 /*Right*/ ][ 6 /*Up*/ ] = {
+const Orient OCube::FrontSides [ 6 /*Right*/ ][ 6 /*Up*/ ] = {
 
     // Front   Right     Up   Down    Left   Back
     // --------------------------------------------
@@ -42,7 +40,7 @@ const Facet OCube::FrontSides [ 6 /*Right*/ ][ 6 /*Up*/ ] = {
       ********************************************************/
 };
 
-void OCube::init( Facet r, Facet u, CubeID groupID )
+void OCube::init( Orient r, Orient u, CubeID groupID )
 {
   m_whatIs[_R] = r;
   m_whatIs[_U] = u;
@@ -52,7 +50,7 @@ void OCube::init( Facet r, Facet u, CubeID groupID )
   m_whatIs[_D] = SideOpposite( m_whatIs[_U] );
   m_whatIs[_B] = SideOpposite( m_whatIs[_F] );
 
-  all_facet( ID )
+  all_orient( ID )
   {
     m_whereIs[m_whatIs[ID]] = ID;
     m_aligned[ID] = ( m_whatIs[ID] == ID );
@@ -60,17 +58,17 @@ void OCube::init( Facet r, Facet u, CubeID groupID )
   m_whatIs[_NF]  = _NF;
   m_whereIs[_NF] = _NF;
   m_aligned[_NF] = false;
-  m_groupID = groupID;
+  m_cubeID = groupID;
 
   // Set a readable name 
   m_readable.push_back( Token ( whatIs( _R ) ) );
   m_readable.push_back( Token ( whatIs( _U ) ) );
   m_readable.push_back( Token ( whatIs( _F ) ) );
   m_readable.push_back( '(' );
-  if (m_groupID < 10)
+  if (m_cubeID < 10)
   {
       m_readable.push_back( ' ' );
   }
-  m_readable.append( std::to_string( m_groupID ) );
+  m_readable.append( std::to_string( m_cubeID ) );
   m_readable.push_back( ')' );
 }

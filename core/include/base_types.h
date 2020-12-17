@@ -20,23 +20,18 @@
 #ifndef BASE_TYPES__HEADER
 #define BASE_TYPES__HEADER
 
+#include <cstdint>
 #include <def_colors.h>
+#include <string>
 
 typedef unsigned char byte;
 
  // ID types
 //  --------
-typedef unsigned short CubeID;
-typedef unsigned short RotID;
-typedef unsigned short PosID;
-typedef unsigned int   CacheID;
-
- // Facets
-//  ------
-enum Facet
-{
-  _F, _R, _U, _D, _L, _B, _NF
-};
+typedef uint_fast8_t  CubeID;
+typedef uint8_t       RotID;
+typedef uint8_t       PosID;
+typedef uint32_t      CacheID;
 
  // Components
 //  ----------
@@ -45,23 +40,50 @@ enum Axis
   _X, _Y, _Z, _NA
 };
 
-typedef unsigned short Layer;
-typedef unsigned short Turn;
+typedef uint8_t Layer;
+typedef uint8_t Turn;
 
+struct Coord 
+{
+  Layer x ;
+  Layer y ;
+  Layer z ; 
+
+  Coord(): x( 0 ), y( 0 ), z( 0 )
+  {}
+  Coord( Layer x, Layer y, Layer z): x( x ), y( y ), z( z ) 
+  {}  
+  std::string toString() const 
+  { 
+    return "< " + std::to_string( x ) + ' ' + std::to_string( y ) + ' ' + std::to_string( z ) + " >";
+  }
+};
+
+ // Orientations
+//  ------------
+enum Orient
+{
+  _F, _R, _U, _D, _L, _B, _NF
+};
 
  // Auxiliary inline functions
 // ---------------------------
-inline void operator++ ( Facet& id )
+inline void operator++ ( Orient& id )
 {
-  id = Facet( int( id ) + 1 );
+  id = Orient( int( id ) + 1 );
 }
 
-inline Facet SideOpposite( Facet S )
+inline Orient SideOpposite( Orient S )
 {
-  return (S == _NF) ? _NF : Facet( 5 - S );
+  return (S == _NF) ? _NF : Orient( 5 - S );
 }
 
-inline Color::Modifier colorOf( Facet F )
+inline bool Coaxial( Orient a, Orient b )
+{ 
+  return  a == b || a == SideOpposite( b ); 
+}
+
+inline Color::Modifier colorOf( Orient F )
 {
   switch ( F )
   {
@@ -88,11 +110,15 @@ inline Color::Modifier colorOf( Facet F )
   }
 }
 
-
+inline char Token( Orient F ) 
+{ 
+  static const char Tokens [7] = "FRUDLB";
+  return Tokens[ F ];
+}
 
  // Auxiliary macros
 // -----------------
-#define all_facet(i) for(Facet i = _F; i <= _B; ++i)
+#define all_orient(i) for(Orient i = _F; i <= _B; ++i)
 #define  all_cubeid(i) for(CubeID i = 0; i < 24; ++i)
 
 #define all_rot( A, L, T, N )      \

@@ -25,22 +25,6 @@
 
 static const bool SHOW_LOG = false; // setting true is only for debuging purposes
 
-struct Coord 
-{
-  Layer x ;
-  Layer y ;
-  Layer z ; 
-
-  Coord(): x( 0 ), y( 0 ), z( 0 )
-  {}
-  Coord( Layer x, Layer y, Layer z): x( x ), y( y ), z( z ) 
-  {}  
-  std::string toString() const 
-  { 
-    return "< " + std::to_string( x ) + ' ' + std::to_string( y ) + ' ' + std::to_string( z ) + " >";
-  }
-};
-
 /// ----------------------------------- Template declarations starts here ------------------------------------- ///
 template<unsigned int N>
 class CPositions
@@ -51,7 +35,7 @@ class CPositions
   PosID routerPositions [ FrameworkSize [ N ] ][ 24 ] = {};
   PosID frameworkLayer  [ 3 ] [ N ] [ N * N ]         = {}; // [axis] [layer index] [cubes] 
   PosID coordToIndex    [ N ] [ N ] [ N ]             = {};
-  Facet align           [ FrameworkSize [ N ] ]       = {};
+  Orient align           [ FrameworkSize [ N ] ]       = {};
   int   cubeType        [ FrameworkSize [ N ] ]       = {};
   Layer indexToCoord    [ FrameworkSize [ N ] ][ 3 ]  = {}; // [ PosID ] [ Axis ]
   
@@ -67,7 +51,7 @@ class CPositions
   void  initIndices  ();
   
   static PosID* GetNode  ( CubeID id )             { return Singleton->routerPositions[ id ]; }
-  static PosID* GetNode  ( int x, int y, int z )   { return GetNode( GetIndex ( x, y, z) );   }
+  static PosID* GetNode  ( int x, int y, int z )   { return GetNode( GetPosID ( x, y, z) );   }
 
 public:
   static constexpr int GetSize ( ) { return Singleton->FrameworkSize [ N ]; }
@@ -76,16 +60,16 @@ public:
   static   void    OnExit    ( void )                                  { delete Singleton; Singleton = nullptr;                      }
   static   bool    ValID     ( PosID id )                              { return 0 <= id && id < GetSize();                           }
   static   int     Type      ( PosID id )                              { return Singleton -> cubeType[ id ];                         }
-  static   Facet   Side      ( PosID id )                              { return Singleton -> align[ id ];                            }
-  static   Facet   Side      ( PosID id, CubeID rot )                  { return Singleton -> align[ GetIndex( id, rot ) ];           }
-  static   PosID   GetIndex  ( PosID id, CubeID rot )                  { return Singleton -> routerPositions[ id ][ rot ];           }
-  static   PosID   GetIndex  ( const Coord & C )                       { return GetIndex( C.x, C.y, C.z);                            }
-  static   PosID   GetIndex  ( Layer x, Layer y, Layer z )             { return Singleton -> coordToIndex[ x ][ y ][ z ];            }
-  static   PosID   GetIndex  ( Layer x, Layer y, Layer z, CubeID rot ) { return GetNode( x, y, z ) [ rot ];                          }
+  static   Orient  Side      ( PosID id )                              { return Singleton -> align[ id ];                            }
+  static   Orient  Side      ( PosID id, CubeID rot )                  { return Singleton -> align[ GetPosID( id, rot ) ];           }
+  static   PosID   GetPosID  ( PosID id, CubeID rot )                  { return Singleton -> routerPositions[ id ][ rot ];           }
+  static   PosID   GetPosID  ( const Coord & C )                       { return GetPosID( C.x, C.y, C.z);                            }
+  static   PosID   GetPosID  ( Layer x, Layer y, Layer z )             { return Singleton -> coordToIndex[ x ][ y ][ z ];            }
+  static   PosID   GetPosID  ( Layer x, Layer y, Layer z, CubeID rot ) { return GetNode( x, y, z ) [ rot ];                          }
   static   PosID   GetLayer  ( Axis a, Layer l, byte id )              { return Singleton -> frameworkLayer [ a ][ l ][ id ];        }
   static   Layer   LayerSize ( Layer l )                               { return l == 0 || l == N - 1 ? N * N : 4 * ( N - 1 );        }
   static   Layer   GetCoord  ( PosID p, Axis a )                       { return Singleton -> indexToCoord [ p ][ a ];                }
-  static   Layer   GetCoord  ( PosID p, RotID r, Axis a )              { return Singleton -> indexToCoord [ GetIndex( p, r ) ][ a ]; }
+  static   Layer   GetCoord  ( PosID p, RotID r, Axis a )              { return Singleton -> indexToCoord [ GetPosID( p, r ) ][ a ]; }
   static   Coord   GetCoord  ( PosID p ) 
   { 
     return Coord( 
@@ -148,7 +132,7 @@ void CPositions<N>::initIndices()
     { 
       cubeType[ index ] = cType;
       
-      Facet F = _NF;
+      Orient F = _NF;
       if ( cType == 1 )
       {
         if ( x == 0 )
@@ -180,7 +164,7 @@ void CPositions<N>::initIndices()
     {
       coordToIndex[ x ][ y ][ z ] = 0xFF;
     }
-  } // getIndex() is fully working now
+  } // GetPosID() is fully working now
 }
 
 template<unsigned int N>
@@ -189,14 +173,14 @@ void CPositions<N>::initPositions()
   initIndices();
   for_vector ( x, y, z, N )
   {
-    if ( GetIndex( x, y, z ) != 0xFF )
+    if ( GetPosID( x, y, z ) != 0xFF )
     {
-      if ( SHOW_LOG ) clog ( '\n', N, 'X', N,"  ... ", (int)x, (int)y, (int)z, "\t  ", (int) GetIndex( x, y, z) );
+      if ( SHOW_LOG ) clog ( '\n', N, 'X', N,"  ... ", (int)x, (int)y, (int)z, "\t  ", (int) GetPosID( x, y, z) );
       all_cubeid ( id )
       {
         const Coord C = rotate ( x, y, z, id );
-        if ( SHOW_LOG ) clog ( Simplex::GetCube ( id ).toString(), " --> ", C.toString() , "\t| ", (int) GetIndex( C ) );
-        routerPositions[ GetIndex( x, y, z ) ][ id ] = GetIndex( C );
+        if ( SHOW_LOG ) clog ( Simplex::GetCube ( id ).toString(), " --> ", C.toString() , "\t| ", (int) GetPosID( C ) );
+        routerPositions[ GetPosID( x, y, z ) ][ id ] = GetPosID( C );
       }
     }
   }

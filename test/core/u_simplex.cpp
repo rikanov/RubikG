@@ -9,7 +9,7 @@ bool UnitTests::unit_Simplex() const
   NL();
   tcase( "Testing group operations" );
   // test cases
-  Facet testCases[10][3][2]  = 
+  Orient testCases[10][3][2]  = 
                               {/*       A           B      expected AxB  */
                                  { { _R, _U }, { _R, _U }, { _R, _U } }
                                 ,{ { _R, _U }, { _B, _D }, { _B, _D } }
@@ -25,9 +25,9 @@ bool UnitTests::unit_Simplex() const
   
   for( auto c: testCases )
   {
-    const Facet rA = c[0][0], uA = c[0][1];
-    const Facet rB = c[1][0], uB = c[1][1];
-    const Facet rC = c[2][0], uC = c[2][1];
+    const Orient rA = c[0][0], uA = c[0][1];
+    const Orient rB = c[1][0], uB = c[1][1];
+    const Orient rC = c[2][0], uC = c[2][1];
     CubeID A = Simplex::GetGroupID ( rA , uA );
     CubeID B = Simplex::GetGroupID ( rB , uB );
     CubeID C = Simplex::GetGroupID ( rC , uC );

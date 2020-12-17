@@ -33,7 +33,7 @@
 // ID = 3 * N * Axis + 3 * Layer + Turn 
 // ID < 3 * N * 3
 
-static inline Facet GetBaseFacet( Axis axis )
+static inline Orient GetBaseOrient( Axis axis )
 {
   switch( axis )
   {
@@ -48,7 +48,7 @@ static inline Facet GetBaseFacet( Axis axis )
   }
 }
 
-static inline Facet TransformBaseFacet( Facet base, CubeID trans )
+static inline Orient TransformBaseOrient( Orient base, CubeID trans )
 {
   return Simplex::GetCube( trans ).whereIs( base );
 }
@@ -76,7 +76,7 @@ class CRotations
 
   void  init();
   void  transformRotIDs();
-  RotID transformedRotID( Facet trans, Layer layer, Turn turn );
+  RotID transformedRotID( Orient trans, Layer layer, Turn turn );
 
   public:
 
@@ -127,7 +127,7 @@ void CRotations<N>::init()
 }
 
 template<unsigned int N>
-RotID CRotations<N>::transformedRotID( Facet trans, Layer layer, Turn turn )
+RotID CRotations<N>::transformedRotID( Orient trans, Layer layer, Turn turn )
 {
   switch( trans )
   {
@@ -144,7 +144,7 @@ RotID CRotations<N>::transformedRotID( Facet trans, Layer layer, Turn turn )
     case _F:
       return GetRotID( _Z, N - 1 - layer, 4 - turn );
     default:
-      clog( "invalid facet to get axis" );
+      clog( "invalid Orient to get axis" );
       return 0;
   }
 }
@@ -156,8 +156,8 @@ void CRotations<N>::transformRotIDs()
     const RotID rotID = GetRotID( axis, layer, turn);
     all_cubeid( cubeID )
     {
-      Facet base  = GetBaseFacet( axis );
-      Facet trans = TransformBaseFacet( base, cubeID );
+      Orient base  = GetBaseOrient( axis );
+      Orient trans = TransformBaseOrient( base, cubeID );
       m_tRotID[ rotID ][ cubeID ] = transformedRotID( trans, layer, turn );
     }
   }

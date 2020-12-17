@@ -26,35 +26,33 @@
 // It won't be used directly by algorithms but its mapping function is very useful for UI too.
 // The basic idea: there are 24 different cube orientation, forming a non-Abelian group
 // which is isomorph to P{4} permutation group. Mapping to integer: query the Right and Up
-// facets current values. ( 6 possible 'Right' facets each of them has 4 possible 'Up' facets )
+// Orients current values. ( 6 possible 'Right' Orients each of them has 4 possible 'Up' Orients )
 // Their properties and group operation stored and handled in a singleton Simplex class
 
 class OCube
 {
-  static const char  Tokens [7];
-  static const Facet FrontSides [ 6 /*Right*/ ][ 6 /*Up*/ ];
+  static const Orient FrontSides [ 6 /*Right*/ ][ 6 /*Up*/ ];
 
-  Facet  m_whereIs [7];
-  Facet  m_whatIs  [7];
+  Orient m_whereIs [7];
+  Orient m_whatIs  [7];
   bool   m_aligned [7];
-  CubeID m_groupID;
+  CubeID m_cubeID;
 
   std::string m_readable;
 
 public:
   OCube( ) = default;
-  void init ( Facet R, Facet U, CubeID groupID );
+  void init ( Orient R, Orient U, CubeID groupID );
 
-  Facet   whereIs ( Facet ID ) const { return m_whereIs[ID]; }
-  Facet	  whatIs  ( Facet ID ) const { return m_whatIs[ID];  }
-  bool    aligned ( Facet ID ) const { return m_aligned[ID]; }
-  CubeID  groupID (   void   ) const { return m_groupID;     }
+  Orient  whereIs   ( Orient ID ) const { return m_whereIs[ID]; }
+  Orient	whatIs    ( Orient ID ) const { return m_whatIs[ID];  }
+  bool    aligned   ( Orient ID ) const { return m_aligned[ID]; }
+  CubeID  getCubeID (   void    ) const { return m_cubeID;      }
 
   const std::string& toString () const { return m_readable;         }
   operator        const char* () const { return m_readable.c_str(); }
   
-  static char  Token     ( Facet F )          { return Tokens[ F ];      }
-  static Facet FrontSide ( Facet r, Facet u ) { return FrontSides[r][u]; }
+  static Orient FrontSide ( Orient r, Orient u ) { return FrontSides[r][u]; }
 };
 
 #endif // !ORIENTED_CUBE_HEADER

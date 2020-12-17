@@ -14,9 +14,9 @@ void Simplex::init()
 {
   // determine group IDs. Identity element most have ID = 0
   CubeID lastRadix[6] = {};
-  all_facet ( right )
+  all_orient ( right )
   {
-    all_facet ( up )
+    all_orient ( up )
     {
       if ( Coaxial(right, up) )
       {
@@ -43,8 +43,8 @@ void Simplex::initGroup()
       OCube B = GetCube ( b );
 
       // create a composition of them:
-      Facet cr = A.whatIs ( B.whatIs ( _R ) );
-      Facet cu = A.whatIs ( B.whatIs ( _U ) );
+      Orient cr = A.whatIs ( B.whatIs ( _R ) );
+      Orient cu = A.whatIs ( B.whatIs ( _U ) );
 
       const CubeID c = GetGroupID ( cr, cu );
 
@@ -65,7 +65,7 @@ void Simplex::initGroup()
   }
   all_cubeid( id )
   {
-    for( Facet F: { _F, _R, _U, _L, _D, _B } )
+    for( Orient F: { _F, _R, _U, _L, _D, _B } )
       align[ id ][F] = GetCube( id ).aligned( F ); 
   }
 }

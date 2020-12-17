@@ -40,23 +40,21 @@ private:
   CubeID  simplexGroupID   [ 6 /*Right*/ ][ 6 /*Up*/ ];
   CubeID  composition      [ 24 /* A */  ][ 24 /*B*/ ]; // X = AB
   CubeID  transform        [ 24 /* A */  ][ 24 /*B*/ ]; // AX = B => X = inv(A) B
-  bool    align            [ 24 /* ID */ ][ 6  /*F*/ ]; // [ id ] [ facet ]
+  bool    align            [ 24 /* ID */ ][ 6  /*F*/ ]; // [ id ] [ Orient ]
   
 public:
   // create a singleton object
   static void          Instance    ( )                          { if ( Singleton == nullptr ) new Simplex;   }
   static void          OnExit      ( )                          { delete Singleton; Singleton = nullptr;     }
   static const OCube & GetCube     ( CubeID ID )                { return Singleton -> simplexGroup [ID];     }
-  static const OCube & GetCube     ( Facet r, Facet u )         { return GetCube( GetGroupID( r, u ) );      }
-  static CubeID        GetGroupID  ( Facet r, Facet u )         { return Singleton -> simplexGroupID [r][u]; }
-  static bool          Aligned     ( CubeID a, Facet f )        { return Singleton -> align[ a ][ f ];       }
+  static const OCube & GetCube     ( Orient r, Orient u )         { return GetCube( GetGroupID( r, u ) );      }
+  static CubeID        GetGroupID  ( Orient r, Orient u )         { return Singleton -> simplexGroupID [r][u]; }
+  static bool          Aligned     ( CubeID a, Orient f )        { return Singleton -> align[ a ][ f ];       }
   static CubeID        Composition ( CubeID a, CubeID b )       { return Singleton -> composition [a][b];    }
   static CubeID        Transform   ( CubeID a, CubeID b )       { return Singleton -> transform [a][b];      }
   static CubeID        Inverse     ( CubeID a )                 { return Singleton -> transform [a][0];      } 
-  static CubeID        Tilt        ( Axis a, int t = 1 )        { return Singleton -> tilt [a][t];           }
+  static CubeID        Tilt        ( Axis a, Turn t = 1 )       { return Singleton -> tilt [a][t];           }
   
-  static bool          Coaxial     ( Facet a, Facet b )         { return  a == b || a == SideOpposite( b ) || a == _NF || b == _NF; }
-
 };
 
 #endif //SIMPLEX_HEADER
