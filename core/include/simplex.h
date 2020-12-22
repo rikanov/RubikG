@@ -26,8 +26,6 @@ class Simplex
 {
     static Simplex * Singleton;
   
-  CubeID tilt [ 3 ] [ 4 ] = {};
-
 private: 
   // functions
   Simplex();
@@ -36,24 +34,34 @@ private:
 
 private: 
   // array datamembers
-  OCube   simplexGroup     [ 24 /* ID */ ];
-  CubeID  simplexGroupID   [ 6 /*Right*/ ][ 6 /*Up*/ ];
-  CubeID  composition      [ 24 /* A */  ][ 24 /*B*/ ]; // X = AB
-  CubeID  transform        [ 24 /* A */  ][ 24 /*B*/ ]; // AX = B => X = inv(A) B
-  bool    align            [ 24 /* ID */ ][ 6  /*F*/ ]; // [ id ] [ Orient ]
+  OCube   m_simplexGroup     [ 24 /* ID */ ];
+  CubeID  m_tilt             [ 3 ] [ 4 ] = {};
+  CubeID  m_simplexGroupID   [ 6 /*Right*/ ][ 6 /*Up*/ ];
+  CubeID  m_composition      [ 24 /* A */  ][ 24 /*B*/ ]; // X = AB
+  CubeID  m_transform        [ 24 /* A */  ][ 24 /*B*/ ]; // AX = B => X = inv(A) B
+  bool    m_align            [ 24 /* ID */ ][ 6  /*F*/ ]; // [ id ] [ Orient ]
   
+  const OCube & getCube     ( CubeID ID )           const  { return m_simplexGroup [ID];                      }
+  const OCube & getCube     ( Orient r, Orient u )  const  { return m_simplexGroup[ m_simplexGroupID[r][u] ]; }
+  bool          aligned     ( CubeID a, Orient f )  const  { return m_align          [a][f];                  }
+  CubeID        getGroupID  ( Orient r, Orient u )  const  { return m_simplexGroupID [r][u];                  }
+  CubeID        composition ( CubeID a, CubeID b )  const  { return m_composition    [a][b];                  }
+  CubeID        transform   ( CubeID a, CubeID b )  const  { return m_transform      [a][b];                  }
+  CubeID        inverse     ( CubeID a )            const  { return m_transform      [a][0];                  } 
+  CubeID        tilt        ( Axis a, Turn t = 1 )  const  { return m_tilt           [a][t];                  }
+
 public:
   // create a singleton object
-  static void          Instance    ( )                          { if ( Singleton == nullptr ) new Simplex;   }
-  static void          OnExit      ( )                          { delete Singleton; Singleton = nullptr;     }
-  static const OCube & GetCube     ( CubeID ID )                { return Singleton -> simplexGroup [ID];     }
-  static const OCube & GetCube     ( Orient r, Orient u )         { return GetCube( GetGroupID( r, u ) );      }
-  static CubeID        GetGroupID  ( Orient r, Orient u )         { return Singleton -> simplexGroupID [r][u]; }
-  static bool          Aligned     ( CubeID a, Orient f )        { return Singleton -> align[ a ][ f ];       }
-  static CubeID        Composition ( CubeID a, CubeID b )       { return Singleton -> composition [a][b];    }
-  static CubeID        Transform   ( CubeID a, CubeID b )       { return Singleton -> transform [a][b];      }
-  static CubeID        Inverse     ( CubeID a )                 { return Singleton -> transform [a][0];      } 
-  static CubeID        Tilt        ( Axis a, Turn t = 1 )       { return Singleton -> tilt [a][t];           }
+  static void            Instance    ( )                          { if ( Singleton == nullptr ) new Simplex;  }
+  static void            OnExit      ( )                          { delete Singleton; Singleton = nullptr;    }
+  static const OCube &   GetCube     ( CubeID ID )                { return Singleton -> getCube     ( ID );   }
+  static const OCube &   GetCube     ( Orient r, Orient u )       { return Singleton -> getCube     ( r, u ); }
+  static CubeID          GetGroupID  ( Orient r, Orient u )       { return Singleton -> getGroupID  ( r, u ); }
+  static bool            Aligned     ( CubeID a, Orient f )       { return Singleton -> aligned     ( a, f ); }
+  static CubeID          Composition ( CubeID a, CubeID b )       { return Singleton -> composition ( a, b ); }
+  static CubeID          Transform   ( CubeID a, CubeID b )       { return Singleton -> transform   ( a, b ); }
+  static CubeID          Inverse     ( CubeID a )                 { return Singleton -> transform   ( a, 0 ); } 
+  static CubeID          Tilt        ( Axis a, Turn t = 1 )       { return Singleton -> tilt        ( a, t ); }
   
 };
 

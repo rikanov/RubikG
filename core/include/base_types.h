@@ -33,6 +33,27 @@ typedef uint8_t       RotID;
 typedef uint8_t       PosID;
 typedef uint32_t      CacheID;
 
+ // Cube types
+//  ----------
+enum CType
+{
+  _Inner, _Side, _Edge, _Corner
+};
+
+inline CType getCType( const int ct )
+{
+  switch( ct )
+  {
+    case 1:
+      return _Side;
+    case 2:
+      return _Edge;
+    case 3:
+      return _Corner;
+    default:
+      return _Inner;
+  }
+}
  // Components
 //  ----------
 enum Axis 

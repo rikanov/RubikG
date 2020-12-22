@@ -32,12 +32,12 @@ class CPositions
   static constexpr unsigned int FrameworkSize [] = { 0, 1, 8 - 0, 27 - 1, 64 - 8, 125 - 27, 216 - 64, 341 - 125, 512 - 216, 721 - 341, 1000 - 512 }; //  N > 1 :  N ^ 3 - ( N - 2 ) ^ 3
   static CPositions * Singleton; 
   
-  PosID routerPositions [ FrameworkSize [ N ] ][ 24 ] = {};
-  PosID frameworkLayer  [ 3 ] [ N ] [ N * N ]         = {}; // [axis] [layer index] [cubes] 
-  PosID coordToIndex    [ N ] [ N ] [ N ]             = {};
-  Orient align           [ FrameworkSize [ N ] ]       = {};
-  int   cubeType        [ FrameworkSize [ N ] ]       = {};
-  Layer indexToCoord    [ FrameworkSize [ N ] ][ 3 ]  = {}; // [ PosID ] [ Axis ]
+  PosID  m_routerPositions [ FrameworkSize [ N ] ][ 24 ] = {};
+  PosID  m_frameworkLayer  [ 3 ] [ N ] [ N * N ]         = {}; // [axis] [layer index] [cubes] 
+  PosID  m_coordToIndex    [ N ] [ N ] [ N ]             = {};
+  Orient m_align           [ FrameworkSize [ N ] ]       = {};
+  CType  m_cubeType        [ FrameworkSize [ N ] ]       = {};
+  Layer  m_indexToCoord    [ FrameworkSize [ N ] ][ 3 ]  = {}; // [ PosID ] [ Axis ]
   
   CPositions();
   
@@ -50,32 +50,32 @@ class CPositions
   void  initPositions();
   void  initIndices  ();
   
-  static PosID* GetNode  ( CubeID id )             { return Singleton->routerPositions[ id ]; }
+  static PosID* GetNode  ( CubeID id )             { return Singleton->m_routerPositions[ id ]; }
   static PosID* GetNode  ( int x, int y, int z )   { return GetNode( GetPosID ( x, y, z) );   }
 
 public:
   static constexpr int GetSize ( ) { return Singleton->FrameworkSize [ N ]; }
   
-  static   void    Instance  ( void )                                  { if ( Singleton == nullptr ) new CPositions<N>;              }
-  static   void    OnExit    ( void )                                  { delete Singleton; Singleton = nullptr;                      }
-  static   bool    ValID     ( PosID id )                              { return 0 <= id && id < GetSize();                           }
-  static   int     Type      ( PosID id )                              { return Singleton -> cubeType[ id ];                         }
-  static   Orient  Side      ( PosID id )                              { return Singleton -> align[ id ];                            }
-  static   Orient  Side      ( PosID id, CubeID rot )                  { return Singleton -> align[ GetPosID( id, rot ) ];           }
-  static   PosID   GetPosID  ( PosID id, CubeID rot )                  { return Singleton -> routerPositions[ id ][ rot ];           }
-  static   PosID   GetPosID  ( const Coord & C )                       { return GetPosID( C.x, C.y, C.z);                            }
-  static   PosID   GetPosID  ( Layer x, Layer y, Layer z )             { return Singleton -> coordToIndex[ x ][ y ][ z ];            }
-  static   PosID   GetPosID  ( Layer x, Layer y, Layer z, CubeID rot ) { return GetNode( x, y, z ) [ rot ];                          }
-  static   PosID   GetLayer  ( Axis a, Layer l, byte id )              { return Singleton -> frameworkLayer [ a ][ l ][ id ];        }
-  static   Layer   LayerSize ( Layer l )                               { return l == 0 || l == N - 1 ? N * N : 4 * ( N - 1 );        }
-  static   Layer   GetCoord  ( PosID p, Axis a )                       { return Singleton -> indexToCoord [ p ][ a ];                }
-  static   Layer   GetCoord  ( PosID p, RotID r, Axis a )              { return Singleton -> indexToCoord [ GetPosID( p, r ) ][ a ]; }
+  static   void    Instance  ( void )                                  { if ( Singleton == nullptr ) new CPositions<N>;          }
+  static   void    OnExit    ( void )                                  { delete Singleton; Singleton = nullptr;                  }
+  static   bool    ValID     ( PosID id )                              { return 0 <= id && id < GetSize();                       }
+  static   CType   Type      ( PosID id )                              { return Singleton -> m_cubeType[ id ];                   }
+  static   Orient  Side      ( PosID id )                              { return Singleton -> m_align[ id ];                      }
+  static   Orient  Side      ( PosID id, CubeID rot )                  { return Singleton -> m_align[ GetPosID( id, rot ) ];     }
+  static   PosID   GetPosID  ( PosID id, CubeID rot )                  { return Singleton -> m_routerPositions[ id ][ rot ];     }
+  static   PosID   GetPosID  ( const Coord & C )                       { return GetPosID( C.x, C.y, C.z);                        }
+  static   PosID   GetPosID  ( Layer x, Layer y, Layer z )             { return Singleton -> m_coordToIndex[ x ][ y ][ z ];      }
+  static   PosID   GetPosID  ( Layer x, Layer y, Layer z, CubeID rot ) { return GetNode( x, y, z ) [ rot ];                      }
+  static   PosID   GetLayer  ( Axis a, Layer l, byte id )              { return Singleton -> m_frameworkLayer [ a ][ l ][ id ];  }
+  static   Layer   LayerSize ( Layer l )                               { return l == 0 || l == N - 1 ? N * N : 4 * ( N - 1 );    }
+  static   Layer   GetCoord  ( PosID p, Axis a )                       { return Singleton -> m_indexToCoord [ p ][ a ];          }
+  static   Layer   GetCoord  ( PosID p, RotID r, Axis a )              { return Singleton -> m_indexToCoord [ GetPosID( p, r ) ][ a ]; }
   static   Coord   GetCoord  ( PosID p ) 
   { 
     return Coord( 
-      Singleton->indexToCoord [ p ][ _X ], 
-      Singleton->indexToCoord [ p ][ _Y ], 
-      Singleton->indexToCoord [ p ][ _Z ]
+      Singleton->m_indexToCoord [ p ][ _X ], 
+      Singleton->m_indexToCoord [ p ][ _Y ], 
+      Singleton->m_indexToCoord [ p ][ _Z ]
       ); 
   }
 };
@@ -126,14 +126,14 @@ void CPositions<N>::initIndices()
     //    1: side
     //    2: edge
     //    3: corner
-    const int cType = ( x == 0 || x == N - 1 ) + ( y == 0 || y == N - 1 ) + ( z == 0 || z == N - 1 );
+    const CType cType = getCType( ( x == 0 || x == N - 1 ) + ( y == 0 || y == N - 1 ) + ( z == 0 || z == N - 1 ) );
        
-    if ( cType != 0 )
+    if ( cType != _Inner )
     { 
-      cubeType[ index ] = cType;
+      m_cubeType[ index ] = cType;
       
       Orient F = _NF;
-      if ( cType == 1 )
+      if ( cType == _Side )
       {
         if ( x == 0 )
           F = _L;
@@ -148,21 +148,21 @@ void CPositions<N>::initIndices()
         else if ( z == N - 1 )
           F = _F;
       }
-      align[ index ] = F;
+      m_align[ index ] = F;
       
-      frameworkLayer [ _X ][ x ][ idX[x] ++ ] = index;
-      frameworkLayer [ _Y ][ y ][ idY[y] ++ ] = index;
-      frameworkLayer [ _Z ][ z ][ idZ[z] ++ ] = index;
+      m_frameworkLayer [ _X ][ x ][ idX[x] ++ ] = index;
+      m_frameworkLayer [ _Y ][ y ][ idY[y] ++ ] = index;
+      m_frameworkLayer [ _Z ][ z ][ idZ[z] ++ ] = index;
       
-      indexToCoord [ index ][ _X ] = x;
-      indexToCoord [ index ][ _Y ] = y;
-      indexToCoord [ index ][ _Z ] = z;
+      m_indexToCoord [ index ][ _X ] = x;
+      m_indexToCoord [ index ][ _Y ] = y;
+      m_indexToCoord [ index ][ _Z ] = z;
       
-      coordToIndex [ x ][ y ][ z ] = index++;
+      m_coordToIndex [ x ][ y ][ z ] = index++;
     }
     else
     {
-      coordToIndex[ x ][ y ][ z ] = 0xFF;
+      m_coordToIndex[ x ][ y ][ z ] = 0xFF;
     }
   } // GetPosID() is fully working now
 }
@@ -180,7 +180,7 @@ void CPositions<N>::initPositions()
       {
         const Coord C = rotate ( x, y, z, id );
         if ( SHOW_LOG ) clog ( Simplex::GetCube ( id ).toString(), " --> ", C.toString() , "\t| ", (int) GetPosID( C ) );
-        routerPositions[ GetPosID( x, y, z ) ][ id ] = GetPosID( C );
+        m_routerPositions[ GetPosID( x, y, z ) ][ id ] = GetPosID( C );
       }
     }
   }

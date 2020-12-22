@@ -43,17 +43,17 @@ public:
   
   // Operations
   Rubik<N> inverse    ( void ) const;
-  void          rotate     ( const Axis, const Layer, const Turn turn = 1 );
-  void          rotate     ( const RotID rotID );
-  void          shuffle    ( int depth = 0 );
+  void     rotate     ( const Axis, const Layer, const Turn turn = 1 );
+  void     rotate     ( const RotID rotID );
+  void     shuffle    ( int depth = 0 );
   
   static Rubik<N> Transform  ( const Rubik<N>& A, const Rubik<N>& C ) { return Rubik<N>( A.inverse(), C ); } // transform( A, C ) returns with B where A + B = C
   
   // Operators
-  constexpr Rubik<N>& operator=  ( const Rubik<N>& B );
-  bool                operator== ( const Rubik<N>& X ) ;
+  const     bool      operator== ( const Rubik<N>& X ) ;
+  constexpr Rubik<N>& operator=  ( const Rubik<N>& B ) ;
   const     Rubik<N>  operator+  ( const Rubik<N>& B ) { return Rubik<N> ( *this, B ); }
-  const     Rubik<N>  operator-  ( const Rubik<N>& B ) { return Transform( B, *this );      }
+  const     Rubik<N>  operator-  ( const Rubik<N>& B ) { return Transform( B, *this ); }
   // Destructor
   ~Rubik( );
   
@@ -77,12 +77,7 @@ public:
   void print( bool separator = true ) const;
 };
 
-// print a single Orient on different operating systems
-#ifdef _WIN32
-  static const char FChar[] = { (char) 254u, '\0' };
-#else
   static const char FChar[] = "■";
-#endif
 
 /// ----------------------------------- Template definitions starts here ------------------------------------- ///
 
@@ -139,7 +134,7 @@ constexpr Rubik<N>& Rubik<N>::operator = ( const Rubik<N>& C )
 
 // equlity
 template<unsigned int N>
-bool Rubik<N>::operator == ( const Rubik<N>& C )
+const bool Rubik<N>::operator == ( const Rubik<N>& C )
 {
   for ( int i = 0; i < Fsize; ++ i )
   {
