@@ -32,9 +32,6 @@ class Rubik
 
 public:
   
-  static void InitializeBase();
-  static void DeleteBase();
-
   // Constructors
   Rubik( void );
   Rubik( const Rubik<N>&, const Rubik<N>& );
@@ -58,9 +55,10 @@ public:
   ~Rubik( );
   
   // Query functions
-  CubeID       getCubeID ( PosID id, RotID rot ) const { return frameworkSpace[ CPositions<N>::GetPosID( id, rot ) ]; }
-  CubeID       getCubeID ( PosID id )            const { return frameworkSpace[id];                                   }
-  OCube        getCube   ( PosID id )            const { return Simplex::GetCube( getCubeID ( id ) );                 }
+  CubeID  getCubeState ( PosID id )            const ;
+  CubeID  getCubeID    ( PosID id, RotID rot ) const { return frameworkSpace[ CPositions<N>::GetPosID( id, rot ) ]; }
+  CubeID  getCubeID    ( PosID id )            const { return frameworkSpace[id];                                   }
+  OCube   getCube      ( PosID id )            const { return Simplex::GetCube( getCubeID ( id ) );                 }
   
   inline PosID whatIs    ( PosID id ) const ;
   inline PosID whereIs   ( PosID id ) const ;
@@ -77,7 +75,7 @@ public:
   void print( bool separator = true ) const;
 };
 
-  static const char FChar[] = "■";
+  static const char FChar[] = "*";
 
 /// ----------------------------------- Template definitions starts here ------------------------------------- ///
 
@@ -219,6 +217,17 @@ PosID Rubik<N>::whereIs( PosID id ) const
 }
 
 template<unsigned int N>
+CubeID Rubik<N>::getCubeState( PosID id ) const
+{ 
+  CubeID rot = 0; 
+  while ( frameworkSpace[ CPositions<N>::GetPosID( id, rot ) ] != rot )
+  {
+    ++ rot;
+  }
+  return rot;
+}
+
+template<unsigned int N>
 Orient Rubik<N>::getOrient ( const Orient right, const Orient up, int x, int y ) const
 {
   if ( Coaxial ( right, up ) || x < 0 || x >= N || y < 0 || y >= N ) // invalid setting
@@ -226,12 +235,12 @@ Orient Rubik<N>::getOrient ( const Orient right, const Orient up, int x, int y )
     return _NF;
   }
   
-  const CubeID trans  = Simplex::GetGroupID   ( right, up ); 
-  const CubeID inv    = Simplex::Inverse      ( trans ); 
-  const Orient  Orient  = OCube::FrontSide      ( right, up ); // = Simplex::GetCube( trans ).whatIs( _F );
+  const CubeID trans  = Simplex::GetGroupID     ( right, up ); 
+  const CubeID inv    = Simplex::Inverse        ( trans ); 
+  const Orient orient = OCube::FrontSide        ( right, up ); // = Simplex::GetCube( trans ).whatIs( _F );
   const int    index  = CPositions<N>::GetPosID ( x, y, N - 1, inv );
   
-  return getCube ( index ).whatIs( Orient );
+  return getCube ( index ).whatIs( orient );
 }
 
 template<unsigned int N> 
@@ -239,6 +248,7 @@ bool Rubik<N>::integrity() const
 {
   static const Orient orientations [6][2] = { { _F, _U }, { _R, _U }, { _B, _U }, { _L, _U }, { _R, _B }, { _R, _F } };
   
+  bool result = true;
   int counter[6] = {};
   for ( auto side : orientations )
   {
@@ -250,12 +260,12 @@ bool Rubik<N>::integrity() const
       }
     }
   }
-  int idx = 0;
-  while ( idx < 6 && counter[idx] == N * N )
+  for( int idx = 0; idx < 6; ++ idx )
   {
-    ++idx;
+    result &= counter[idx] == N * N ;
   }
-  return idx == 6;
+
+  return result;
 }
 
  // Printer

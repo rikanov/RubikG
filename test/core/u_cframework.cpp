@@ -1,7 +1,7 @@
 #include <test.h>
 #include <rubik.h>
 
-bool UnitTests::unit_CFramework() const
+bool UnitTests::unit_Rubik() const
 {
   bool success = true;
   head( "cube framework" );
@@ -60,7 +60,7 @@ bool UnitTests::unit_CFramework() const
   
   tcase( "Test case 8", "integrity test of 4 x 4 cubes");
   Rubik<4> test8A, test8B, test8C;
-  const int num = 1000;
+  const int num = 10;
   int counter = 0;
   for ( int s = 0; s < num; ++s )
   {

@@ -48,11 +48,6 @@ static inline Orient GetBaseOrient( Axis axis )
   }
 }
 
-static inline Orient TransformBaseOrient( Orient base, CubeID trans )
-{
-  return Simplex::GetCube( trans ).whereIs( base );
-}
-
 template<unsigned int N>
 class CRotations
 {
@@ -162,7 +157,7 @@ void CRotations<N>::transformRotIDs()
     all_cubeid( cubeID )
     {
       Orient base  = GetBaseOrient( axis );
-      Orient trans = TransformBaseOrient( base, cubeID );
+      Orient trans = Simplex::GetCube( cubeID ).whereIs( base );
       m_tRotID[ rotID ][ cubeID ] = transformedRotID( trans, layer, turn );
     }
   }

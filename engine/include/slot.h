@@ -1,13 +1,12 @@
 #ifndef CUBE_SLOT__H
 #define CUBE_SLOT__H
 
-#include <cube_framework.h>
+#include <base_types.h>
 
 constexpr unsigned int pow24[] = { 1, 24, 576, 13824, 331776, 7962624 };
 
-struct CubeSlot
+struct CSlot
 {
-  Orient orient = _NF;
   PosID  pos   = 0;
   CubeID rot   = 0;
 };
