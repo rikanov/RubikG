@@ -1,5 +1,4 @@
 #include <test.h>
-#include <state.h>
 
 bool UnitTests::testCore() const
 {

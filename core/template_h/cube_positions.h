@@ -35,8 +35,6 @@ class CPositions
   PosID  m_routerPositions [ FrameworkSize [ N ] ][ 24 ] = {};
   PosID  m_frameworkLayer  [ 3 ] [ N ] [ N * N ]         = {}; // [axis] [layer index] [cubes] 
   PosID  m_coordToIndex    [ N ] [ N ] [ N ]             = {};
-  Orient m_align           [ FrameworkSize [ N ] ]       = {};
-  CType  m_cubeType        [ FrameworkSize [ N ] ]       = {};
   Layer  m_indexToCoord    [ FrameworkSize [ N ] ][ 3 ]  = {}; // [ PosID ] [ Axis ]
   
   CPositions();
@@ -54,22 +52,19 @@ class CPositions
   static PosID* GetNode  ( int x, int y, int z )   { return GetNode( GetPosID ( x, y, z) );   }
 
 public:
-  static constexpr int GetSize ( ) { return Singleton->FrameworkSize [ N ]; }
+  static constexpr int GetSize ( ) { return FrameworkSize [ N ]; }
   
   static   void    Instance  ( void )                                  { if ( Singleton == nullptr ) new CPositions<N>;          }
   static   void    OnExit    ( void )                                  { delete Singleton; Singleton = nullptr;                  }
   static   bool    ValID     ( PosID id )                              { return 0 <= id && id < GetSize();                       }
-  static   CType   Type      ( PosID id )                              { return Singleton -> m_cubeType[ id ];                   }
-  static   Orient  Side      ( PosID id )                              { return Singleton -> m_align[ id ];                      }
-  static   Orient  Side      ( PosID id, CubeID rot )                  { return Singleton -> m_align[ GetPosID( id, rot ) ];     }
   static   PosID   GetPosID  ( PosID id, CubeID rot )                  { return Singleton -> m_routerPositions[ id ][ rot ];     }
   static   PosID   GetPosID  ( const Coord & C )                       { return GetPosID( C.x, C.y, C.z);                        }
   static   PosID   GetPosID  ( Layer x, Layer y, Layer z )             { return Singleton -> m_coordToIndex[ x ][ y ][ z ];      }
   static   PosID   GetPosID  ( Layer x, Layer y, Layer z, CubeID rot ) { return GetNode( x, y, z ) [ rot ];                      }
   static   PosID   GetLayer  ( Axis a, Layer l, byte id )              { return Singleton -> m_frameworkLayer [ a ][ l ][ id ];  }
   static   Layer   LayerSize ( Layer l )                               { return l == 0 || l == N - 1 ? N * N : 4 * ( N - 1 );    }
-  static   Layer   GetCoord  ( PosID p, Axis a )                       { return Singleton -> m_indexToCoord [ p ][ a ];          }
-  static   Layer   GetCoord  ( PosID p, RotID r, Axis a )              { return Singleton -> m_indexToCoord [ GetPosID( p, r ) ][ a ]; }
+  static   Layer   GetLayer  ( PosID p, Axis a )                       { return Singleton -> m_indexToCoord [ p ][ a ];          }
+  static   Layer   GetLayer  ( PosID p, CubeID r, Axis a )             { return Singleton -> m_indexToCoord [ GetPosID( p, r ) ][ a ]; }
   static   Coord   GetCoord  ( PosID p ) 
   { 
     return Coord( 
@@ -121,35 +116,9 @@ void CPositions<N>::initIndices()
   idX [N] = {}, idY [N] = {}, idZ [N] = {}; // slice indices
   for_vector ( x, y, z, N )
   {
-    //  cType:
-    //    0: inner cube
-    //    1: side
-    //    2: edge
-    //    3: corner
-    const CType cType = getCType( ( x == 0 || x == N - 1 ) + ( y == 0 || y == N - 1 ) + ( z == 0 || z == N - 1 ) );
-       
-    if ( cType != _Inner )
-    { 
-      m_cubeType[ index ] = cType;
-      
-      Orient F = _NF;
-      if ( cType == _Side )
-      {
-        if ( x == 0 )
-          F = _L;
-        else if ( x == N - 1 )
-          F = _R;
-        else if ( y == 0 )
-          F = _D;
-        else if ( y == N - 1 )
-          F = _U;
-        else if ( z == 0 )
-          F = _B;
-        else if ( z == N - 1 )
-          F = _F;
-      }
-      m_align[ index ] = F;
-      
+    const bool innerCube = x != 0 && x != N - 1 && y != 0 && y != N - 1 && z != 0 && z != N - 1 ;
+    if ( !innerCube )
+    {
       m_frameworkLayer [ _X ][ x ][ idX[x] ++ ] = index;
       m_frameworkLayer [ _Y ][ y ][ idY[y] ++ ] = index;
       m_frameworkLayer [ _Z ][ z ][ idZ[z] ++ ] = index;

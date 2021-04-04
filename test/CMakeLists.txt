@@ -6,15 +6,15 @@ include_directories(../core/template_h)
 include_directories(../CLi/include)
 include_directories(../engine )
 
-find_library( CLi  REQUIRED )
-find_library( core REQUIRED )
+#find_library( cli  REQUIRED )
+#find_library( core REQUIRED )
 
 add_library(test  test.h
                   common/test_common.cpp
                   common/test_launchers.cpp  
                   core/u_simplex.cpp 
                   core/u_crotations.cpp
-                  core/u_cframework.cpp
+                  core/u_rubik.cpp
                   engine/u_state.cpp
                  )
 

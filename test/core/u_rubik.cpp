@@ -4,9 +4,9 @@
 bool UnitTests::unit_Rubik() const
 {
   bool success = true;
-  head( "cube framework" );
+  head( "Rubik framework" );
 
-  clog_( "Cube framework test..." );
+  clog_( "Rubik framework test..." );
   Rubik<5> test1, test2;
   done();
 
@@ -81,6 +81,6 @@ bool UnitTests::unit_Rubik() const
   tail( std::to_string( counter ) + " out of " + std::to_string( num ) + " executed", s );
   success &= s;
 
-  finish( "Cube framework", success );
+  finish( "Rubik framework", success );
   return success;
 }

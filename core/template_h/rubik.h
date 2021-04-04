@@ -47,10 +47,10 @@ public:
   static Rubik<N> Transform  ( const Rubik<N>& A, const Rubik<N>& C ) { return Rubik<N>( A.inverse(), C ); } // transform( A, C ) returns with B where A + B = C
   
   // Operators
-  const     bool      operator== ( const Rubik<N>& X ) ;
-  constexpr Rubik<N>& operator=  ( const Rubik<N>& B ) ;
-  const     Rubik<N>  operator+  ( const Rubik<N>& B ) { return Rubik<N> ( *this, B ); }
-  const     Rubik<N>  operator-  ( const Rubik<N>& B ) { return Transform( B, *this ); }
+  const  bool      operator== ( const Rubik<N>& X ) ;
+  const  Rubik<N>& operator=  ( const Rubik<N>& B ) ;
+  const  Rubik<N>  operator+  ( const Rubik<N>& B ) { return Rubik<N> ( *this, B ); }
+  const  Rubik<N>  operator-  ( const Rubik<N>& B ) { return Transform( B, *this ); }
   // Destructor
   ~Rubik( );
   
@@ -123,7 +123,7 @@ Rubik<N>::Rubik( Rubik<N> && f )
 
 // assignement
 template<unsigned int N>
-constexpr Rubik<N>& Rubik<N>::operator = ( const Rubik<N>& C )
+const Rubik<N>& Rubik<N>::operator = ( const Rubik<N>& C )
 {
   for ( int i = 0; i < Fsize; ++ i )
     frameworkSpace[i] = C.frameworkSpace[i];

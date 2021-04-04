@@ -24,7 +24,7 @@
 #include <def_colors.h>
 #include <string>
 
-typedef unsigned char byte;
+typedef uint8_t byte;
 
  // ID types
 //  --------
@@ -33,27 +33,6 @@ typedef uint8_t       RotID;
 typedef uint8_t       PosID;
 typedef uint32_t      CacheID;
 
- // Cube types
-//  ----------
-enum CType
-{
-  _Inner, _Side, _Edge, _Corner
-};
-
-inline CType getCType( const int ct )
-{
-  switch( ct )
-  {
-    case 1:
-      return _Side;
-    case 2:
-      return _Edge;
-    case 3:
-      return _Corner;
-    default:
-      return _Inner;
-  }
-}
  // Components
 //  ----------
 enum Axis 
@@ -139,8 +118,12 @@ inline char Token( Orient F )
 
  // Auxiliary macros
 // -----------------
-#define all_orient(i) for(Orient i = _F; i <= _B; ++i)
-#define  all_cubeid(i) for(CubeID i = 0; i < 24; ++i)
+#define all_orient(i) for( Orient i = _F; i <= _B; ++i )
+#define all_cubeid(i) for( CubeID i = 0 ; i < 24 ; ++i )
+
+#define all_layer( A, L, N )     \
+   for ( Axis A: { _X, _Y, _Z } ) \
+     for ( Layer L = 0; L < N; ++L )
 
 #define all_rot( A, L, T, N )      \
    for ( Axis A: { _X, _Y, _Z } )   \
