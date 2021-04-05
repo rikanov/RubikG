@@ -9,7 +9,6 @@ bool UnitTests::unit_CState() const
   head( "CacheIDmapper" );
 
   tcase( "Memory allocation" );
-  CacheIDmap   <4> testMap( 4 );
   CacheIDmapper<4> test   ( 4 );
   const PosID toSolve[] = {
                             CPositions<4>::GetPosID( 1, 1, 0 ),
@@ -18,8 +17,8 @@ bool UnitTests::unit_CState() const
                             CPositions<4>::GetPosID( 2, 2, 0 )
                           };
   test.initialize( toSolve );
-  success |= test.generateMap( testMap );
 
+  auto testMap = test.generateMap();
   tail( "Memory allocation", success );
 
   finish( "CacheIDmapper", success );

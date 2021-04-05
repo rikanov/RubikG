@@ -19,15 +19,10 @@ public:
   : m_size( size )
   , m_qeueudCubes( new CacheID [ _pow24[ size ] ] )
   {
-    reset();
-  }
-
-  void reset()
-  {
     m_qeuIn = m_qeuOut = m_qeueudCubes;
     m_used = new bool [ _pow24[ m_size ] ] { false };
   }
-  
+
   bool operator << ( const CacheID& id )
   {
     if ( m_used[ id ] == false )
@@ -65,8 +60,8 @@ class CacheIDmap
 
 public:
   CacheIDmap( size_t size )
-  :  m_map( new CacheID[ _pow24[ size - 1 ] * 3 * N * 3 ] )
-  ,  m_dist( new byte[ _pow24[ size - 1 ] ] )
+  :  m_map ( new CacheID[ _pow24[ size - 1 ] * 3 * N * 3 ] )
+  ,  m_dist( new byte   [ _pow24[ size - 1 ] ] )
   {
     for( CacheID cacheID = 0; cacheID < _pow24[ size - 1 ]; ++ cacheID )
     {

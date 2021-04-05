@@ -11,9 +11,11 @@ class CacheIDmapper
   size_t m_size;  // number of cubies in the subspace
   Qeueu  m_qeueu;
 
-  const PosID * m_position;
+  // result map
+  CacheIDmap<N> * m_resMap;
 
-  CubeID * m_operations;
+  const PosID * m_position;
+  CubeID      * m_operations;
 
   CubeID & operation( int posIndex, CubeID rot, Axis axis, Layer layer )
   {
@@ -21,13 +23,17 @@ class CacheIDmapper
   }
 
   void initOperations();
-  void extendNode( const CacheID parentID, CacheIDmap<N>& refMap );
+  void extendNode( const CacheID parentID );
+
+  CacheID getCacheID( const CubeID * P );
+  void    setCacheID( CacheID cacheID, CubeID * P );
 
 public:
   CacheIDmapper( const size_t size )
   : m_size  ( size )
   , m_qeueu ( size )
-  , m_position( nullptr )
+  , m_resMap( new CacheIDmap<N> ( size ) )
+  , m_position  ( nullptr )
   , m_operations( nullptr )
   {
 
@@ -36,6 +42,7 @@ public:
   ~CacheIDmapper()
   {
     delete[] m_operations;
+    delete   m_resMap;
   }
 
   void initialize( const PosID * P )
@@ -44,8 +51,6 @@ public:
     acceptID( 0 ) ;
     initOperations();
   }
-
-  bool generateMap( CacheIDmap<N> & refMap );
 
   bool acceptID( CacheID cacheID )
   {
@@ -57,15 +62,16 @@ public:
     return m_qeueu << getCacheID( P );
   }
 
-  CacheID getCacheID( const CubeID * P );
-  void    setCacheID( CacheID cacheID, CubeID * P );
+  const CacheIDmap<N> * generateMap();
 };
 
 template<unsigned int N>
 void CacheIDmapper<N>::initOperations()
 {
   delete[] m_operations;
+  delete   m_resMap;
   m_operations = new CubeID [ m_size * 24 * 3 * N ];
+  m_resMap     = new CacheIDmap<N> ( m_size );
   for( int posIndex = 0; posIndex < m_size; ++ posIndex )
   {
     all_cubeid( cubeID )
@@ -87,18 +93,18 @@ void CacheIDmapper<N>::initOperations()
 
 
 template<unsigned int N>
-bool CacheIDmapper<N>::generateMap(CacheIDmap<N>& refMap)
+const CacheIDmap<N> * CacheIDmapper<N>::generateMap()
 {
   CacheID nextParent;
   while( m_qeueu >> nextParent )
   {
-    extendNode( nextParent, refMap );
+    extendNode( nextParent );
   }
-  return true;
+  return m_resMap;
 }
 
 template<unsigned int N>
-void CacheIDmapper<N>::extendNode(const CacheID parentID, CacheIDmap<N>& refMap )
+void CacheIDmapper<N>::extendNode(const CacheID parentID )
 {
   CubeID child [ m_size ];
   CubeID parent[ m_size ];
@@ -107,23 +113,22 @@ void CacheIDmapper<N>::extendNode(const CacheID parentID, CacheIDmap<N>& refMap 
   {
     for( Axis axis: {_X, _Y, _Z} )
     {
+      const Layer layer = CPositions<N>::GetLayer( m_position[id], parent[id], axis );
       for( Turn turn : { 1, 2, 3} )
       {
         for( int nid = 0; nid < m_size; ++nid )
         {
-          const Layer layer = CPositions<N>::GetLayer( m_position[id], parent[nid], axis );
           child[nid] = operation( id, parent[nid], axis, layer );
           const CacheID nextID = getCacheID( child );
           if ( m_qeueu << nextID )
           {
-            refMap.distance( nextID ) = refMap.distance( parentID ) + 1;
+            m_resMap -> distance( nextID ) = m_resMap -> distance( parentID ) + 1;
           }
-          refMap.map( parentID, axis, layer, turn ) = nextID;
+          m_resMap -> map( parentID, axis, layer, turn ) = nextID;
         }
       }
     }
   }
-
 }
 
 template<unsigned int N>
