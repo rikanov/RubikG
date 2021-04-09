@@ -25,7 +25,7 @@
 
 // Mapping between all the basic rotations and the set of one-byte size IDs:
 // Axis  --> X,Y or Z represented by integers [ 0..2 ]
-// Layer --> index of the turning slice [ 0..N ) where N isthe size of the cube
+// Layer --> index of a single turning layer [ 0..N ) where N isthe size of the cube
 // Turn  --> 1: a simple clockwise turn  2: double turn 3: tripple (or inverse) turn
 //
 // to get ID we use a mixed radix system:

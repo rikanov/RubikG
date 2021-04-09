@@ -4,6 +4,8 @@
 #include <rubik.h>
 #include <containers.h>
 
+
+
 template< unsigned int N >
 class CacheIDmapper
 {
@@ -23,7 +25,7 @@ class CacheIDmapper
 private:
   CubeID & operation( uint_fast8_t posIndex, CubeID rot, Axis axis, Layer layer )
   {
-    return m_operations[ layer + N * ( axis + 3*rot + 72*posIndex ) ];
+    return m_operations[ layer + ( 2*N - 3 ) * ( axis + 3*rot + 72*posIndex ) ];
   }
 
   void cloneParent()
@@ -35,8 +37,11 @@ private:
   }
 
   void rotateLayer   ( const Axis axis, const Layer layer );
-  void initOperations( const Axis axis, const Layer layer, const CubeID cubeID );
+  void addSingleOperations( const Axis axis, const Layer layer, const CubeID cubeID );
+  void addGroupOperations ( const Axis axis, const Layer layer, const CubeID cubeID );
   void generateOperations();
+  void singleRotations();
+  void groupRotations();
   void extendNode();
 
   CacheID getCacheID( const CubeID * P );
@@ -86,18 +91,41 @@ public:
 template<unsigned int N>
 void CacheIDmapper<N>::generateOperations()
 {
-  m_operations = new CubeID [ m_size * 24 * 3 * N ];
+  m_operations = new CubeID [ m_size * 24 * 3 * ( 2*N - 3 ) ];
+  singleRotations();
+  groupRotations();
+}
+
+
+template<unsigned int N>
+void CacheIDmapper<N>::singleRotations()
+{
   all_cubeid( cubeID )
   {
-    all_layer( axis, layer, N )
+    all_layer( axis, layer, N - 1 )
     {
-      initOperations( axis, layer, cubeID );
+      addSingleOperations( axis, layer, cubeID );
     }
   }
 }
 
 template<unsigned int N>
-void CacheIDmapper<N>::initOperations( const Axis axis, const Layer layer, const CubeID cubeID )
+void CacheIDmapper<N>::groupRotations()
+{
+  all_cubeid( cubeID )
+  {
+    for( Axis axis: { _X, _Y, _Z } )
+    {
+      for( Layer layer = N - 1; layer > 1; -- layer )
+      {
+        addGroupOperations( axis, layer, cubeID );
+      }
+    }
+  }
+}
+
+template<unsigned int N>
+void CacheIDmapper<N>::addSingleOperations( const Axis axis, const Layer layer, const CubeID cubeID )
 {
   for( uint_fast8_t posIndex = 0; posIndex < m_size; ++ posIndex )
   {
@@ -108,6 +136,23 @@ void CacheIDmapper<N>::initOperations( const Axis axis, const Layer layer, const
     else
     {
       operation( posIndex, cubeID, axis, layer ) = cubeID;
+    }
+  }
+}
+
+template<unsigned int N>
+void CacheIDmapper<N>::addGroupOperations( const Axis axis, const Layer layer, const CubeID cubeID )
+{
+  for( uint_fast8_t posIndex = 0; posIndex < m_size; ++ posIndex )
+  {
+    const Layer groupLayer = 2 * N - 2 - layer;
+    if ( CPositions<N>::GetLayer( m_position[posIndex], cubeID, axis ) <= layer )
+    {
+      operation( posIndex, cubeID, axis, groupLayer ) = Simplex::Composition( cubeID, Simplex::Tilt( axis ) );
+    }
+    else
+    {
+      operation( posIndex, cubeID, axis, groupLayer ) = cubeID;
     }
   }
 }

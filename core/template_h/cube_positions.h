@@ -23,7 +23,7 @@
 #include <text_output.h>
 #include <simplex.h>
 
-static const bool SHOW_LOG = false; // setting true is only for debuging purposes
+static constexpr bool SHOW_LOG = false; // setting true is only for debuging purposes
 
 /// ----------------------------------- Template declarations starts here ------------------------------------- ///
 template<unsigned int N>
