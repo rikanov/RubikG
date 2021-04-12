@@ -31,6 +31,7 @@ typedef uint8_t byte;
 typedef uint_fast8_t  CubeID;
 typedef uint8_t       RotID;
 typedef uint8_t       PosID;
+typedef uint8_t       DistID;
 typedef uint32_t      CacheID;
 
  // Components

@@ -9,198 +9,113 @@
 template< unsigned int N >
 class CacheIDmapper
 {
-  const size_t m_size;  // number of cubies in the subspace
-  Qeueu m_qeueu;
+  size_t   m_size;     // number of cubies in the subspace
+  PosID  * m_position; // positions of the cubies
+
+  Qeueu  * m_qeueu;
 
   CacheID  m_parentID;
   CubeID * m_parent;
   CubeID * m_child;
 
-  const PosID * m_position;
-  CubeID      * m_operations;
-
-  // result map
-  CacheIDmap<N> * m_resMap;
-
 private:
-  CubeID & operation( uint_fast8_t posIndex, CubeID rot, Axis axis, Layer layer )
-  {
-    return m_operations[ layer + ( 2*N - 3 ) * ( axis + 3*rot + 72*posIndex ) ];
-  }
-
-  void cloneParent()
-  {
-    for( uint_fast8_t i = 0; i < m_size; ++ i)
-    {
-      m_child[i] = m_parent[i];
-    }
-  }
-
-  void rotateLayer   ( const Axis axis, const Layer layer );
-  void addSingleOperations( const Axis axis, const Layer layer, const CubeID cubeID );
-  void addGroupOperations ( const Axis axis, const Layer layer, const CubeID cubeID );
-  void generateOperations();
-  void singleRotations();
-  void groupRotations();
-  void extendNode();
+  void clean();
+  void setParent();
+  void cloneParent();
 
   CacheID getCacheID( const CubeID * P );
-  void    setParent();
 
 public:
-  CacheIDmapper( const size_t size )
-  : m_size  ( size )
-  , m_qeueu ( size )
-  , m_parent( new CubeID[ size ] )
-  , m_child ( new CubeID[ size ] )
-  , m_position  ( nullptr )
-  , m_operations( nullptr )
-  , m_resMap    ( nullptr )
-  {
+  CacheIDmapper();
+  ~CacheIDmapper();
 
-  }
+  void init( const PosID * P, size_t size );
+  void init( SubSpace & P );
 
-  ~CacheIDmapper()
-  {
-    delete[] m_parent;
-    delete[] m_child;
-    delete[] m_operations;
-    delete   m_resMap;
-  }
+  bool acceptID ( CacheID cacheID )   { return *m_qeueu << cacheID;         }
+  bool accept   ( const CubeID * P )  { return *m_qeueu << getCacheID( P ); }
 
-  void initialize( const PosID * P )
-  {
-    m_position = P;
-    acceptID( 0 ) ;
-    generateOperations();
-  }
-
-  bool acceptID( CacheID cacheID )
-  {
-    return m_qeueu << cacheID;
-  }
-
-  bool accept( const CubeID * P )
-  {
-    return m_qeueu << getCacheID( P );
-  }
-
-  const CacheIDmap<N> * getMap();
+  void createMap( CacheIDmap<N> & result );
 };
 
-template<unsigned int N>
-void CacheIDmapper<N>::generateOperations()
+template<unsigned int N> CacheIDmapper<N>::CacheIDmapper()
+: m_size ( 0 )
+, m_position ( nullptr )
+, m_qeueu    ( nullptr )
+, m_parent   ( nullptr )
+, m_child    ( nullptr )
 {
-  m_operations = new CubeID [ m_size * 24 * 3 * ( 2*N - 3 ) ];
-  singleRotations();
-  groupRotations();
 }
 
-
 template<unsigned int N>
-void CacheIDmapper<N>::singleRotations()
+void CacheIDmapper<N>::init(const PosID* P, size_t size)
 {
-  all_cubeid( cubeID )
+  clean();
+
+  m_size     = size;
+  m_parent   = new CubeID [ size ];
+  m_child    = new CubeID [ size ];
+  m_position = new PosID  [ size ];
+
+  m_qeueu    = new Qeueu ( size - 1 );
+
+  for( int i = 0; i < size; ++ i )
   {
-    all_layer( axis, layer, N - 1 )
-    {
-      addSingleOperations( axis, layer, cubeID );
-    }
+    m_position[i] = P[i];
   }
+
+  acceptID( 0 ) ;
 }
 
 template<unsigned int N>
-void CacheIDmapper<N>::groupRotations()
+void CacheIDmapper<N>::init(SubSpace& P)
 {
-  all_cubeid( cubeID )
+  clean();
+
+  m_size     = P.size();
+  m_parent   = new CubeID [ P.size() ];
+  m_child    = new CubeID [ P.size() ];
+  m_position = new PosID  [ P.size() ];
+
+  m_qeueu    = new Qeueu ( P.size() - 1 );
+
+  std::copy( P.begin(), P.end(), m_position );
+
+  acceptID( 0 ) ;
+}
+
+template<unsigned int N>
+void CacheIDmapper<N>::createMap( CacheIDmap<N> & result )
+{
+  result.init( m_size, true );
+  while( *m_qeueu >> m_parentID )
   {
-    for( Axis axis: { _X, _Y, _Z } )
+    setParent();
+    all_rot( axis, layer, turn, N - 1 )
     {
-      for( Layer layer = N - 1; layer > 1; -- layer )
+      if ( layer == 0 )
+        cloneParent();
+
+      for( unsigned int posIndex = 0; posIndex < m_size; ++ posIndex )
       {
-        addGroupOperations( axis, layer, cubeID );
+        if ( CPositions<N>::GetLayer( m_position[posIndex], m_child[posIndex], axis ) == layer )
+        {
+          m_child[posIndex] = Simplex::Composition( m_child[posIndex], Simplex::Tilt( axis, turn) );
+        }
       }
-    }
-  }
-}
 
-template<unsigned int N>
-void CacheIDmapper<N>::addSingleOperations( const Axis axis, const Layer layer, const CubeID cubeID )
-{
-  for( uint_fast8_t posIndex = 0; posIndex < m_size; ++ posIndex )
-  {
-    if ( CPositions<N>::GetLayer( m_position[posIndex], cubeID, axis ) == layer )
-    {
-      operation( posIndex, cubeID, axis, layer ) = Simplex::Composition( cubeID, Simplex::Tilt( axis ) );
-    }
-    else
-    {
-      operation( posIndex, cubeID, axis, layer ) = cubeID;
-    }
-  }
-}
+      const CacheID nextID = getCacheID( m_child );
+      if ( *m_qeueu << nextID )
+      {
+        result.setDistance( nextID, result.getDistance( m_parentID ) + 1 );
+      }
+      else if ( result.getDistance( nextID ) == result.getDistance( m_parentID ) + 1 )
+      {
+        result.addCachedStep( nextID, CRotations<N-1>::GetInvRotID( axis, layer, turn ) );
+      }
 
-template<unsigned int N>
-void CacheIDmapper<N>::addGroupOperations( const Axis axis, const Layer layer, const CubeID cubeID )
-{
-  for( uint_fast8_t posIndex = 0; posIndex < m_size; ++ posIndex )
-  {
-    const Layer groupLayer = 2 * N - 2 - layer;
-    if ( CPositions<N>::GetLayer( m_position[posIndex], cubeID, axis ) <= layer )
-    {
-      operation( posIndex, cubeID, axis, groupLayer ) = Simplex::Composition( cubeID, Simplex::Tilt( axis ) );
+      result.setMap( m_parentID, axis, layer, turn, nextID );
     }
-    else
-    {
-      operation( posIndex, cubeID, axis, groupLayer ) = cubeID;
-    }
-  }
-}
-
-template<unsigned int N>
-const CacheIDmap<N> * CacheIDmapper<N>::getMap()
-{
-  if ( m_resMap == nullptr )
-  {
-    m_resMap = new CacheIDmap<N> ( m_size );
-    while( m_qeueu >> m_parentID )
-    {
-      extendNode();
-    }
-  }
-  return m_resMap;
-}
-
-template<unsigned int N>
-void CacheIDmapper<N>::extendNode()
-{
-  setParent();
-  for( uint_fast8_t id = 0; id < m_size; ++id )
-  {
-    for( Axis axis: {_X, _Y, _Z} )
-    {
-      const Layer layer = CPositions<N>::GetLayer( m_position[id], m_parent[id], axis );
-      rotateLayer( axis, layer );
-    }
-  }
-}
-
-template<unsigned int N>
-void CacheIDmapper<N>::rotateLayer( const Axis axis, const Layer layer )
-{
-  cloneParent(); 
-  for( Turn turn : { 1, 2, 3} )
-  {
-    for( uint_fast8_t cube = 0; cube < m_size; ++cube )
-    {
-      m_child[cube] = operation( cube, m_child[cube], axis, layer );
-    }
-    const CacheID nextID = getCacheID( m_child );
-    if ( m_qeueu << nextID )
-    {
-      m_resMap -> distance( nextID ) = m_resMap -> distance( m_parentID ) + 1;
-    }
-    m_resMap -> map( m_parentID, axis, layer, turn ) = nextID;
   }
 }
 
@@ -209,7 +124,7 @@ CacheID CacheIDmapper<N>::getCacheID(const CubeID* P)
 {
   CacheID result = 0;
   const CubeID inv0 = Simplex::Inverse( P[0] );
-  for( uint_fast8_t i = 1; i < m_size; ++i )
+  for( int i = 1; i < m_size; ++i )
   {
     result += Simplex::Composition( P[i], inv0 ) * _pow24[ i - 1 ];
   }
@@ -221,10 +136,36 @@ void CacheIDmapper<N>::setParent()
 {
   CacheID cacheID = m_parentID;
   m_parent[0] = 0;
-  for( uint_fast8_t i = 1; i < m_size; ++i, cacheID /= 24 )
+  for( int i = 1; i < m_size; ++i, cacheID /= 24 )
   {
     m_parent[i] = cacheID % 24;
   }
 }
+
+template<unsigned int N>
+void CacheIDmapper<N>::cloneParent()
+{
+  for( int i = 0; i < m_size; ++ i )
+  {
+    m_child[i] = m_parent[i];
+  }
+}
+
+template<unsigned int N>
+void CacheIDmapper<N>::clean()
+{
+  delete[] m_parent;
+  delete[] m_child;
+  delete[] m_position;
+  delete   m_qeueu;
+}
+
+template<unsigned int N>
+CacheIDmapper<N>::~CacheIDmapper()
+{
+  clean();
+}
+
+
 
 #endif // ! CACHE_GENERATOR__H

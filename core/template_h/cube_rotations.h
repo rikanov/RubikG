@@ -25,7 +25,7 @@
 
 // Mapping between all the basic rotations and the set of one-byte size IDs:
 // Axis  --> X,Y or Z represented by integers [ 0..2 ]
-// Layer --> index of a single turning layer [ 0..N ) where N isthe size of the cube
+// Layer --> index of a single turning layer or the last layer of a slice [ 0..N ) where N isthe size of the cube
 // Turn  --> 1: a simple clockwise turn  2: double turn 3: tripple (or inverse) turn
 //
 // to get ID we use a mixed radix system:
@@ -51,8 +51,12 @@ static inline Orient GetBaseOrient( Axis axis )
 template<unsigned int N>
 class CRotations
 {
-  static CRotations<N> * Singleton;
+
+public:
   static constexpr int AllRotIDs = 3 * N * 3 + 1;
+
+private:
+  static CRotations<N> * Singleton;
 
   std::random_device                 m_randomDevice;
   std::default_random_engine         m_randomEngine;
@@ -74,19 +78,22 @@ class CRotations
   RotID transformedRotID( Orient trans, Layer layer, Turn turn );
 
   RotID   getRotID ( Axis A, Layer L, Turn T ) const  { return m_rotID [A][L][T]; }
-  Axis    getAxis  ( RotID rotID )             const  { return m_axis  [ rotID ]; }
-  Layer   getLayer ( RotID rotID )             const  { return m_layer [ rotID ]; }
-  Turn    getTurn  ( RotID rotID )             const  { return m_turn  [ rotID ]; }
+
+  Axis    getAxis  ( RotID rotID ) const  { return m_axis  [ rotID ]; }
+  Layer   getLayer ( RotID rotID ) const  { return m_layer [ rotID ]; }
+  Turn    getTurn  ( RotID rotID ) const  { return m_turn  [ rotID ]; }
   
   public:
 
   static void Instance();
   static void OnExit();
 
-  static  RotID   GetRotID ( Axis A, Layer L, Turn T ) { return Singleton -> getRotID( A, L, T); }
-  static  Axis    GetAxis  ( RotID rotID )             { return Singleton -> getAxis  ( rotID ); }
-  static  Layer   GetLayer ( RotID rotID )             { return Singleton -> getLayer ( rotID ); }
-  static  Turn    GetTurn  ( RotID rotID )             { return Singleton -> getTurn  ( rotID ); }
+  static RotID GetInvRotID ( Axis A, Layer L, Turn T ) { return Singleton -> getRotID( A, L, 4 - T ); }
+  static RotID GetRotID    ( Axis A, Layer L, Turn T ) { return Singleton -> getRotID( A, L, T );     }
+
+  static Axis  GetAxis  ( RotID rotID )  { return Singleton -> getAxis  ( rotID ); }
+  static Layer GetLayer ( RotID rotID )  { return Singleton -> getLayer ( rotID ); }
+  static Turn  GetTurn  ( RotID rotID )  { return Singleton -> getTurn  ( rotID ); }
 
   static RotID Random();
   static std::string ToString( Axis  );

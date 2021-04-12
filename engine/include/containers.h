@@ -1,8 +1,11 @@
 #ifndef CONTAINERS__H
 #define CONTAINERS__H
 
+#include <initializer_list>
 
 constexpr unsigned int _pow24[] = { 1, 24, 576, 13824, 331776, 7962624 };
+
+using SubSpace = const std::initializer_list <PosID>;
 
 // an excluding FIFO object: any CacheID value can be pushed in only once a life time
 class Qeueu
@@ -55,47 +58,76 @@ public:
 template<unsigned int N>
 class CacheIDmap
 {
+  using _crot = CRotations< N-1 >;
+
   CacheID * m_map;
-  byte    * m_dist;
+  DistID  * m_dist;
+
+  // Use doubled memory for quickening deep search
+  // It is optional, use init( size, true ) to allow it
+
+  RotID  * m_cachedStep;
+  DistID * m_complexity;
+
+  void clean()
+  {
+    delete[] m_map;
+    delete[] m_dist;
+    delete[] m_cachedStep;
+  }
 
 public:
-  CacheIDmap( size_t size )
-  :  m_map ( new CacheID[ _pow24[ size - 1 ] * 3 * N * 3 ] )
-  ,  m_dist( new byte   [ _pow24[ size - 1 ] ] )
+  CacheIDmap()
+  :  m_map  ( nullptr )
+  ,  m_dist ( nullptr )
+  ,  m_cachedStep ( nullptr )
+  ,  m_complexity ( nullptr )
   {
-    for( CacheID cacheID = 0; cacheID < _pow24[ size - 1 ]; ++ cacheID )
+    _crot::Instance();
+  }
+
+  void init ( const size_t size, const bool useCache = false )
+  {
+    clean();
+    m_map  = new CacheID [ _pow24[ size - 1 ] * _crot::AllRotIDs ];
+    m_dist = new DistID  [ _pow24[ size - 1 ] ] {};
+
+    if ( useCache )
     {
-      all_rot( axis, layer, turn, N )
-      {
-        map( cacheID, axis, layer, turn ) = cacheID;
-      }
+      m_cachedStep = new RotID  [ _pow24[ size - 1 ] * _crot::AllRotIDs ] {};
+      m_complexity = new DistID [ _pow24[ size - 1 ] ];
     }
+  }
+
+  void setMap( CacheID cacheID, const Axis axis, const Layer layer, const Turn turn, const CacheID nextID )
+  {
+    m_map[ _crot::GetRotID( axis, layer, turn) + _crot::AllRotIDs * cacheID ] = nextID ;
+  }
+
+  CacheID getNode( CacheID cacheID, Axis axis, Layer layer, Turn turn ) const
+  {
+    return m_map[ _crot::GetRotID( axis, layer, turn) + _crot::AllRotIDs * cacheID ];
+  }
+
+  void addCachedStep( const CacheID cacheID, const RotID rotID )
+  {
+    if ( m_cachedStep )
+      m_cachedStep[ m_complexity[ cacheID ] ++ ] = rotID;
+  }
+
+  void setDistance( CacheID cacheID, byte distance )
+  {
+    m_dist[ cacheID ] = distance;
+  }
+
+  int getDistance( CacheID cacheID ) const
+  {
+    return m_dist[ cacheID ];
   }
 
   ~CacheIDmap()
   {
-    delete[] m_map;
-    delete[] m_dist;
-  }
-
-  CacheID & map( CacheID cacheID, Axis axis, Layer layer, Turn turn )
-  {
-    return m_map[ turn + 3 * layer + 3 * N * axis + 9 * N * cacheID ];
-  }
-
-  CacheID map( CacheID cacheID, Axis axis, Layer layer, Turn turn ) const
-  {
-    return m_map[ -1 + turn + 3 * layer + 3 * N * axis + 9 * N * cacheID ];
-  }
-
-  byte & distance( CacheID cacheID )
-  {
-    return m_dist[ cacheID ];
-  }
-
-  byte distance( CacheID cacheID ) const
-  {
-    return m_dist[ cacheID ];
+    clean();
   }
 
 };
