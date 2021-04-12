@@ -58,13 +58,10 @@ public:
 template<unsigned int N>
 class CacheIDmap
 {
-  using _crot = CRotations< N-1 >;
+  using _crot = CRotations< N >;
 
   CacheID * m_map;
   DistID  * m_dist;
-
-  // Use doubled memory for quickening deep search
-  // It is optional, use init( size, true ) to allow it
 
   RotID  * m_cachedStep;
   DistID * m_complexity;
@@ -86,41 +83,47 @@ public:
     _crot::Instance();
   }
 
-  void init ( const size_t size, const bool useCache = false )
+  void init ( const size_t size )
   {
     clean();
     m_map  = new CacheID [ _pow24[ size - 1 ] * _crot::AllRotIDs ];
     m_dist = new DistID  [ _pow24[ size - 1 ] ] {};
 
-    if ( useCache )
+    m_cachedStep = new RotID  [ _pow24[ size - 1 ] * _crot::AllRotIDs ];
+    m_complexity = new DistID [ _pow24[ size - 1 ] ] {};
+  }
+
+  void connect( const CacheID start, const Axis axis, const Layer layer, const Turn turn, const CacheID result, const bool first )
+  {
+    if ( first )
     {
-      m_cachedStep = new RotID  [ _pow24[ size - 1 ] * _crot::AllRotIDs ] {};
-      m_complexity = new DistID [ _pow24[ size - 1 ] ];
+      m_dist[ result ] = m_dist[ start ] + 1;
+    }
+    
+    const bool closer = m_dist[ result ] == m_dist[ start ] + 1;
+    if ( turn == 1 || ( turn == 2 && closer ) ) // no duplicate by inverses
+    {
+      m_map[ start  * _crot::AllRotIDs + _crot::GetRotID( axis, layer,   turn ) ] = result;
+      m_map[ result * _crot::AllRotIDs + _crot::GetRotID( axis, layer, 4-turn ) ] = start;
+    }
+
+    if ( closer )
+    {
+      m_cachedStep[ m_complexity[ result ] ++ ] = _crot::GetRotID( axis, layer, 4-turn );
     }
   }
 
-  void setMap( CacheID cacheID, const Axis axis, const Layer layer, const Turn turn, const CacheID nextID )
-  {
-    m_map[ _crot::GetRotID( axis, layer, turn) + _crot::AllRotIDs * cacheID ] = nextID ;
-  }
-
-  CacheID getNode( CacheID cacheID, Axis axis, Layer layer, Turn turn ) const
+  CacheID getNext( CacheID cacheID, Axis axis, Layer layer, Turn turn ) const
   {
     return m_map[ _crot::GetRotID( axis, layer, turn) + _crot::AllRotIDs * cacheID ];
   }
 
-  void addCachedStep( const CacheID cacheID, const RotID rotID )
+  int complexity( const CacheID id ) const
   {
-    if ( m_cachedStep )
-      m_cachedStep[ m_complexity[ cacheID ] ++ ] = rotID;
+    return m_complexity[ id ];
   }
 
-  void setDistance( CacheID cacheID, byte distance )
-  {
-    m_dist[ cacheID ] = distance;
-  }
-
-  int getDistance( CacheID cacheID ) const
+  int distance( CacheID cacheID ) const
   {
     return m_dist[ cacheID ];
   }

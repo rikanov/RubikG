@@ -22,6 +22,7 @@ private:
   void clean();
   void setParent();
   void cloneParent();
+  void nextChild( const Axis axis, const Layer layer, const Turn turn );
 
   CacheID getCacheID( const CubeID * P );
 
@@ -35,7 +36,8 @@ public:
   bool acceptID ( CacheID cacheID )   { return *m_qeueu << cacheID;         }
   bool accept   ( const CubeID * P )  { return *m_qeueu << getCacheID( P ); }
 
-  void createMap( CacheIDmap<N> & result );
+  void createSliceMap( CacheIDmap<N> & result );
+  void createLayerMap( CacheIDmap<N> & result );
 };
 
 template<unsigned int N> CacheIDmapper<N>::CacheIDmapper()
@@ -85,36 +87,49 @@ void CacheIDmapper<N>::init(SubSpace& P)
 }
 
 template<unsigned int N>
-void CacheIDmapper<N>::createMap( CacheIDmap<N> & result )
+void CacheIDmapper<N>::createSliceMap( CacheIDmap<N> & result )
 {
-  result.init( m_size, true );
+  result.init( m_size );
   while( *m_qeueu >> m_parentID )
   {
     setParent();
-    all_rot( axis, layer, turn, N - 1 )
+    for( Axis axis: { _X, _Y, _Z } )
     {
-      if ( layer == 0 )
-        cloneParent();
-
-      for( unsigned int posIndex = 0; posIndex < m_size; ++ posIndex )
+      for( Turn turn : { 1, 2, 3 } )
       {
-        if ( CPositions<N>::GetLayer( m_position[posIndex], m_child[posIndex], axis ) == layer )
+        cloneParent();
+        for( Layer layer = 0; layer < N - 1; ++layer )
         {
-          m_child[posIndex] = Simplex::Composition( m_child[posIndex], Simplex::Tilt( axis, turn) );
+          nextChild( axis, layer, turn );
+          const CacheID nextID = getCacheID( m_child );
+          result.connect( m_parentID, axis, layer, turn, nextID, *m_qeueu << nextID );
         }
       }
+    }
+  }
+}
 
-      const CacheID nextID = getCacheID( m_child );
-      if ( *m_qeueu << nextID )
+template<unsigned int N>
+void CacheIDmapper<N>::createLayerMap( CacheIDmap<N> & result )
+{
+  result.init( m_size );
+  while ( *m_qeueu >> m_parentID )
+  {
+    setParent();  
+    cloneParent();
+    for ( unsigned int posIndex = 0; posIndex < m_size; ++ posIndex )
+    {
+      for ( Axis axis: { _X, _Y, _Z } )
       {
-        result.setDistance( nextID, result.getDistance( m_parentID ) + 1 );
+        const Layer layer = CPositions<N>::GetLayer( m_position[posIndex], m_child[posIndex], axis );
+        for ( Turn turn: { 1, 2, 3} )
+        {
+          nextChild( axis, layer, 1 );
+          const CacheID nextID = getCacheID( m_child );
+          result.connect( m_parentID, axis, layer, turn, nextID, *m_qeueu << nextID );
+        }
+        nextChild( axis, layer, 1 ); // to reach original position by four 90 degree rotations
       }
-      else if ( result.getDistance( nextID ) == result.getDistance( m_parentID ) + 1 )
-      {
-        result.addCachedStep( nextID, CRotations<N-1>::GetInvRotID( axis, layer, turn ) );
-      }
-
-      result.setMap( m_parentID, axis, layer, turn, nextID );
     }
   }
 }
@@ -124,7 +139,7 @@ CacheID CacheIDmapper<N>::getCacheID(const CubeID* P)
 {
   CacheID result = 0;
   const CubeID inv0 = Simplex::Inverse( P[0] );
-  for( int i = 1; i < m_size; ++i )
+  for( unsigned int i = 1; i < m_size; ++i )
   {
     result += Simplex::Composition( P[i], inv0 ) * _pow24[ i - 1 ];
   }
@@ -132,11 +147,23 @@ CacheID CacheIDmapper<N>::getCacheID(const CubeID* P)
 }
 
 template<unsigned int N>
+void CacheIDmapper<N>::nextChild ( const Axis axis, const Layer layer, const Turn turn )
+{
+  for( unsigned int posIndex = 0; posIndex < m_size; ++ posIndex )
+  {
+    if ( CPositions<N>::GetLayer( m_position[posIndex], m_child[posIndex], axis ) == layer )
+    {
+      m_child[posIndex] = Simplex::Composition( m_child[posIndex], Simplex::Tilt( axis, turn) );
+    }
+  }
+}
+
+template<unsigned int N>
 void CacheIDmapper<N>::setParent()
 {
   CacheID cacheID = m_parentID;
   m_parent[0] = 0;
-  for( int i = 1; i < m_size; ++i, cacheID /= 24 )
+  for( unsigned int i = 1; i < m_size; ++i, cacheID /= 24 )
   {
     m_parent[i] = cacheID % 24;
   }
@@ -145,7 +172,7 @@ void CacheIDmapper<N>::setParent()
 template<unsigned int N>
 void CacheIDmapper<N>::cloneParent()
 {
-  for( int i = 0; i < m_size; ++ i )
+  for( unsigned int i = 0; i < m_size; ++i )
   {
     m_child[i] = m_parent[i];
   }
