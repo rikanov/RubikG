@@ -55,13 +55,12 @@ public:
   ~Rubik( );
   
   // Query functions
-  CubeID  getCubeState ( PosID id )            const ;
   CubeID  getCubeID    ( PosID id, RotID rot ) const { return frameworkSpace[ CPositions<N>::GetPosID( id, rot ) ]; }
   CubeID  getCubeID    ( PosID id )            const { return frameworkSpace[id];                                   }
   OCube   getCube      ( PosID id )            const { return Simplex::GetCube( getCubeID ( id ) );                 }
   
-  inline PosID whatIs    ( PosID id ) const ;
-  inline PosID whereIs   ( PosID id ) const ;
+  inline PosID whatIs  ( PosID id ) const ;
+  inline PosID whereIs ( PosID id ) const ;
   
   Coord   whatIs    ( Coord C )  const { return CPositions<N>::getCoord( whatIs ( CPositions<N>::GetPosID( C ) ) ); }
   Coord   whereIs   ( Coord C )  const { return CPositions<N>::getCoord( whereIs( CPositions<N>::GetPosID( C ) ) ); }
@@ -217,17 +216,6 @@ PosID Rubik<N>::whereIs( PosID id ) const
 }
 
 template<unsigned int N>
-CubeID Rubik<N>::getCubeState( PosID id ) const
-{ 
-  CubeID rot = 0; 
-  while ( frameworkSpace[ CPositions<N>::GetPosID( id, rot ) ] != rot )
-  {
-    ++ rot;
-  }
-  return rot;
-}
-
-template<unsigned int N>
 Orient Rubik<N>::getOrient ( const Orient right, const Orient up, int x, int y ) const
 {
   if ( Coaxial ( right, up ) || x < 0 || x >= N || y < 0 || y >= N ) // invalid setting
@@ -268,82 +256,6 @@ bool Rubik<N>::integrity() const
   return result;
 }
 
- // Printer
-//  -------
-template<unsigned int N>
-void Rubik<N>::show( Orient F ) const
-{
-  std::cout << colorOf( F ) << FChar << ' ';
-}
-
-template<unsigned int N>
-void Rubik<N>::show( Orient right, Orient up, Layer x, Layer y ) const
-{
-  const Orient F = getOrient( right, up, x, y );
-  show( F );
-}
-
-template<unsigned int N>
-void Rubik<N>::print( Orient right, Orient up ) const
-{
-  std::cout << std::endl;
-  for ( Layer y = N - 1; y >= 0; --y )
-  {
-    for ( Layer x = 0; x < N; ++x )
-    {
-      show( right, up, x, y );
-    }
-    NL();
-  }        
-  NL();
-}
-
-template<unsigned int N>
-void Rubik<N>::print( bool separator ) const
-{
-  const int SideSize = separator ? N + 1 : N; 
-  // print UP side
-  for ( Layer y = SideSize; y > 0; --y )
-  {
-    for ( Layer x = 0; x < SideSize; ++x )
-    {
-      show( _NF );
-    }
-    for ( Layer x = 0; x < SideSize; ++x )
-    {
-      show( _R, _B, x, y - 1 );
-    }
-    NL();
-  }
-  // print middle sides Left - Front - Right - Back
-  Orient orientations [] = { _F, _R, _B, _L };
-  for ( Layer y = SideSize; y > 0; --y )
-  {
-    for ( Orient right: orientations )
-    {
-      for ( Layer x = 0; x < SideSize; ++x )
-      {
-        show( right, _U, x, y - 1 );
-      }
-	}
-	NL();
-  }
-  // print DOWN side
-  for ( Layer y = SideSize ; y > 0; --y )
-  {
-    for ( Layer x = 0; x < SideSize; ++x )
-    {
-      show( _NF );
-    }
-    for ( Layer x = 0; x < SideSize; ++x )
-    {
-      show( _R, _F, x, y - 1 );
-    }
-    NL();
-  }
-  NL( Color::gray );
-}
-
  // Destructor
 //  ----------
 template<unsigned int N>
@@ -353,4 +265,5 @@ Rubik<N>::~Rubik()
   frameworkSpace = nullptr;
 }
 
+#include <rubik_cli.h>
 #endif

@@ -4,8 +4,6 @@
 #include <rubik.h>
 #include <containers.h>
 
-
-
 template< unsigned int N >
 class CacheIDmapper
 {
@@ -30,14 +28,15 @@ public:
   CacheIDmapper();
   ~CacheIDmapper();
 
-  void init( const PosID * P, size_t size );
   void reset( SubSpace & P );
 
   bool acceptID ( CacheID cacheID )   { return *m_qeueu << cacheID;         }
   bool accept   ( const CubeID * P )  { return *m_qeueu << getCacheID( P ); }
 
-  void createSliceMap( CacheIDmap< N > & result );
-  void createLayerMap( CacheIDmap<N-1> & result );
+  void createMap( CacheIDmap<N> & result );
+private:
+  void addLayerRotations( CacheIDmap<N> & result );
+  void addSliceRotations( CacheIDmap<N> & result );
 };
 
 template<unsigned int N> CacheIDmapper<N>::CacheIDmapper()
@@ -47,26 +46,6 @@ template<unsigned int N> CacheIDmapper<N>::CacheIDmapper()
 , m_parent   ( nullptr )
 , m_child    ( nullptr )
 {
-}
-
-template<unsigned int N>
-void CacheIDmapper<N>::init(const PosID* P, size_t size)
-{
-  clean();
-
-  m_size     = size;
-  m_parent   = new CubeID [ size ];
-  m_child    = new CubeID [ size ];
-  m_position = new PosID  [ size ];
-
-  m_qeueu    = new Qeueu ( size - 1 );
-
-  for( int i = 0; i < size; ++ i )
-  {
-    m_position[i] = P[i];
-  }
-
-  acceptID( 0 ) ;
 }
 
 template<unsigned int N>
@@ -86,56 +65,52 @@ void CacheIDmapper<N>::reset(SubSpace& P)
   acceptID( 0 ) ;
 }
 
+
 template<unsigned int N>
-void CacheIDmapper<N>::createSliceMap( CacheIDmap<N> & result )
+void CacheIDmapper<N>::createMap( CacheIDmap<N> & result )
 {
   result.init( m_size );
   while( *m_qeueu >> m_parentID )
   {
     setParent();
-    for( Axis axis: { _X, _Y, _Z } )
-    {
-      for( Turn turn : { 1, 2, 3 } )
-      {
-        cloneParent();
-        for( Layer layer = 0; layer < N - 1; ++layer )
-        {
-          nextChild( axis, layer, turn );
-          const CacheID nextID = getCacheID( m_child );
-          result.connect( m_parentID, axis, layer, turn, nextID, *m_qeueu << nextID );
-        }
-      }
-    }
+    addLayerRotations( result );
+    addSliceRotations( result );
   }
 }
 
 template<unsigned int N>
-void CacheIDmapper<N>::createLayerMap( CacheIDmap<N-1> & result )
+void CacheIDmapper<N>::addLayerRotations( CacheIDmap<N> & result )
 {
-  result.init( m_size );
-  while ( *m_qeueu >> m_parentID )
+  all_rot( axis, layer, turn, N )
   {
-    setParent();  
     cloneParent();
-    for ( unsigned int posIndex = 0; posIndex < m_size; ++ posIndex )
+    nextChild( axis, layer, turn );
+    const CacheID nextID = getCacheID( m_child );
+    result.connect( m_parentID, axis, layer, turn, nextID, *m_qeueu << nextID );
+  }
+}
+
+template<unsigned int N>
+void CacheIDmapper<N>::addSliceRotations( CacheIDmap<N> & result )
+{
+  for( Axis axis: { _X, _Y, _Z } )
+  {
+    for( Turn turn : { 1, 2, 3 } )
     {
-      for ( Axis axis: { _X, _Y, _Z } )
+      cloneParent();
+      nextChild( axis, 0, turn );
+      for( Layer layer = 1; layer < N - 2; ++layer )
       {
-        const Layer layer = CPositions<N>::GetLayer( m_position[posIndex], m_child[posIndex], axis );
-        for ( Turn turn: { 1, 2, 3} )
-        {
-          nextChild( axis, layer, 1 );
-          const CacheID nextID = getCacheID( m_child );
-          result.connect( m_parentID, axis, layer, turn, nextID, *m_qeueu << nextID );
-        }
-        nextChild( axis, layer, 1 ); // to reach original position by four 90 degree rotations
+        nextChild( axis, layer, turn );
+        const CacheID nextID = getCacheID( m_child );
+        result.connect( m_parentID, axis, layer + N - 1, turn, nextID, *m_qeueu << nextID );
       }
     }
   }
 }
 
 template<unsigned int N>
-CacheID CacheIDmapper<N>::getCacheID(const CubeID* P)
+CacheID CacheIDmapper<N>::getCacheID( const CubeID * P )
 {
   CacheID result = 0;
   const CubeID inv0 = Simplex::Inverse( P[0] );
@@ -192,7 +167,5 @@ CacheIDmapper<N>::~CacheIDmapper()
 {
   clean();
 }
-
-
 
 #endif // ! CACHE_GENERATOR__H

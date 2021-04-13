@@ -10,8 +10,7 @@ bool UnitTests::unit_CState() const
 
   tcase( "Memory allocation" );
   CacheIDmapper<4> test;
-  CacheIDmap   <4> sliceResult;
-  CacheIDmap   <3> layerResult;
+  CacheIDmap   <4> result;
   SubSpace toSolve = {
                  CPositions<4>::GetPosID( 1, 1, 0 ),
                  CPositions<4>::GetPosID( 1, 2, 0 ),
@@ -21,14 +20,12 @@ bool UnitTests::unit_CState() const
                 };
 
   test.reset( toSolve );
-  test.createSliceMap( sliceResult );       
-  test.reset( toSolve );
-  test.createLayerMap( layerResult );
+  test.createMap( result ); 
 
-  for( int i = 100000, counter = 0; i < 200500; ++i )
+  for( int i = 200000, counter = 0; i < 200500; ++i )
   {
-    if ( sliceResult.distance( i ) < layerResult.distance( i ) )
-      clog( counter++, '\t', i, "\t:", sliceResult.distance( i ), sliceResult.complexity( i ), "\t|", layerResult.distance( i ), layerResult.complexity( i ) );
+    if ( result.distance( i ) > 0 )
+      clog( counter++, '\t', i, ":", result.distance( i ), result.complexity( i ) );
   }
   tail( "Memory allocation", success );
 

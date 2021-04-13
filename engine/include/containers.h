@@ -58,7 +58,7 @@ public:
 template<unsigned int N>
 class CacheIDmap
 {
-  using _crot = CRotations< N >;
+  using _crot = CRotations< 2 * N - 3 >;
 
   CacheID * m_map;
   DistID  * m_dist;
@@ -102,7 +102,7 @@ template<unsigned int N> CacheIDmap<N>::CacheIDmap()
 }
 
 template<unsigned int N>
-void CacheIDmap<N>::init(const size_t size)
+void CacheIDmap<N>::init( const size_t size )
 {
   clean();
   m_map  = new CacheID [ _pow24[ size - 1 ] * _crot::AllRotIDs ];
@@ -113,7 +113,7 @@ void CacheIDmap<N>::init(const size_t size)
 }
 
 template<unsigned int N>
-void CacheIDmap<N>::connect(const CacheID start, const Axis axis, const Layer layer, const Turn turn, const CacheID result, const bool first)
+void CacheIDmap<N>::connect( const CacheID start, const Axis axis, const Layer layer, const Turn turn, const CacheID result, const bool first )
 {
   if ( first )
   {
@@ -121,7 +121,7 @@ void CacheIDmap<N>::connect(const CacheID start, const Axis axis, const Layer la
   }
 
   const bool closer = m_dist[ result ] == m_dist[ start ] + 1;
-  if ( turn == 1 || ( turn == 2 && closer ) ) // no duplicate by inverses
+  if ( turn < 3 ) // no duplicate by inverses
   {
     m_map[ start  * _crot::AllRotIDs + _crot::GetRotID( axis, layer,   turn ) ] = result;
     m_map[ result * _crot::AllRotIDs + _crot::GetRotID( axis, layer, 4-turn ) ] = start;
