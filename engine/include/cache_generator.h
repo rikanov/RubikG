@@ -31,13 +31,13 @@ public:
   ~CacheIDmapper();
 
   void init( const PosID * P, size_t size );
-  void init( SubSpace & P );
+  void reset( SubSpace & P );
 
   bool acceptID ( CacheID cacheID )   { return *m_qeueu << cacheID;         }
   bool accept   ( const CubeID * P )  { return *m_qeueu << getCacheID( P ); }
 
-  void createSliceMap( CacheIDmap<N> & result );
-  void createLayerMap( CacheIDmap<N> & result );
+  void createSliceMap( CacheIDmap< N > & result );
+  void createLayerMap( CacheIDmap<N-1> & result );
 };
 
 template<unsigned int N> CacheIDmapper<N>::CacheIDmapper()
@@ -70,7 +70,7 @@ void CacheIDmapper<N>::init(const PosID* P, size_t size)
 }
 
 template<unsigned int N>
-void CacheIDmapper<N>::init(SubSpace& P)
+void CacheIDmapper<N>::reset(SubSpace& P)
 {
   clean();
 
@@ -110,7 +110,7 @@ void CacheIDmapper<N>::createSliceMap( CacheIDmap<N> & result )
 }
 
 template<unsigned int N>
-void CacheIDmapper<N>::createLayerMap( CacheIDmap<N> & result )
+void CacheIDmapper<N>::createLayerMap( CacheIDmap<N-1> & result )
 {
   result.init( m_size );
   while ( *m_qeueu >> m_parentID )

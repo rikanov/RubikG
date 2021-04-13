@@ -66,52 +66,14 @@ class CacheIDmap
   RotID  * m_cachedStep;
   DistID * m_complexity;
 
-  void clean()
-  {
-    delete[] m_map;
-    delete[] m_dist;
-    delete[] m_cachedStep;
-  }
+  void clean();
 
 public:
-  CacheIDmap()
-  :  m_map  ( nullptr )
-  ,  m_dist ( nullptr )
-  ,  m_cachedStep ( nullptr )
-  ,  m_complexity ( nullptr )
-  {
-    _crot::Instance();
-  }
+  CacheIDmap();
+  ~CacheIDmap();
 
-  void init ( const size_t size )
-  {
-    clean();
-    m_map  = new CacheID [ _pow24[ size - 1 ] * _crot::AllRotIDs ];
-    m_dist = new DistID  [ _pow24[ size - 1 ] ] {};
-
-    m_cachedStep = new RotID  [ _pow24[ size - 1 ] * _crot::AllRotIDs ];
-    m_complexity = new DistID [ _pow24[ size - 1 ] ] {};
-  }
-
-  void connect( const CacheID start, const Axis axis, const Layer layer, const Turn turn, const CacheID result, const bool first )
-  {
-    if ( first )
-    {
-      m_dist[ result ] = m_dist[ start ] + 1;
-    }
-    
-    const bool closer = m_dist[ result ] == m_dist[ start ] + 1;
-    if ( turn == 1 || ( turn == 2 && closer ) ) // no duplicate by inverses
-    {
-      m_map[ start  * _crot::AllRotIDs + _crot::GetRotID( axis, layer,   turn ) ] = result;
-      m_map[ result * _crot::AllRotIDs + _crot::GetRotID( axis, layer, 4-turn ) ] = start;
-    }
-
-    if ( closer )
-    {
-      m_cachedStep[ m_complexity[ result ] ++ ] = _crot::GetRotID( axis, layer, 4-turn );
-    }
-  }
+  void init ( const size_t size );
+  void connect( const CacheID start, const Axis axis, const Layer layer, const Turn turn, const CacheID result, const bool first );
 
   CacheID getNext( CacheID cacheID, Axis axis, Layer layer, Turn turn ) const
   {
@@ -128,11 +90,63 @@ public:
     return m_dist[ cacheID ];
   }
 
-  ~CacheIDmap()
+};
+
+template<unsigned int N> CacheIDmap<N>::CacheIDmap()
+  :  m_map  ( nullptr )
+  ,  m_dist ( nullptr )
+  ,  m_cachedStep ( nullptr )
+  ,  m_complexity ( nullptr )
+{
+  _crot::Instance();
+}
+
+template<unsigned int N>
+void CacheIDmap<N>::init(const size_t size)
+{
+  clean();
+  m_map  = new CacheID [ _pow24[ size - 1 ] * _crot::AllRotIDs ];
+  m_dist = new DistID  [ _pow24[ size - 1 ] ] {};
+
+  m_cachedStep = new RotID  [ _pow24[ size - 1 ] * _crot::AllRotIDs ];
+  m_complexity = new DistID [ _pow24[ size - 1 ] ] {};
+}
+
+template<unsigned int N>
+void CacheIDmap<N>::connect(const CacheID start, const Axis axis, const Layer layer, const Turn turn, const CacheID result, const bool first)
+{
+  if ( first )
   {
-    clean();
+    m_dist[ result ] = m_dist[ start ] + 1;
   }
 
-};
+  const bool closer = m_dist[ result ] == m_dist[ start ] + 1;
+  if ( turn == 1 || ( turn == 2 && closer ) ) // no duplicate by inverses
+  {
+    m_map[ start  * _crot::AllRotIDs + _crot::GetRotID( axis, layer,   turn ) ] = result;
+    m_map[ result * _crot::AllRotIDs + _crot::GetRotID( axis, layer, 4-turn ) ] = start;
+  }
+
+  if ( closer )
+  {
+    m_cachedStep[ m_complexity[ result ] ++ ] = _crot::GetRotID( axis, layer, 4-turn );
+  }
+}
+
+template<unsigned int N>
+void CacheIDmap<N>::clean()
+{
+  delete[] m_map;
+  delete[] m_dist;
+  delete[] m_cachedStep;
+}
+
+template<unsigned int N>
+CacheIDmap<N>::~CacheIDmap()
+{
+  clean();
+}
+
+
 
 #endif // ! CONTAINERS__H
