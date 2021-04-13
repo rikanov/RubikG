@@ -1,5 +1,5 @@
 #include <test.h>
-#include <cache_generator.h>
+#include <insight.h>
 
 
 bool UnitTests::unit_CState() const
@@ -9,8 +9,7 @@ bool UnitTests::unit_CState() const
   head( "CacheIDmapper" );
 
   tcase( "Memory allocation" );
-  CacheIDmapper<4> test;
-  CacheIDmap   <4> result;
+
   SubSpace toSolve = {
                  CPositions<4>::GetPosID( 1, 1, 0 ),
                  CPositions<4>::GetPosID( 1, 2, 0 ),
@@ -18,15 +17,16 @@ bool UnitTests::unit_CState() const
                  CPositions<4>::GetPosID( 2, 2, 0 ),
                  CPositions<4>::GetPosID( 2, 0, 0 )
                 };
+; 
+  Insight<4> testInsight( toSolve );
 
-  test.reset( toSolve );
-  test.createMap( result ); 
+  Rubik<4> test4;
+  testInsight.set( test4 );
+  clog( testInsight.state() );
 
-  for( int i = 200000, counter = 0; i < 200500; ++i )
-  {
-    if ( result.distance( i ) > 0 )
-      clog( counter++, '\t', i, ":", result.distance( i ), result.complexity( i ) );
-  }
+  testInsight.rotate( _X, 1, 1 );
+  clog( testInsight.state() );
+
   tail( "Memory allocation", success );
 
   finish( "CacheIDmapper", success );

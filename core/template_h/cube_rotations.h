@@ -78,6 +78,7 @@ private:
   RotID transformedRotID( Orient trans, Layer layer, Turn turn );
 
   RotID   getRotID ( Axis A, Layer L, Turn T ) const  { return m_rotID [A][L][T]; }
+  RotID   getRotID ( RotID R, CubeID C )       const  { return m_tRotID[R][C];    }
 
   Axis    getAxis  ( RotID rotID ) const  { return m_axis  [ rotID ]; }
   Layer   getLayer ( RotID rotID ) const  { return m_layer [ rotID ]; }
@@ -90,6 +91,7 @@ private:
 
   static RotID GetInvRotID ( Axis A, Layer L, Turn T ) { return Singleton -> getRotID( A, L, 4 - T ); }
   static RotID GetRotID    ( Axis A, Layer L, Turn T ) { return Singleton -> getRotID( A, L, T );     }
+  static RotID GetRotID    ( RotID R, CubeID C )       { return Singleton -> getRotID( R, C );        }
 
   static Axis  GetAxis  ( RotID rotID )  { return Singleton -> getAxis  ( rotID ); }
   static Layer GetLayer ( RotID rotID )  { return Singleton -> getLayer ( rotID ); }
@@ -160,10 +162,10 @@ void CRotations<N>::transformRotIDs()
 {
   all_rot( axis, layer, turn, N )
   {
-    const RotID rotID = GetRotID( axis, layer, turn);
+    const RotID  rotID = GetRotID( axis, layer, turn);
+    const Orient base  = GetBaseOrient( axis );
     all_cubeid( cubeID )
     {
-      Orient base  = GetBaseOrient( axis );
       Orient trans = Simplex::GetCube( cubeID ).whereIs( base );
       m_tRotID[ rotID ][ cubeID ] = transformedRotID( trans, layer, turn );
     }

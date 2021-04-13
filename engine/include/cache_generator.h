@@ -7,9 +7,14 @@
 template< unsigned int N >
 class CacheIDmapper
 {
+
+  using _crot = CRotations< 2 * N - 3 >;
+
+protected:
   size_t   m_size;     // number of cubies in the subspace
   PosID  * m_position; // positions of the cubies
 
+private:
   Qeueu  * m_qeueu;
 
   CacheID  m_parentID;
@@ -22,8 +27,6 @@ private:
   void cloneParent();
   void nextChild( const Axis axis, const Layer layer, const Turn turn );
 
-  CacheID getCacheID( const CubeID * P );
-
 public:
   CacheIDmapper();
   ~CacheIDmapper();
@@ -32,8 +35,10 @@ public:
 
   bool acceptID ( CacheID cacheID )   { return *m_qeueu << cacheID;         }
   bool accept   ( const CubeID * P )  { return *m_qeueu << getCacheID( P ); }
-
   void createMap( CacheIDmap<N> & result );
+  
+  CacheID getCacheID( const CubeID * P );
+
 private:
   void addLayerRotations( CacheIDmap<N> & result );
   void addSliceRotations( CacheIDmap<N> & result );
@@ -76,6 +81,7 @@ void CacheIDmapper<N>::createMap( CacheIDmap<N> & result )
     addLayerRotations( result );
     addSliceRotations( result );
   }
+  clean();
 }
 
 template<unsigned int N>
@@ -158,14 +164,19 @@ void CacheIDmapper<N>::clean()
 {
   delete[] m_parent;
   delete[] m_child;
-  delete[] m_position;
   delete   m_qeueu;
+
+  m_parent = nullptr;
+  m_child  = nullptr;
+  m_qeueu  = nullptr;
 }
 
 template<unsigned int N>
 CacheIDmapper<N>::~CacheIDmapper()
 {
   clean();
+  delete[] m_position;
+  m_position = nullptr;
 }
 
 #endif // ! CACHE_GENERATOR__H

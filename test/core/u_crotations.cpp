@@ -1,6 +1,7 @@
 #include <test.h>
 #include <cube_rotations.h>
 
+// ToDo: add transformed rotations to unit tests!
 bool UnitTests::unit_CRotations() const
 {
   bool success = true;

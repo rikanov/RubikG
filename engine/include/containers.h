@@ -75,14 +75,24 @@ public:
   void init ( const size_t size );
   void connect( const CacheID start, const Axis axis, const Layer layer, const Turn turn, const CacheID result, const bool first );
 
-  CacheID getNext( CacheID cacheID, Axis axis, Layer layer, Turn turn ) const
+  CacheID getState( CacheID cacheID, Axis axis, Layer layer, Turn turn ) const
   {
     return m_map[ _crot::GetRotID( axis, layer, turn) + _crot::AllRotIDs * cacheID ];
   }
 
-  int complexity( const CacheID id ) const
+  CacheID getState( CacheID cacheID, RotID rotID ) const
+  {
+    return m_map[ rotID + _crot::AllRotIDs * cacheID ];
+  }
+
+  size_t complexity( const CacheID id ) const
   {
     return m_complexity[ id ];
+  }
+
+  RotID router( const CacheID cacheID, const int id ) const
+  {
+    return m_cachedStep[ cacheID * _crot::AllRotIDs + id ] ;
   }
 
   int distance( CacheID cacheID ) const
@@ -129,7 +139,7 @@ void CacheIDmap<N>::connect( const CacheID start, const Axis axis, const Layer l
 
   if ( closer )
   {
-    m_cachedStep[ m_complexity[ result ] ++ ] = _crot::GetRotID( axis, layer, 4-turn );
+    m_cachedStep[ result * _crot::AllRotIDs + m_complexity[ result ] ++ ] = _crot::GetRotID( axis, layer, 4-turn );
   }
 }
 
@@ -139,6 +149,10 @@ void CacheIDmap<N>::clean()
   delete[] m_map;
   delete[] m_dist;
   delete[] m_cachedStep;
+
+  m_map  = nullptr;
+  m_dist = nullptr;
+  m_cachedStep = nullptr;
 }
 
 template<unsigned int N>
@@ -146,7 +160,5 @@ CacheIDmap<N>::~CacheIDmap()
 {
   clean();
 }
-
-
 
 #endif // ! CONTAINERS__H
