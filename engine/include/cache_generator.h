@@ -4,6 +4,17 @@
 #include <rubik.h>
 #include <containers.h>
 
+inline 
+CacheID GetCacheID( const CubeID * P, const size_t size )
+{
+  CacheID result = 0;
+  const CubeID inv0 = Simplex::Inverse( P[0] );
+  for( unsigned int i = 1; i < size; ++i )
+  {
+    result += Simplex::Composition( P[i], inv0 ) * _pow24[ i - 1 ];
+  }
+  return result;
+}
 template< unsigned int N >
 class CacheIDmapper
 {
@@ -35,13 +46,15 @@ public:
 
   bool acceptID ( CacheID cacheID )   { return *m_qeueu << cacheID;         }
   bool accept   ( const CubeID * P )  { return *m_qeueu << getCacheID( P ); }
+  
   void createMap( CacheIDmap<N> & result );
   
-  CacheID getCacheID( const CubeID * P );
-
 private:
   void addLayerRotations( CacheIDmap<N> & result );
   void addSliceRotations( CacheIDmap<N> & result );
+
+  CacheID getCacheID( const CubeID * P ) const   { return GetCacheID( P, m_size ); }
+
 };
 
 template<unsigned int N> CacheIDmapper<N>::CacheIDmapper()
@@ -113,18 +126,6 @@ void CacheIDmapper<N>::addSliceRotations( CacheIDmap<N> & result )
       }
     }
   }
-}
-
-template<unsigned int N>
-CacheID CacheIDmapper<N>::getCacheID( const CubeID * P )
-{
-  CacheID result = 0;
-  const CubeID inv0 = Simplex::Inverse( P[0] );
-  for( unsigned int i = 1; i < m_size; ++i )
-  {
-    result += Simplex::Composition( P[i], inv0 ) * _pow24[ i - 1 ];
-  }
-  return result;
 }
 
 template<unsigned int N>
