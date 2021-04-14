@@ -22,12 +22,13 @@ public:
   {
     m_state = m_map.getState( m_state, _crot::GetRotID( axis, layer, turn, Simplex::Inverse( m_prior ) ) );
 
-    const RotID rotID = _crot::GetRotID( axis, layer, turn);
-    if ( ( rotID  < N && layer         == CPositions<N>::GetLayer( this -> m_position[0], m_prior, axis ) ) ||
-         ( rotID >= N && layer - N + 1 <= CPositions<N>::GetLayer( this -> m_position[0], m_prior, axis ) ) )
+    const RotID rotID = _crot::GetRotID( axis, layer, turn); clog_( "Tilt", (int) m_prior, "-->" );
+    if ( ( layer  < N && layer         == CPositions<N>::GetLayer( this -> m_position[0], m_prior, axis ) ) ||
+         ( layer >= N && layer - N + 1 <= CPositions<N>::GetLayer( this -> m_position[0], m_prior, axis ) ) )
     {
-      m_prior = Simplex::Tilt(m_prior, axis, turn );
+      m_prior = Simplex::Tilt( m_prior, axis, turn ); clog_("ok");
     }
+    clog( (int) m_prior );
   }
 
   void rotate( const RotID rotID  )
@@ -36,10 +37,10 @@ public:
 
     const Axis  axis  = _crot::GetAxis ( rotID );
     const Layer layer = _crot::GetLayer( rotID );
-    if ( ( rotID  < N && layer         == CPositions<N>::GetLayer( this -> m_position[0], m_prior, axis ) ) ||
-         ( rotID >= N && layer - N + 1 <= CPositions<N>::GetLayer( this -> m_position[0], m_prior, axis ) ) )
+    if ( ( layer  < N && layer         == CPositions<N>::GetLayer( this -> m_position[0], m_prior, axis ) ) ||
+         ( layer >= N && layer - N + 1 <= CPositions<N>::GetLayer( this -> m_position[0], m_prior, axis ) ) )
     {
-      m_prior = Simplex::Tilt( m_prior, axis, _crot::GetTurn( rotID ) );
+      m_prior = Simplex::Tilt( m_prior, axis, _crot::GetTurn( rotID ) );clog_("ok");
     }
   }
 

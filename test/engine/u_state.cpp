@@ -24,7 +24,9 @@ bool UnitTests::unit_CState() const
   testInsight.set( test4 );
   clog( testInsight.state() );
 
+  testInsight.rotate( _X, 0, 2 );
   testInsight.rotate( _X, 1, 2 );
+  testInsight.rotate( _Z, 5, 1 );
   clog( testInsight.state() );
 
   tail( "Memory allocation", success );
