@@ -77,8 +77,9 @@ private:
   void  transformRotIDs();
   RotID transformedRotID( Orient trans, Layer layer, Turn turn );
 
-  RotID   getRotID ( Axis A, Layer L, Turn T ) const  { return m_rotID [A][L][T]; }
-  RotID   getRotID ( RotID R, CubeID C )       const  { return m_tRotID[R][C];    }
+  RotID   getRotID ( RotID R, CubeID C )                 const  { return m_tRotID[R][C];                    }
+  RotID   getRotID ( Axis A, Layer L, Turn T )           const  { return m_rotID [A][L][T];                 }
+  RotID   getRotID ( Axis A, Layer L, Turn T, CubeID C ) const  { return getRotID( getRotID( A, L, T), C ); }
 
   Axis    getAxis  ( RotID rotID ) const  { return m_axis  [ rotID ]; }
   Layer   getLayer ( RotID rotID ) const  { return m_layer [ rotID ]; }
@@ -89,9 +90,10 @@ private:
   static void Instance();
   static void OnExit();
 
-  static RotID GetInvRotID ( Axis A, Layer L, Turn T ) { return Singleton -> getRotID( A, L, 4 - T ); }
-  static RotID GetRotID    ( Axis A, Layer L, Turn T ) { return Singleton -> getRotID( A, L, T );     }
-  static RotID GetRotID    ( RotID R, CubeID C )       { return Singleton -> getRotID( R, C );        }
+  static RotID GetInvRotID ( Axis A, Layer L, Turn T )           { return Singleton -> getRotID( A, L, 4 - T ); }
+  static RotID GetRotID    ( Axis A, Layer L, Turn T )           { return Singleton -> getRotID( A, L, T );     }
+  static RotID GetRotID    ( Axis A, Layer L, Turn T, CubeID C ) { return Singleton -> getRotID( A, L, T, C );  }
+  static RotID GetRotID    ( RotID R, CubeID C )                 { return Singleton -> getRotID( R, C );        }
 
   static Axis  GetAxis  ( RotID rotID )  { return Singleton -> getAxis  ( rotID ); }
   static Layer GetLayer ( RotID rotID )  { return Singleton -> getLayer ( rotID ); }

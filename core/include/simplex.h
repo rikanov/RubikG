@@ -62,7 +62,9 @@ public:
   static CubeID          Transform   ( CubeID a, CubeID b )       { return Singleton -> transform   ( a, b ); }
   static CubeID          Inverse     ( CubeID a )                 { return Singleton -> transform   ( a, 0 ); } 
   static CubeID          Tilt        ( Axis a, Turn t = 1 )       { return Singleton -> tilt        ( a, t ); }
-  
+  // ToDo: use cached array for Tilt( CubeID, Axis, Turn )
+  static CubeID          Tilt        ( CubeID c, Axis a, Turn t = 1 )   { return Singleton->Composition( c, Singleton -> tilt( a, t ) ); }
+
 };
 
 #endif //SIMPLEX_HEADER
