@@ -45,7 +45,7 @@ public:
   void init ( Orient R, Orient U, CubeID groupID );
 
   Orient  whereIs   ( Orient ID ) const { return m_whereIs[ID]; }
-  Orient	whatIs    ( Orient ID ) const { return m_whatIs[ID];  }
+  Orient  whatIs    ( Orient ID ) const { return m_whatIs[ID];  }
   bool    aligned   ( Orient ID ) const { return m_aligned[ID]; }
   CubeID  getCubeID (   void    ) const { return m_cubeID;      }
 

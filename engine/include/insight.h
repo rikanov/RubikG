@@ -26,7 +26,7 @@ public:
 
   void set( const Rubik<N> & );
 
-  int rotate( const Axis axis, const Layer layer, const Turn turn );
+  int rotate( Axis axis, Layer layer, Turn turn );
   int rotate( const RotID rotID  );
 
   void step( const unsigned int id )
@@ -97,13 +97,11 @@ void Insight<N>::set( const Rubik<N> & R )
 }
 
 template<unsigned int N>
-int Insight<N>::rotate( const Axis axis, const Layer layer, const Turn turn )
+int Insight<N>::rotate( Axis axis, Layer layer, Turn turn )
 {
- /* if ( m_base > 0 )
-  {
-    clog( "rotID:", _crot::ToString( _crot::GetRotID( axis, layer, turn, m_base ) ) );
-    return rotate( _crot::GetRotID( axis, layer, turn, m_base ) );
-  }*/
+  clog_( _crot::ToString( _crot::GetRotID( axis, layer, turn) ), '*', Simplex::GetCube(  m_base  ).toString(), "-->" );
+  ExtRotations<N>::Transform( axis, layer, turn, m_base );
+  clog( _crot::ToString( _crot::GetRotID( axis, layer, turn ) ) );
   m_state = m_map -> getState( m_state, _crot::GetRotID( axis, layer, turn, Simplex::Inverse( m_prior ) ) );
 
   if ( ( layer  < N && layer         == CPositions<N>::GetLayer( m_pos[0], m_prior, axis ) ) ||

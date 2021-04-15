@@ -75,7 +75,6 @@ private:
 
   void  init();
   void  transformRotIDs();
-  RotID transformedRotID( Orient trans, Layer layer, Turn turn );
 
   RotID   getRotID ( RotID R, CubeID C )                 const  { return m_tRotID[R][C];                    }
   RotID   getRotID ( Axis A, Layer L, Turn T )           const  { return m_rotID [A][L][T];                 }
@@ -98,6 +97,8 @@ private:
   static Axis  GetAxis  ( RotID rotID )  { return Singleton -> getAxis  ( rotID ); }
   static Layer GetLayer ( RotID rotID )  { return Singleton -> getLayer ( rotID ); }
   static Turn  GetTurn  ( RotID rotID )  { return Singleton -> getTurn  ( rotID ); }
+
+  static void Transform( Axis & axis, Layer & layer, Turn & turn, const CubeID cubeID );
 
   static RotID Random();
   static std::string ToString( Axis  );
@@ -138,27 +139,49 @@ void CRotations<N>::init()
 }
 
 template<unsigned int N>
-RotID CRotations<N>::transformedRotID( Orient trans, Layer layer, Turn turn )
+void CRotations<N>::Transform( Axis & axis, Layer & layer, Turn & turn, const CubeID cubeID )
 {
+  const Orient base  = GetBaseOrient( axis );
+  const Orient trans = Simplex::GetCube( cubeID ).whereIs( base );
+  clog_( Token( trans ) );
   switch( trans )
   {
     case _L:
-      return GetRotID( _X, layer, turn );
+      axis = _X;
+      break;
+
     case _D:
-      return GetRotID( _Y, layer, turn );
+      axis = _Y;
+      break;
+
     case _B:
-      return GetRotID( _Z, layer, turn );
+      axis = _Z;
+      break;
+
     case _R:
-      return GetRotID( _X, N - 1 - layer, 4 - turn );
+      axis  = _X;
+      layer = N - 1 - layer;
+      turn  = 4 - turn;
+      break;
+
     case _U:
-      return GetRotID( _Y, N - 1 - layer, 4 - turn );
+      axis  = _Y;
+      layer = N - 1 - layer;
+      turn  = 4 - turn;
+      break;
+
     case _F:
-      return GetRotID( _Z, N - 1 - layer, 4 - turn );
+      axis  = _Z;
+      layer = N - 1 - layer;
+      turn  = 4 - turn;
+      break;
+
     default:
       clog( "invalid Orient to get axis" );
-      return 0;
+      return;
   }
 }
+
 template<unsigned int N>
 void CRotations<N>::transformRotIDs()
 {
@@ -169,7 +192,11 @@ void CRotations<N>::transformRotIDs()
     all_cubeid( cubeID )
     {
       Orient trans = Simplex::GetCube( cubeID ).whereIs( base );
-      m_tRotID[ rotID ][ cubeID ] = transformedRotID( trans, layer, turn );
+      Axis  tAxis  = axis;
+      Layer tLayer = layer;
+      Turn  tTurn  = turn;
+      Transform( axis, layer, turn, cubeID );
+      m_tRotID[ rotID ][ cubeID ] = GetRotID( tAxis, tLayer, tTurn );
     }
   }
 }
@@ -201,4 +228,63 @@ std::string CRotations<N>::ToString( RotID rotID )
 {
   return std::string( "{ _" + ToString ( GetAxis ( rotID ) ) + ", " + std::to_string( GetLayer ( rotID ) ) + ", " + std::to_string( GetTurn ( rotID ) ) + " }" );
 }
+// 4: 8 ; 5: 11 ; 6: 14 ; 7: 17; 8: 20
+template<unsigned int N>
+class ExtRotations
+{
+  static constexpr size_t NT = 2 * N - 3;
+
+public:
+
+  static void Transform( Axis & axis, Layer & layer, Turn & turn, const CubeID cubeID )
+  {
+    if ( layer < N )
+    {
+      CRotations<N>::Transform( axis, layer, turn, cubeID );
+      return;
+    }
+
+  const Orient base  = GetBaseOrient( axis );
+  const Orient trans = Simplex::GetCube( cubeID ).whereIs( base );
+
+  switch( trans )
+  {
+    case _L:
+      axis = _X;
+      break;
+
+    case _D:
+      axis = _Y;
+      break;
+
+    case _B:
+      axis = _Z;
+      break;
+
+    case _R:
+      axis  = _X;
+      layer = 3 * N - 4 - layer;
+      turn  = 4 - turn;
+      break;
+
+    case _U:
+      axis  = _Y;
+      layer = 3 * N - 4 - layer;
+      turn  = 4 - turn;
+      break;
+
+    case _F:
+      axis  = _Z;
+      layer = 3 * N - 4 - layer;
+      turn  = 4 - turn;
+      break;
+
+    default:
+      clog( "invalid Orient to get axis" );
+      return;
+  }
+
+  }
+};
+
 #endif // ! CUBE_ROTATIONS__H
