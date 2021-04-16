@@ -9,7 +9,7 @@ class Insight
 {
   using _crot = CRotations< 2 * N - 3 >;
 
-  CacheID       m_state;
+  CacheID       m_stateID;
   CubeID        m_prior;
 
   const size_t  m_size;
@@ -31,19 +31,20 @@ public:
 
   void step( const unsigned int id )
   {
-    rotate( m_map -> router( m_state, id ) );
+    rotate( m_map -> router( m_stateID, id ) );
   }
   
   CacheID state() const
   {
-    return m_state;
+    return m_stateID;
   }
 
   int distance() const
   {
-    return m_map -> distance( m_state );
+    return m_map -> distance( m_stateID );
   }
 
+  void print() const;
 };
 
 template<unsigned int N>
@@ -77,11 +78,22 @@ Insight<N>::Insight( Insight<N> & orig, const CubeID base )
   for ( size_t i = 0; i < m_size; ++i )
   {
     pos[i] = CPositions<N>::GetPosID( orig.m_pos[i], base );
-    clog_( CPositions<N>::GetCoord( pos[i] ).toString() );
   }
   
   m_pos = pos;
 }
+template<unsigned int N>
+void Insight<N>::print() const
+ {
+   PosID * pos = new PosID [ m_size ];
+   SetCacheID( pos, m_stateID, m_size, m_prior ); 
+   for ( size_t i = 0; i < m_size; ++i )
+   {
+     clog( CPositions<N>::GetCoord( m_pos[i] ).toString() ,"-->", CPositions<N>::GetCoord( CPositions<N>::GetPosID( m_pos[i], pos[i] ) ).toString() );
+   }
+   clog( "Order: ", distance(), "Prior: ", Simplex::GetCube( m_prior ).toString() );
+   delete[] pos;
+ }
 
 template<unsigned int N>
 void Insight<N>::set( const Rubik<N> & R )
@@ -92,7 +104,7 @@ void Insight<N>::set( const Rubik<N> & R )
   {
     subset[ posIndex ] = R.getCubeID( m_pos[ posIndex ] );
   }
-  m_state = GetCacheID( subset, m_size );
+  m_stateID = GetCacheID( subset, m_size );
   delete[] subset;
 }
 
@@ -100,14 +112,16 @@ template<unsigned int N>
 int Insight<N>::rotate( Axis axis, Layer layer, Turn turn )
 {
   clog_( _crot::ToString( _crot::GetRotID( axis, layer, turn) ), '*', Simplex::GetCube(  m_base  ).toString(), "-->" );
-  ExtRotations<N>::Transform( axis, layer, turn, m_base );
-  clog( _crot::ToString( _crot::GetRotID( axis, layer, turn ) ) );
-  m_state = m_map -> getState( m_state, _crot::GetRotID( axis, layer, turn, Simplex::Inverse( m_prior ) ) );
+  //CExtRotations<N>::Transform( axis, layer, turn, m_base );
+  clog_( _crot::ToString( _crot::GetRotID( axis, layer, turn ) ), ',' ) ;
+  clog( _crot::ToString( CExtRotations<N>::GetRotID( axis, layer, turn,Simplex::Composition( Simplex::Inverse( m_prior ), m_base ) ) ) );
+  m_stateID = m_map -> getState( m_stateID, CExtRotations<N>::GetRotID( axis, layer, turn, Simplex::Composition( Simplex::Inverse( m_prior ), m_base ) ) );
 
   if ( ( layer  < N && layer         == CPositions<N>::GetLayer( m_pos[0], m_prior, axis ) ) ||
-       ( layer >= N && layer - N + 1 <= CPositions<N>::GetLayer( m_pos[0], m_prior, axis ) ) )
+       ( layer >= N && layer - N + 1 >= CPositions<N>::GetLayer( m_pos[0], m_prior, axis ) ) )
   {
-    m_prior = Simplex::Tilt( m_prior, axis, turn );
+    clog_( Simplex::GetCube( m_prior).toString(), "-->" );
+    m_prior = Simplex::Tilt( m_prior, axis, turn ); clog( Simplex::GetCube( m_prior).toString() );
   }
 
   return distance();
@@ -116,7 +130,7 @@ int Insight<N>::rotate( Axis axis, Layer layer, Turn turn )
 template<unsigned int N>
 int Insight<N>::rotate( const RotID rotID  )
 {
-  m_state = m_map -> getState( m_state, _crot::GetRotID( rotID, Simplex::Inverse( m_prior ) ) );
+  m_stateID = m_map -> getState( m_stateID, _crot::GetRotID( rotID, Simplex::Inverse( m_prior ) ) );
 
   const Axis  axis  = _crot::GetAxis ( rotID );
   const Layer layer = _crot::GetLayer( rotID );

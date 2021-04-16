@@ -131,12 +131,9 @@ void CacheIDmap<N>::connect( const CacheID start, const Axis axis, const Layer l
   }
 
   const bool closer = m_dist[ result ] == m_dist[ start ] + 1;
-  if ( turn < 3 ) // no duplicate by inverses
-  {
     m_map[ start  * _crot::AllRotIDs + _crot::GetRotID( axis, layer,   turn ) ] = result;
     m_map[ result * _crot::AllRotIDs + _crot::GetRotID( axis, layer, 4-turn ) ] = start;
-  }
-
+ 
   if ( closer )
   {
     m_cachedStep[ result * _crot::AllRotIDs + m_complexity[ result ] ++ ] = _crot::GetRotID( axis, layer, 4-turn );

@@ -27,18 +27,42 @@ bool UnitTests::unit_CState() const
 
   clog( "\nbase test:\n----------\n");
   
-  clog( baseInsight.state(), '\t', baseInsight.rotate( _X, 0, 2 ) );
-  clog( baseInsight.state(), '\t', baseInsight.rotate( _X, 1, 2 ) );
-  clog( baseInsight.state(), '\t', baseInsight.rotate( _Z, 4, 2 ) );
-  clog( baseInsight.state(), '\t', baseInsight.rotate( _X, 0, 2 ) );
+  baseInsight.print();
+  clog( baseInsight.rotate( _Z, 0, 2 ) );
+  baseInsight.print();
+  clog( baseInsight.rotate( _X, 1, 2 ) );
+  baseInsight.print();
+  clog( baseInsight.rotate( _Z, 0, 2 ) );
+  baseInsight.print();
+  clog( baseInsight.rotate( _X, 0, 2 ) );
+  baseInsight.print();
+  clog( baseInsight.rotate( _Y, 1, 2 ) );
+  baseInsight.print();
+  clog( baseInsight.rotate( _Y, 3, 2 ) );
+  baseInsight.print();
+  clog( baseInsight.rotate( _X, 2, 1 ) );
+  baseInsight.print();
 
   clog( "\ntransformed test:\n-----------------\n" );
 
-  clog( transInsight.state(), '\t', transInsight.rotate( _Y, 1, 2 ) );
-  clog( transInsight.state(), '\t', transInsight.rotate( _Y, 0, 2 ) );
-  clog( transInsight.state(), '\t', transInsight.rotate( _Y, 0, 1 ) );
-  clog( transInsight.state(), '\t', transInsight.rotate( _Y, 0, 1 ) );
-
+  transInsight.print();
+  clog( transInsight.rotate( _Y, 1, 2 ) );
+  transInsight.print();
+  clog( transInsight.rotate( _Y, 0, 2 ) );
+  transInsight.print();
+  clog( transInsight.rotate( _Y, 0, 1 ) );
+  transInsight.print();
+  clog( transInsight.rotate( _Y, 0, 1 ) );
+  transInsight.print();
+  clog( transInsight.rotate( _X, 4, 1 ) );
+  transInsight.print();
+  clog( transInsight.rotate( _Y, 4, 2 ) );
+  transInsight.print();
+  clog( transInsight.rotate( _Y, 4, 2 ) );
+  transInsight.print();
+  clog( transInsight.rotate( _X, 4, 3 ) );
+  transInsight.print();
+  
   tail( "Memory allocation", success );
 
   finish( "CacheIDmapper", success );

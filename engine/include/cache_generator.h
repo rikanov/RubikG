@@ -15,6 +15,27 @@ CacheID GetCacheID( const CubeID * P, const size_t size )
   }
   return result;
 }
+
+inline
+void SetCacheID( CubeID * P, CacheID cacheID, const size_t size )
+{
+  P[0] = 0;
+  for( unsigned int i = 1; i < size; ++i, cacheID /= 24 )
+  {
+    P[i] = cacheID % 24;
+  }
+}
+
+inline
+void SetCacheID( CubeID * P, CacheID cacheID, const size_t size, const CubeID prior )
+{
+  P[0] = prior;
+  for( unsigned int i = 1; i < size; ++i, cacheID /= 24 )
+  {
+    P[i] = Simplex::Composition( cacheID % 24, prior);
+  }
+}
+
 template< unsigned int N >
 class CacheIDmapper
 {
@@ -131,7 +152,7 @@ void CacheIDmapper<N>::addSliceRotations( CacheIDmap<N> & result )
 template<unsigned int N>
 void CacheIDmapper<N>::nextChild ( const Axis axis, const Layer layer, const Turn turn )
 {
-  for( unsigned int posIndex = 0; posIndex < m_size; ++ posIndex )
+  for( size_t posIndex = 0; posIndex < m_size; ++ posIndex )
   {
     if ( CPositions<N>::GetLayer( m_position[posIndex], m_child[posIndex], axis ) == layer )
     {
@@ -143,12 +164,7 @@ void CacheIDmapper<N>::nextChild ( const Axis axis, const Layer layer, const Tur
 template<unsigned int N>
 void CacheIDmapper<N>::setParent()
 {
-  CacheID cacheID = m_parentID;
-  m_parent[0] = 0;
-  for( unsigned int i = 1; i < m_size; ++i, cacheID /= 24 )
-  {
-    m_parent[i] = cacheID % 24;
-  }
+  SetCacheID ( m_parent, m_parentID, m_size );
 }
 
 template<unsigned int N>
