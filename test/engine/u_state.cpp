@@ -24,44 +24,79 @@ bool UnitTests::unit_CState() const
   Rubik<4> test4;
   baseInsight.set( test4 );
   transInsight.set( test4 );
-
+/*
+for( int i = 0; i < 20; ++i)
+{
+  RotID stack[20];
+  for( int t = 0; t < 20; ++t)
+  {
+    stack[t] = CRotations<5>::Random();
+    baseInsight.rotate( stack[t] );
+  }
+  for( int t = 0; t < 20; ++t)
+  {
+    baseInsight.rotate( CExtRotations<4>::Inverse( stack[ 19 -t ] ) );
+  }
+}*/
   clog( "\nbase test:\n----------\n");
   
-  baseInsight.print();
+  
   clog( baseInsight.rotate( _Z, 0, 2 ) );
-  baseInsight.print();
-  clog( baseInsight.rotate( _X, 1, 2 ) );
-  baseInsight.print();
+  
+  clog( baseInsight.rotate( _Z, 1, 2 ) );
+  
+  clog( baseInsight.rotate( _X, 1, 1 ) );
+  
   clog( baseInsight.rotate( _Z, 0, 2 ) );
-  baseInsight.print();
-  clog( baseInsight.rotate( _X, 0, 2 ) );
-  baseInsight.print();
-  clog( baseInsight.rotate( _Y, 1, 2 ) );
-  baseInsight.print();
-  clog( baseInsight.rotate( _Y, 3, 2 ) );
-  baseInsight.print();
-  clog( baseInsight.rotate( _X, 2, 1 ) );
-  baseInsight.print();
+  
+  clog( baseInsight.rotate( _X, 4, 2 ) );
+  
+  clog( baseInsight.rotate( _Y, 4, 1 ) );
+  
+  clog( baseInsight.rotate( _Y, 4, 2 ) );
+  
+  clog( baseInsight.rotate( _Z, 4, 1 ) );
+  
+  clog( baseInsight.rotate( _Y, 3, 1 ) );
+  
+  clog( baseInsight.rotate( _Y, 3, 3 ) );
+  
+  clog( baseInsight.rotate( _X, 4, 3 ) );
+  
+  clog( baseInsight.rotate( _X, 4, 1 ) );
+  
+  clog( baseInsight.rotate( _Z, 4, 3 ) );
+  
+  clog( baseInsight.rotate( _Y, 4, 1 ) );
+  
+  clog( baseInsight.rotate( _X, 4, 2 ) );
+  
+  clog( baseInsight.rotate( _Z, 0, 2 ) );
+  
+  clog( baseInsight.rotate( _X, 1, 3 ) );
+  
+  clog( baseInsight.rotate( _Z, 4, 2 ) );
+  
 
   clog( "\ntransformed test:\n-----------------\n" );
 
-  transInsight.print();
+  
   clog( transInsight.rotate( _Y, 1, 2 ) );
-  transInsight.print();
+  
   clog( transInsight.rotate( _Y, 0, 2 ) );
-  transInsight.print();
+  
   clog( transInsight.rotate( _Y, 0, 1 ) );
-  transInsight.print();
+  
   clog( transInsight.rotate( _Y, 0, 1 ) );
-  transInsight.print();
+  
   clog( transInsight.rotate( _X, 4, 1 ) );
-  transInsight.print();
+  
   clog( transInsight.rotate( _Y, 4, 2 ) );
-  transInsight.print();
+  
   clog( transInsight.rotate( _Y, 4, 2 ) );
-  transInsight.print();
+  
   clog( transInsight.rotate( _X, 4, 3 ) );
-  transInsight.print();
+  
   
   tail( "Memory allocation", success );
 

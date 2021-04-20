@@ -48,12 +48,12 @@ static inline Orient GetBaseOrient( Axis axis )
   }
 }
 
-template<unsigned int N>
+template< size_t N >
 class CRotations
 {
 
 public:
-  static constexpr int AllRotIDs = 3 * N * 3 + 1;
+  static constexpr size_t AllRotIDs = 3 * N * 3 + 1;
 
 private:
   static CRotations<N> * Singleton;
@@ -104,10 +104,10 @@ private:
   static std::string ToString( Axis  );
   static std::string ToString( RotID );
 };
-template<unsigned int N>
+template< size_t N >
 CRotations<N> * CRotations<N>::Singleton = nullptr;
 
-template<unsigned int N>
+template< size_t N >
 void CRotations<N>::Instance()
 {
   if ( nullptr == Singleton )
@@ -117,14 +117,14 @@ void CRotations<N>::Instance()
   }
 }
 
-template<unsigned int N>
+template< size_t N >
 void CRotations<N>::OnExit()
 {
   delete Singleton;
   Singleton = nullptr;
 }
 
-template<unsigned int N>
+template< size_t N >
 void CRotations<N>::init()
 {
   RotID rotID = 0;
@@ -138,7 +138,7 @@ void CRotations<N>::init()
   }
 }
 
-template<unsigned int N>
+template< size_t N >
 void CRotations<N>::Transform( Axis & axis, Layer & layer, Turn & turn, const CubeID cubeID )
 {
   const Orient base  = GetBaseOrient( axis );
@@ -181,7 +181,7 @@ void CRotations<N>::Transform( Axis & axis, Layer & layer, Turn & turn, const Cu
   }
 }
 
-template<unsigned int N>
+template< size_t N >
 void CRotations<N>::transformRotIDs()
 {
   all_rot( axis, layer, turn, N )
@@ -200,13 +200,13 @@ void CRotations<N>::transformRotIDs()
   }
 }
 
-template<unsigned int N>
+template< size_t N >
 RotID CRotations<N>::Random()
 {
   return CRotations<N>::Singleton -> m_distribution( CRotations<N>::Singleton -> m_randomEngine );
 }
 
-template<unsigned int N>
+template< size_t N >
 std::string CRotations<N>::ToString( Axis A )
 {
   switch ( A )
@@ -222,13 +222,13 @@ std::string CRotations<N>::ToString( Axis A )
   }
 }
 
-template<unsigned int N>
+template< size_t N >
 std::string CRotations<N>::ToString( RotID rotID )  
 {
   return std::string( "{ _" + ToString ( GetAxis ( rotID ) ) + ", " + std::to_string( GetLayer ( rotID ) ) + ", " + std::to_string( GetTurn ( rotID ) ) + " }" );
 }
 // 4: 8 ; 5: 11 ; 6: 14 ; 7: 17; 8: 20
-template<unsigned int N>
+template< size_t N >
 class CExtRotations
 {
   static constexpr size_t NT = 2 * N - 3;
@@ -291,6 +291,16 @@ public:
 
   static RotID GetRotID( Axis axis, Layer layer, Turn turn, const CubeID cubeID )
   {
+    Transform( axis, layer, turn, cubeID );
+    return CRotations<2*N - 3>::GetRotID( axis, layer, turn );
+  }
+
+  
+  static RotID GetRotID( const RotID rotID, const CubeID cubeID )
+  {
+    Axis   axis = CRotations<2*N - 3>::GetAxis ( rotID );
+    Layer layer = CRotations<2*N - 3>::GetLayer( rotID );
+    Turn   turn = CRotations<2*N - 3>::GetTurn ( rotID );
     Transform( axis, layer, turn, cubeID );
     return CRotations<2*N - 3>::GetRotID( axis, layer, turn );
   }

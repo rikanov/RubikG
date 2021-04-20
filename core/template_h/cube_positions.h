@@ -26,10 +26,10 @@
 static constexpr bool SHOW_LOG = false; // setting true is only for debuging purposes
 
 /// ----------------------------------- Template declarations starts here ------------------------------------- ///
-template<unsigned int N>
+template< size_t N >
 class CPositions
 {
-  static constexpr unsigned int FrameworkSize [] = { 0, 1, 8 - 0, 27 - 1, 64 - 8, 125 - 27, 216 - 64, 341 - 125, 512 - 216, 721 - 341, 1000 - 512 }; //  N > 1 :  N ^ 3 - ( N - 2 ) ^ 3
+  static constexpr size_t FrameworkSize [] = { 0, 1, 8 - 0, 27 - 1, 64 - 8, 125 - 27, 216 - 64, 341 - 125, 512 - 216, 721 - 341, 1000 - 512 }; //  N > 1 :  N ^ 3 - ( N - 2 ) ^ 3
   static CPositions * Singleton; 
   
   PosID  m_routerPositions [ FrameworkSize [ N ] ][ 24 ] = {};
@@ -76,10 +76,10 @@ public:
 };
 
 /// ----------------------------------- Template definitions starts here ------------------------------------- ///
-template<unsigned int N>
+template< size_t N >
 CPositions<N> * CPositions<N>::Singleton = nullptr;
 
-template<unsigned int N>
+template< size_t N >
 CPositions<N>:: CPositions( )
 {
   Singleton = this;
@@ -90,12 +90,12 @@ CPositions<N>:: CPositions( )
 //    start from ( x y z ) 
 //    take a turn corresponding to rot value
 //    return the given ( x' y' z' ) vector
-template<unsigned int N> 
+template< size_t N > 
 Coord CPositions<N>::rotate( Layer x, Layer y, Layer z, CubeID id)
 {
   Coord result;
   OCube rot = Simplex::GetCube( id );
-  unsigned int coord[6];
+  Layer coord[6];
   coord[ _F ] = N - 1 - z;
   coord[ _R ] = N - 1 - x;
   coord[ _U ] = N - 1 - y;
@@ -109,7 +109,7 @@ Coord CPositions<N>::rotate( Layer x, Layer y, Layer z, CubeID id)
   return result;
 }
 
-template<unsigned int N>
+template< size_t N >
 void CPositions<N>::initIndices()
 {
   int index = 0,
@@ -136,7 +136,7 @@ void CPositions<N>::initIndices()
   } // GetPosID() is fully working now
 }
 
-template<unsigned int N>
+template< size_t N >
 void CPositions<N>::initPositions()
 {
   initIndices();

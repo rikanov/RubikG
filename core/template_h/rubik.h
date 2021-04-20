@@ -24,7 +24,7 @@
 #include <cube_positions.h>
 
 /// ----------------------------------- Template declarations starts here ------------------------------------- ///
-template<unsigned int N>
+template< size_t N >
 class Rubik
 {
   static constexpr int Fsize = CPositions<N>::GetSize();
@@ -82,7 +82,7 @@ public:
 //  ------------
 
 // default
-template<unsigned int N>
+template< size_t N >
 Rubik<N>::Rubik( )
  : frameworkSpace( new CubeID [ Fsize ] () )
 {
@@ -90,7 +90,7 @@ Rubik<N>::Rubik( )
 }
 
 // Conmposition of two cubes --> construct a new one
-template<unsigned int N>
+template< size_t N >
 Rubik<N>::Rubik( const Rubik<N> & cf1, const Rubik<N> & cf2 )
  : frameworkSpace( new CubeID [ Fsize ] )
 {
@@ -102,7 +102,7 @@ Rubik<N>::Rubik( const Rubik<N> & cf1, const Rubik<N> & cf2 )
 }
 
 // copy
-template<unsigned int N> 
+template< size_t N > 
 Rubik<N>::Rubik( const Rubik<N>& C )
  : frameworkSpace( new CubeID [ Fsize ] )
 {
@@ -110,7 +110,7 @@ Rubik<N>::Rubik( const Rubik<N>& C )
     frameworkSpace[i] = C.frameworkSpace[i];
 }
 
-template<unsigned int N>
+template< size_t N >
 Rubik<N>::Rubik( Rubik<N> && f )
 { 
   frameworkSpace = f.frameworkSpace;
@@ -121,7 +121,7 @@ Rubik<N>::Rubik( Rubik<N> && f )
 //  ----------
 
 // assignement
-template<unsigned int N>
+template< size_t N >
 const Rubik<N>& Rubik<N>::operator = ( const Rubik<N>& C )
 {
   for ( int i = 0; i < Fsize; ++ i )
@@ -130,7 +130,7 @@ const Rubik<N>& Rubik<N>::operator = ( const Rubik<N>& C )
 }
 
 // equlity
-template<unsigned int N>
+template< size_t N >
 const bool Rubik<N>::operator == ( const Rubik<N>& C )
 {
   for ( int i = 0; i < Fsize; ++ i )
@@ -142,7 +142,7 @@ const bool Rubik<N>::operator == ( const Rubik<N>& C )
 }
 
 // inverse
-template<unsigned int N> 
+template< size_t N > 
 Rubik<N> Rubik<N>::inverse() const
 {
   Rubik<N> inv;
@@ -156,7 +156,7 @@ Rubik<N> Rubik<N>::inverse() const
 }
 
 // clockwise rotation one layer (side) with 90 degree turns
-template<unsigned int N> 
+template< size_t N > 
 void Rubik<N>::rotate( const Axis axis, const Layer layer, const Turn turn )
 {
   const int cubes = CPositions<N>::LayerSize( layer );
@@ -175,7 +175,7 @@ void Rubik<N>::rotate( const Axis axis, const Layer layer, const Turn turn )
 }
 
 // rotation by using RotID
-template<unsigned int N> void Rubik<N>::rotate( const RotID rotID )
+template< size_t N > void Rubik<N>::rotate( const RotID rotID )
 {
   const Axis  axis  = CRotations<N>::GetAxis  ( rotID );
   const Layer layer = CRotations<N>::GetLayer ( rotID );
@@ -183,7 +183,7 @@ template<unsigned int N> void Rubik<N>::rotate( const RotID rotID )
   rotate( axis, layer, turn ); 
 }
 
-template<unsigned int N> 
+template< size_t N > 
 void Rubik<N>::shuffle( int depth )
 {
   static std::random_device randomDevice;
@@ -198,13 +198,13 @@ void Rubik<N>::shuffle( int depth )
 
  // Query functions
 //  ---------------
-template<unsigned int N>
+template< size_t N >
 PosID Rubik<N>::whatIs( PosID id ) const
 { 
   return CPositions<N>::GetPosID( id, Simplex::Inverse( frameworkSpace [ id ] ) ); 
 }
 
-template<unsigned int N>
+template< size_t N >
 PosID Rubik<N>::whereIs( PosID id ) const
 { 
   CubeID rot = 0; 
@@ -215,7 +215,7 @@ PosID Rubik<N>::whereIs( PosID id ) const
   return CPositions<N>::GetPosID( id, rot );
 }
 
-template<unsigned int N>
+template< size_t N >
 Orient Rubik<N>::getOrient ( const Orient right, const Orient up, int x, int y ) const
 {
   if ( Coaxial ( right, up ) || x < 0 || x >= N || y < 0 || y >= N ) // invalid setting
@@ -231,7 +231,7 @@ Orient Rubik<N>::getOrient ( const Orient right, const Orient up, int x, int y )
   return getCube ( index ).whatIs( orient );
 }
 
-template<unsigned int N> 
+template< size_t N > 
 bool Rubik<N>::integrity() const
 {
   static const Orient orientations [6][2] = { { _F, _U }, { _R, _U }, { _B, _U }, { _L, _U }, { _R, _B }, { _R, _F } };
@@ -258,7 +258,7 @@ bool Rubik<N>::integrity() const
 
  // Destructor
 //  ----------
-template<unsigned int N>
+template< size_t N >
 Rubik<N>::~Rubik()
 {
   delete[] frameworkSpace;

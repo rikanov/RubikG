@@ -9,7 +9,7 @@ CacheID GetCacheID( const CubeID * P, const size_t size )
 {
   CacheID result = 0;
   const CubeID inv0 = Simplex::Inverse( P[0] );
-  for( unsigned int i = 1; i < size; ++i )
+  for( size_t i = 1; i < size; ++i )
   {
     result += Simplex::Composition( P[i], inv0 ) * _pow24[ i - 1 ];
   }
@@ -20,7 +20,7 @@ inline
 void SetCacheID( CubeID * P, CacheID cacheID, const size_t size )
 {
   P[0] = 0;
-  for( unsigned int i = 1; i < size; ++i, cacheID /= 24 )
+  for( size_t i = 1; i < size; ++i, cacheID /= 24 )
   {
     P[i] = cacheID % 24;
   }
@@ -30,13 +30,13 @@ inline
 void SetCacheID( CubeID * P, CacheID cacheID, const size_t size, const CubeID prior )
 {
   P[0] = prior;
-  for( unsigned int i = 1; i < size; ++i, cacheID /= 24 )
+  for( size_t i = 1; i < size; ++i, cacheID /= 24 )
   {
     P[i] = Simplex::Composition( cacheID % 24, prior);
   }
 }
 
-template< unsigned int N >
+template< size_t N >
 class CacheIDmapper
 {
 
@@ -78,7 +78,7 @@ private:
 
 };
 
-template<unsigned int N> CacheIDmapper<N>::CacheIDmapper()
+template< size_t N > CacheIDmapper<N>::CacheIDmapper()
 : m_size ( 0 )
 , m_position ( nullptr )
 , m_qeueu    ( nullptr )
@@ -87,7 +87,7 @@ template<unsigned int N> CacheIDmapper<N>::CacheIDmapper()
 {
 }
 
-template<unsigned int N>
+template< size_t N >
 void CacheIDmapper<N>::reset(SubSpace& P)
 {
   clean();
@@ -105,7 +105,7 @@ void CacheIDmapper<N>::reset(SubSpace& P)
 }
 
 
-template<unsigned int N>
+template< size_t N >
 void CacheIDmapper<N>::createMap( CacheIDmap<N> & result )
 {
   result.init( m_size );
@@ -118,7 +118,7 @@ void CacheIDmapper<N>::createMap( CacheIDmap<N> & result )
   clean();
 }
 
-template<unsigned int N>
+template< size_t N >
 void CacheIDmapper<N>::addLayerRotations( CacheIDmap<N> & result )
 {
   all_rot( axis, layer, turn, N )
@@ -130,7 +130,7 @@ void CacheIDmapper<N>::addLayerRotations( CacheIDmap<N> & result )
   }
 }
 
-template<unsigned int N>
+template< size_t N >
 void CacheIDmapper<N>::addSliceRotations( CacheIDmap<N> & result )
 {
   for( Axis axis: { _X, _Y, _Z } )
@@ -149,7 +149,7 @@ void CacheIDmapper<N>::addSliceRotations( CacheIDmap<N> & result )
   }
 }
 
-template<unsigned int N>
+template< size_t N >
 void CacheIDmapper<N>::nextChild ( const Axis axis, const Layer layer, const Turn turn )
 {
   for( size_t posIndex = 0; posIndex < m_size; ++ posIndex )
@@ -161,22 +161,22 @@ void CacheIDmapper<N>::nextChild ( const Axis axis, const Layer layer, const Tur
   }
 }
 
-template<unsigned int N>
+template< size_t N >
 void CacheIDmapper<N>::setParent()
 {
   SetCacheID ( m_parent, m_parentID, m_size );
 }
 
-template<unsigned int N>
+template< size_t N >
 void CacheIDmapper<N>::cloneParent()
 {
-  for( unsigned int i = 0; i < m_size; ++i )
+  for( size_t i = 0; i < m_size; ++i )
   {
     m_child[i] = m_parent[i];
   }
 }
 
-template<unsigned int N>
+template< size_t N >
 void CacheIDmapper<N>::clean()
 {
   delete[] m_parent;
@@ -188,7 +188,7 @@ void CacheIDmapper<N>::clean()
   m_qeueu  = nullptr;
 }
 
-template<unsigned int N>
+template< size_t N >
 CacheIDmapper<N>::~CacheIDmapper()
 {
   clean();

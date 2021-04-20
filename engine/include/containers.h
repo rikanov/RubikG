@@ -3,7 +3,7 @@
 
 #include <initializer_list>
 
-constexpr unsigned int _pow24[] = { 1, 24, 576, 13824, 331776, 7962624 };
+constexpr size_t _pow24[] = { 1, 24, 576, 13824, 331776, 7962624 };
 
 using SubSpace = const std::initializer_list <PosID>;
 
@@ -55,7 +55,7 @@ public:
   }
 };
 
-template<unsigned int N>
+template< size_t N >
 class CacheIDmap
 {
   using _crot = CRotations< 2 * N - 3 >;
@@ -102,7 +102,7 @@ public:
 
 };
 
-template<unsigned int N> CacheIDmap<N>::CacheIDmap()
+template< size_t N > CacheIDmap<N>::CacheIDmap()
   :  m_map  ( nullptr )
   ,  m_dist ( nullptr )
   ,  m_cachedStep ( nullptr )
@@ -111,7 +111,7 @@ template<unsigned int N> CacheIDmap<N>::CacheIDmap()
   _crot::Instance();
 }
 
-template<unsigned int N>
+template< size_t N >
 void CacheIDmap<N>::init( const size_t size )
 {
   clean();
@@ -122,7 +122,7 @@ void CacheIDmap<N>::init( const size_t size )
   m_complexity = new DistID [ _pow24[ size - 1 ] ] {};
 }
 
-template<unsigned int N>
+template< size_t N >
 void CacheIDmap<N>::connect( const CacheID start, const Axis axis, const Layer layer, const Turn turn, const CacheID result, const bool first )
 {
   if ( first )
@@ -140,7 +140,7 @@ void CacheIDmap<N>::connect( const CacheID start, const Axis axis, const Layer l
   }
 }
 
-template<unsigned int N>
+template< size_t N >
 void CacheIDmap<N>::clean()
 {
   delete[] m_map;
@@ -152,7 +152,7 @@ void CacheIDmap<N>::clean()
   m_cachedStep = nullptr;
 }
 
-template<unsigned int N>
+template< size_t N >
 CacheIDmap<N>::~CacheIDmap()
 {
   clean();
