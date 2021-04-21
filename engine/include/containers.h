@@ -63,7 +63,7 @@ class CacheIDmap
   CacheID * m_map;
   DistID  * m_dist;
 
-  RotID  * m_cachedStep;
+  RotID  * m_orderedSteps;
   DistID * m_complexity;
 
   void clean();
@@ -92,7 +92,7 @@ public:
 
   RotID router( const CacheID cacheID, const int id ) const
   {
-    return m_cachedStep[ cacheID * _crot::AllRotIDs + id ] ;
+    return m_orderedSteps[ cacheID * _crot::AllRotIDs + id ] ;
   }
 
   int distance( CacheID cacheID ) const
@@ -105,7 +105,7 @@ public:
 template< size_t N > CacheIDmap<N>::CacheIDmap()
   :  m_map  ( nullptr )
   ,  m_dist ( nullptr )
-  ,  m_cachedStep ( nullptr )
+  ,  m_orderedSteps ( nullptr )
   ,  m_complexity ( nullptr )
 {
   _crot::Instance();
@@ -118,8 +118,8 @@ void CacheIDmap<N>::init( const size_t size )
   m_map  = new CacheID [ _pow24[ size - 1 ] * _crot::AllRotIDs ];
   m_dist = new DistID  [ _pow24[ size - 1 ] ] {};
 
-  m_cachedStep = new RotID  [ _pow24[ size - 1 ] * _crot::AllRotIDs ];
-  m_complexity = new DistID [ _pow24[ size - 1 ] ] {};
+  m_orderedSteps = new RotID  [ _pow24[ size - 1 ] * _crot::AllRotIDs ];
+  m_complexity   = new DistID [ _pow24[ size - 1 ] ] {};
 }
 
 template< size_t N >
@@ -130,14 +130,8 @@ void CacheIDmap<N>::connect( const CacheID start, const Axis axis, const Layer l
     m_dist[ result ] = m_dist[ start ] + 1;
   }
 
-  const bool closer = m_dist[ result ] == m_dist[ start ] + 1;
-    m_map[ start  * _crot::AllRotIDs + _crot::GetRotID( axis, layer,   turn ) ] = result;
-    m_map[ result * _crot::AllRotIDs + _crot::GetRotID( axis, layer, 4-turn ) ] = start;
- 
-  if ( closer )
-  {
-    m_cachedStep[ result * _crot::AllRotIDs + m_complexity[ result ] ++ ] = _crot::GetRotID( axis, layer, 4-turn );
-  }
+  m_map[ result * _crot::AllRotIDs + _crot::GetRotID( axis, layer, 4-turn ) ] = start;
+  m_orderedSteps[ result * _crot::AllRotIDs + m_complexity[ result ] ++ ] = _crot::GetRotID( axis, layer, 4-turn );  
 }
 
 template< size_t N >
@@ -145,11 +139,11 @@ void CacheIDmap<N>::clean()
 {
   delete[] m_map;
   delete[] m_dist;
-  delete[] m_cachedStep;
+  delete[] m_orderedSteps;
 
   m_map  = nullptr;
   m_dist = nullptr;
-  m_cachedStep = nullptr;
+  m_orderedSteps = nullptr;
 }
 
 template< size_t N >

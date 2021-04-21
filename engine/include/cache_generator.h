@@ -43,8 +43,8 @@ class CacheIDmapper
   using _crot = CRotations< 2 * N - 3 >;
 
 protected:
-  size_t   m_size;     // number of cubies in the subspace
-  PosID  * m_position; // positions of the cubies
+  size_t m_size; // number of cubies in the subspace
+  const PosID * m_position; // initial positions of the cubies
 
 private:
   Qeueu  * m_qeueu;
@@ -63,7 +63,7 @@ public:
   CacheIDmapper();
   ~CacheIDmapper();
 
-  void reset( SubSpace & P );
+  void initialPosition( const PosID * pos, const size_t size );
 
   bool acceptID ( CacheID cacheID )   { return *m_qeueu << cacheID;         }
   bool accept   ( const CubeID * P )  { return *m_qeueu << getCacheID( P ); }
@@ -88,19 +88,16 @@ template< size_t N > CacheIDmapper<N>::CacheIDmapper()
 }
 
 template< size_t N >
-void CacheIDmapper<N>::reset(SubSpace& P)
+void CacheIDmapper<N>::initialPosition( const PosID * pos, const size_t size )
 {
   clean();
 
-  m_size     = P.size();
-  m_parent   = new CubeID [ P.size() ];
-  m_child    = new CubeID [ P.size() ];
-  m_position = new PosID  [ P.size() ];
-
-  m_qeueu    = new Qeueu ( P.size() - 1 );
-
-  std::copy( P.begin(), P.end(), m_position );
-
+  m_size    = size;
+  m_parent  = new CubeID [ size ];
+  m_child   = new CubeID [ size ];
+  m_qeueu    = new Qeueu ( size - 1 );
+  
+  m_position = pos;
   acceptID( 0 ) ;
 }
 
@@ -192,8 +189,6 @@ template< size_t N >
 CacheIDmapper<N>::~CacheIDmapper()
 {
   clean();
-  delete[] m_position;
-  m_position = nullptr;
 }
 
 #endif // ! CACHE_GENERATOR__H

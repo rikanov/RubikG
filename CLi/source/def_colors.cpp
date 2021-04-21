@@ -13,6 +13,7 @@ namespace Color
   Modifier green  ( GREEN      );
   Modifier cyan   ( LIGHT_CYAN );
   Modifier gray   ( LIGHT_GRAY );
+  Modifier dark   ( DARK_GRAY  );
   Modifier light  ( LIGHT_MAGENTA );
   Modifier yellow ( LIGHT_YELLOW  );
   Modifier white  ( WHITE         );

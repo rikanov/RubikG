@@ -101,6 +101,7 @@ namespace Color
   extern Modifier green;
   extern Modifier cyan;
   extern Modifier gray;
+  extern Modifier dark;
   extern Modifier light;
   extern Modifier yellow;
   extern Modifier white;

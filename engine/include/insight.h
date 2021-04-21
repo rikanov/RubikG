@@ -13,15 +13,12 @@ class Insight
   CubeID        m_prior;
 
   const size_t  m_size;
-  const CubeID  m_base;
-  const PosID   * m_pos;
-  const CacheID * m_baseRotation;
-  const CacheID * m_invBaseRotation;
+  const PosID * m_pos;
+
   const CacheIDmap<N> * m_map;
 
 public:
-  Insight( SubSpace P );
-  Insight( const Insight<N> &, const CubeID );
+  Insight( SubSpace P, const CubeID cid = 0 );
   ~Insight();
 
   void set( const Rubik<N> & );
@@ -47,62 +44,24 @@ public:
 };
 
 template< size_t N >
-Insight<N>::Insight( SubSpace P )
+Insight<N>::Insight( SubSpace P, const CubeID cid )
   : m_size  ( P.size() )
-  , m_base  ( 0 )
-  , m_baseRotation   ( nullptr )
-  , m_invBaseRotation( nullptr )
 {
   CacheIDmapper<N> mapBuilder;
   CacheIDmap<N>    * map = new CacheIDmap<N>();
-  PosID            * pos = new PosID [ P.size() ];
 
-  mapBuilder.reset( P );
+  PosID * pos = new PosID [ P.size() ];
+  size_t i = 0;
+  for( auto p: P )
+  {
+    pos[ i++ ] = CPositions<N>::GetPosID( p, cid );
+  }
+  mapBuilder.initialPosition( pos, P.size() );
   mapBuilder.createMap( *map );
-  
-  std::copy( P.begin(), P.end(), pos );
-  
   m_map = map;
   m_pos = pos;
 }
 
-template< size_t N >
-Insight<N>::Insight( const Insight<N> & orig, const CubeID base )
-  : m_size ( orig.m_size )
-  , m_base ( base )
-  , m_map  ( orig.m_map )
-{
-  PosID  * pos = new PosID [ m_size ];
-
-  for ( size_t i = 0; i < m_size; ++i )
-  {
-    pos[i] = CPositions<N>::GetPosID( orig.m_pos[i], base );
-  }
-  
-  m_pos = pos;
-
-  CubeID transBase[24];
-  all_cubeid( id )
-  {
-    transBase[id] = Simplex::Conjugation( m_base, id );
-  }
-
-  CacheID * baseRotation = new CacheID [ _pow24[ m_size - 1 ] ];
-  CacheID * invRotation  = new CacheID [ _pow24[ m_size - 1 ] ];
-  for( size_t state = 0; state < _pow24[ m_size - 1 ]; ++ state )
-  {
-    CacheID stateID  = orig.m_baseRotation ? orig.m_baseRotation[ state ] : state;
-    CacheID resultID = 0;
-    for( size_t radix = 1; stateID > 0; radix *= 24, stateID /= 24 )
-    {
-      resultID += transBase[ stateID % 24 ] * radix;
-    }
-    baseRotation [ state ]    = resultID;
-    invRotation  [ resultID ] = state;
-  }
-  m_baseRotation    = baseRotation;
-  m_invBaseRotation = invRotation;
-}
 template< size_t N >
 void Insight<N>::print() const
  {
@@ -113,7 +72,95 @@ void Insight<N>::print() const
      clog( CPositions<N>::GetCoord( m_pos[i] ).toString() ,"-->", CPositions<N>::GetCoord( CPositions<N>::GetPosID( m_pos[i], pos[i] ) ).toString() );
    }
    clog( "Order: ", distance(), "Prior: ", Simplex::GetCube( m_prior ).toString() );
-   delete[] pos;
+
+   static constexpr Orient _side[ 3 ][ 4 ] = { 
+          { _NF,  _U, _NF, _NF },
+          {  _L,  _F,  _R,  _B },
+          { _NF,  _D, _NF, _NF }
+   };
+
+   //auto facet = []( const Orient o )  {  };
+   for( size_t raw = 0; raw < 3 * N; ++ raw )
+   {
+     if ( raw % N == 0 )
+       NL();
+
+     for( size_t col = 0; col < 4 * N; ++ col )
+     {
+       if ( col % N == 0 )
+         clog_ ( ' ' );
+
+       const Orient side = _side[ raw / N ][ col / N ];
+       bool grayFacet = true;
+       for ( size_t pid = 0; pid < m_size; ++ pid )
+       {
+          Layer xCoord;
+          Layer yCoord;
+
+          switch( side )
+          {
+          case _U:
+            if ( CPositions<N>::GetLayer( m_pos[pid], pos[pid], _Y ) < N - 1 )
+              continue;
+            xCoord = CPositions<N>::GetLayer( m_pos[pid], pos[pid], _X );
+            yCoord = CPositions<N>::GetLayer( m_pos[pid], pos[pid], _Z );
+            break;
+
+          case _L:
+            if ( CPositions<N>::GetLayer( m_pos[pid], pos[pid], _X ) > 0 )
+              continue;
+            xCoord =         CPositions<N>::GetLayer( m_pos[pid], pos[pid], _Z );
+            yCoord = N - 1 - CPositions<N>::GetLayer( m_pos[pid], pos[pid], _Y );
+            break;
+            
+          case _F:
+            if ( CPositions<N>::GetLayer( m_pos[pid], pos[pid], _Z ) < N - 1 )
+              continue;
+            xCoord =         CPositions<N>::GetLayer( m_pos[pid], pos[pid], _X );
+            yCoord = N - 1 - CPositions<N>::GetLayer( m_pos[pid], pos[pid], _Y );
+            break;
+              
+          case _R:
+            if ( CPositions<N>::GetLayer( m_pos[pid], pos[pid], _X ) < N - 1 )
+              continue;
+            xCoord = N - 1 - CPositions<N>::GetLayer( m_pos[pid], pos[pid], _Z );
+            yCoord = N - 1 - CPositions<N>::GetLayer( m_pos[pid], pos[pid], _Y );
+            break;
+
+          case _B:
+            if ( CPositions<N>::GetLayer( m_pos[pid], pos[pid], _Z ) > 0 )
+              continue;
+            xCoord = N - 1 - CPositions<N>::GetLayer( m_pos[pid], pos[pid], _X );
+            yCoord = N - 1 - CPositions<N>::GetLayer( m_pos[pid], pos[pid], _Y );
+            break;
+          
+          case _D:
+            if ( CPositions<N>::GetLayer( m_pos[pid], pos[pid], _Y ) > 0 )
+              continue;
+            xCoord =         CPositions<N>::GetLayer( m_pos[pid], pos[pid], _X );
+            yCoord = N - 1 - CPositions<N>::GetLayer( m_pos[pid], pos[pid], _Z );
+            break;
+
+          default:
+            clog_( " " );
+            pid = m_size; xCoord = N; grayFacet = false; // outer break
+            break;
+         }
+
+         if ( xCoord == col % N && yCoord == raw % N )
+         {
+           clog_( colorOf( Simplex::GetCube( Simplex::Composition( pos[pid], m_prior ) ).whatIs( side ) ), "*", Color::off );
+           grayFacet = false;
+           break;
+         }
+       }
+       if ( grayFacet )
+       {
+         clog_( Color::dark,".", Color::off );
+       }
+     }
+     NL();
+   }
  }
 
 template< size_t N >
@@ -133,53 +180,26 @@ template< size_t N >
 int Insight<N>::rotate( Axis axis, Layer layer, Turn turn )
 {
   clog( "state:", m_stateID );
-  clog_( _crot::ToString( _crot::GetRotID( axis, layer, turn) ), '*', Simplex::GetCube(  m_base  ).toString(), "-->" );
-  RotID rotID = CExtRotations<N>::GetRotID( axis, layer, turn, Simplex::Composition( Simplex::Inverse( m_base ), Simplex::Inverse( m_prior ) ) );
- // 
+  clog_( _crot::ToString( CExtRotations<N>::GetRotID( axis, layer, turn ) ), "-->" );
+  const RotID rotID = CExtRotations<N>::GetRotID( axis, layer, turn, Simplex::Inverse( m_prior ) );
+  clog( _crot::ToString( rotID ) );
   if ( ( layer  < N && layer         == CPositions<N>::GetLayer( m_pos[0], m_prior, axis ) ) ||
        ( layer >= N && layer - N + 1 >= CPositions<N>::GetLayer( m_pos[0], m_prior, axis ) ) ) 
   {
     clog_( Simplex::GetCube( m_prior).toString(), "-->" );
     m_prior = Simplex::Tilt( m_prior, axis, turn ); clog( Simplex::GetCube( m_prior).toString() );
   }
-  //rotID       = CExtRotations<N>::GetRotID( rotID, Simplex::Inverse( m_prior ) ) ;
-  clog_( _crot::ToString( rotID ), ',' ) ;
-  clog( (int) ( rotID ) );
-  
-  if( m_baseRotation )
-  { 
-    clog( "Before base rotation:\n\n", m_stateID, "-->", m_baseRotation[ m_stateID ]);
-    print();
-    m_stateID = m_baseRotation[ m_stateID ];
-    clog( "After base rotation");
-    print();
-  }
-    m_stateID = m_map -> getState( m_stateID, rotID ) ;
+    
+  m_stateID = m_map -> getState( m_stateID, rotID ) ;
+  print();
 
-  if( m_invBaseRotation )
-  {
-    clog( "Before inverse rotation:\n\n", m_stateID, "-->", m_invBaseRotation[ m_stateID ] );
-    print();
-    m_stateID = m_invBaseRotation[ m_stateID ];
-    clog( "After inverse rotation");
-  }
-    print();
   return distance();
 }
 
 template< size_t N >
 Insight<N>::~Insight()
 {
+  delete   m_map;
   delete[] m_pos;
-  if ( m_baseRotation == nullptr )
-  {
-    delete m_map;
-    m_map = nullptr;
-  }
-  else
-  {
-    delete[] m_baseRotation;
-    delete[] m_invBaseRotation;
-  }
 }
 #endif //  ! INSIGHT__H

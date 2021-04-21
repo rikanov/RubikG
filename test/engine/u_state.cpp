@@ -19,28 +19,16 @@ bool UnitTests::unit_CState() const
                 };
 ; 
   Insight<4> baseInsight( toSolve );
-  Insight<4> transInsight( baseInsight, Simplex::Tilt( _X, 1 ) );
+  Insight<4> transInsight( toSolve, Simplex::Tilt( _X, 1 ) );
 
   Rubik<4> test4;
   baseInsight.set( test4 );
   transInsight.set( test4 );
-/*
-for( int i = 0; i < 20; ++i)
-{
-  RotID stack[20];
-  for( int t = 0; t < 20; ++t)
-  {
-    stack[t] = CRotations<5>::Random();
-    baseInsight.rotate( stack[t] );
-  }
-  for( int t = 0; t < 20; ++t)
-  {
-    baseInsight.rotate( CExtRotations<4>::Inverse( stack[ 19 -t ] ) );
-  }
-}*/
+
   clog( "\nbase test:\n----------\n");
   
-  
+  baseInsight.print();
+
   clog( baseInsight.rotate( _Z, 0, 2 ) );
   
   clog( baseInsight.rotate( _Z, 1, 2 ) );
@@ -80,6 +68,7 @@ for( int i = 0; i < 20; ++i)
 
   clog( "\ntransformed test:\n-----------------\n" );
 
+  transInsight.print();
   
   clog( transInsight.rotate( _Y, 1, 2 ) );
   
